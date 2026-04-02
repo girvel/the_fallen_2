@@ -1,0 +1,54 @@
+--- @meta
+
+--- @alias entity entity_strict|table
+
+--- Any in-game entity except items. All fields and methods are optional.
+--- @class entity_strict: _creature_methods, _animated_methods, _interactive_methods
+--- @field name string in-game name
+--- @field codename string in-code name
+--- @field position vector position in grid cells; can be float if .grid_layer is nil
+--- @field direction vector
+--- @field speed number
+--- @field rotation number purely visual sprite rotation in radians
+--- @field size vector
+--- @field layer layer name of the global display layer; nil if entity is in a grid: mutually exclusive with .grid_layer
+--- @field grid_layer grid_layer name of the grid layer; grid layers are a subset of all layers; mutually exclusive with .layer.
+--- @field ai ai
+--- @field shader shader individial shader to render with
+--- @field sprite sprite [CONST]
+--- @field animation animation
+--- @field faction string determines hostility through State.hostility
+--- @field sounds table<sound_event, sound_multiple> [CONST]
+--- @field cues table<cue_slot, fun(): item> [CONST] Cue overrides (see item.set_cue)
+---
+--- @field base_abilities abilities ability scores before perks/level-ups
+--- @field level integer character level
+--- @field xp integer experience points (from .level to .level + 1)
+--- @field resources table<string, integer> resources to spend on actions
+--- @field inventory table<inventory_slot, item?>
+--- @field hp integer current health points
+--- @field max_hp integer max health points, overrides base :get_max_hp value
+--- @field armor integer static armor class; less priority than :get_armor
+--- @field perks table[] all class, feat, race perks that modify default creature behavior
+--- @field conditions table[] like .perks, but temporary
+---
+--- @field was_interacted_by entity?
+--- @field on_interact fun(entity, entity)?
+---
+--- @field on_add fun(entity)
+--- @field on_remove fun(entity)
+--- @field on_death fun(entity)
+--- @field on_half_hp fun(self: entity) called when HP becomes less than 1/2
+---
+--- @field player_flag true? marks player character for level loading
+--- @field transparent_flag true? marks entities that block path, but not vision
+--- @field perspective_flag true? marks entities that could be seen only from below
+--- @field low_flag true? entity is low: disable reflections, shove may go over
+--- @field boring_flag true? disable log messages about the entity because it's dull
+--- @field no_sound_flag true? disable movement sounds
+--- @field essential_flag true? can't die, gets incapacitated in combat
+--- @field moving_flag true? not stationary, can move
+--- @field immovable_flag true? can not be moved by allies' action.move
+--- @field non_positional_ai_flag true? AI would still be enabled even if the player is far away
+--- @field body_flag true? is true for entities representing resurrectable bodies
+--- @field blind_sight_flag true? doesn't need FOV for searching targets

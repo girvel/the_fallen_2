@@ -1,0 +1,189 @@
+#!/usr/bin/env luajit
+
+local log = require("engine.lib.log")
+local argparse = require("engine.lib.argparse")
+
+local read_run = function(command, ...)
+  local f = assert(io.popen("zsh -c '" .. command:format(...) .. "'"))
+  local result = f:read("*a")
+  f:close()
+  if result:sub(-1, -1) == "\n" then
+    result = result:sub(1, -2)
+  end
+  return result
+end
+
+local run = function(command, ...)
+  command = command:format(...)
+  log.debug(command)
+  local exit_code = os.execute(command)
+  if exit_code ~= 0 then
+    log.fatal("Command exited with code %s", exit_code)
+    os.exit(1)
+  end
+end
+
+local parse_cli = function()
+  local parser = argparse()
+    :description("Fallen engine's build tool")
+    :command_target("command")
+
+  parser:command("stat")
+    :description("Display project line count")
+
+  local exe = parser:command("exe")
+    :description("Build a binary executable to distribute")
+
+  exe:option(
+    "-I --include",
+    "Path to a folder, containing love.exe, love dlls and rcedit-x64.exe"
+  )
+
+  exe:option(
+    "-v --verbose",
+    "Display more output"
+  )
+
+  parser:command("issues")
+    :description("List issues")
+
+  return parser:parse()
+end
+
+local VENDOR_LIBS = {
+  "argparse",
+  "fun",
+  "inspect",
+  "tiny",
+  "memoize",
+  "json",
+  "profile",
+}
+
+local cli = {}
+
+cli.stat = function(args)
+  do
+    local excessive_total = read_run("cat **/*.lua | wc -l")
+    local vendor = read_run(
+      ("cat engine/lib/{%s}.lua | wc -l"):format(table.concat(VENDOR_LIBS, ","))
+    )
+    local total = excessive_total - vendor
+
+    local engine = read_run("cat engine/**/*.lua | wc -l") - vendor
+    local scripts = read_run("cat level/scenes/**/*.lua | wc -l")
+    local palette = read_run("cat level/palette/**/*.lua | wc -l")
+    local other = total - engine - scripts - palette
+
+    print("# Code")
+    print("Engine:  " .. engine)
+    print("Scripts: " .. scripts)
+    print("Palette: " .. palette)
+    print("Other:   " .. other)
+    print()
+    print("Total:   " .. total)
+  end
+
+  do
+    local dot_commits = read_run("git log --oneline --graph | wc -l")
+    local engine_commits = read_run("cd engine; git log --oneline --graph | wc -l")
+    local tags = read_run("git tag -l | wc -l")
+
+    print()
+    print("# Git")
+    print("Commits: " .. dot_commits + engine_commits)
+    print("DOT:     " .. dot_commits)
+    print("Engine:  " .. engine_commits)
+    print("Tags:    " .. tags)
+  end
+
+  do
+    local words = tonumber(read_run("cat **/*.ms | wc -w"))
+    print()
+    print("# Screenplay")
+    print("Words:", words)
+  end
+end
+
+cli.exe = function(args)
+  log.info("Starting the build")
+
+  local include
+  if args.include then
+    include = args.include
+  else
+    include = read_run("dirname $(which love.exe)")
+
+    do
+      local f = io.open(include)
+      if not f then
+        log.fatal("No --love-path provided, unable to find love.exe in PATH")
+        os.exit(1)
+      end
+      f:close()
+    end
+
+    log.info("Found love.exe at %s", include)
+  end
+
+  local name do
+    love = {}
+    local ok, msg = pcall(require, "conf")
+    if ok then
+      local config = {window = {}}
+      love.conf(config)
+      name = config.identity
+      log.info("Indentified the project as %s", name)
+    else
+      name = "game"
+      log.error(msg)
+    end
+    love = nil  --- @diagnostic disable-line
+  end
+
+  local version_suffix = read_run("git tag --points-at")
+  if #version_suffix > 0 then
+    log.info("Detected git tag", version_suffix)
+    version_suffix = "_" .. version_suffix
+  end
+  local versioned_name = name .. version_suffix
+
+  -- prep folder
+  run("mkdir -p .build")
+  run("rm -rf .build/*")
+  run("echo '*' > .build/.gitignore")
+
+  -- build .love
+  run("zip -9 -r%s .build/%s.love assets engine levels conf.lua main.lua",
+    args.verbose and "" or " -q", versioned_name)
+
+  -- pack linux
+  run("mkdir -p .build/%s_linux", versioned_name)
+  run("cp .build/%s.love .build/%s_linux", versioned_name, versioned_name)
+  run("cp engine/lib/*.so .build/%s_linux", versioned_name)
+  run("cd .build; zip -9 -r %s_linux.zip %s_linux", versioned_name, versioned_name)
+
+  -- pack win64
+  run("cat '%s/love.exe' .build/%s.love > .build/%s.exe", include, versioned_name, name)
+  run("convert engine/assets/sprites/icon.png +clone -sample 256x256 +clone -sample 48x48 +clone -sample 32x32 -colorspace sRGB .build/dot.ico")
+  run("wine '%s/rcedit-x64.exe' .build/%s.exe --set-icon .build/dot.ico", include, name)
+  run("mkdir -p .build/%s_win64", versioned_name)
+  run("mv .build/%s.exe .build/%s_win64/%s.exe", name, versioned_name, name)
+  run("cp '%s'/*.dll .build/%s_win64/", include, versioned_name)
+  run("cp engine/lib/*.dll .build/%s_win64/", versioned_name)
+  run("cd .build; zip -9 -r %s_win64.zip %s_win64", versioned_name, versioned_name)
+
+  -- cleanup
+  run("rm .build/%s.love", versioned_name)
+
+  log.info("Build finished.")
+end
+
+cli.issues = function(args)
+  for _, source in ipairs {".", "engine", "engine/lib/moonspeak", "engine/lib/ldump"} do
+    run("cd %s; gh issue list --state all --json number,title,body,comments -L 999 | jq 'map({number, title, body, comments: (.comments | map(.body))})' | cat", source)
+  end
+end
+
+local args = parse_cli()
+cli[args.command](args)

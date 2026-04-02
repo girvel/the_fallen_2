@@ -1,0 +1,6 @@
+[submodule "vendor/ldump"]
+	path = lib/ldump
+	url = https://github.com/girvel/ldump
+[submodule "lib/moonspeak"]
+	path = lib/moonspeak
+	url = https://github.com/girvel/moonspeak

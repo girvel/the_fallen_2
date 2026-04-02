@@ -1,0 +1,6 @@
+[submodule "engine/lib/ldump"]
+	path = engine/lib/ldump
+	url = https://github.com/girvel/ldump
+[submodule "engine/lib/moonspeak"]
+	path = engine/lib/moonspeak
+	url = https://github.com/girvel/moonspeak
