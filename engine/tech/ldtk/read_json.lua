@@ -23,6 +23,11 @@ local read_json = function(path)
       Log.info("%.2f s | Read & parsed JSON %q", love.timer.getTime() - start_t, path)
       return result
     end
+    local err = json_thread:getError()
+    if err then
+      error(err)
+    end
+    love.timer.sleep(.01)
   end
 end
 
