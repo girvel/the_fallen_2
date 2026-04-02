@@ -14,7 +14,7 @@ local ldtk = {}
 --- Level's init.lua return
 --- @class level_definition
 --- @field ldtk_path string
---- @field palette palette
+--- @field palette palette entity factories by layer and then name
 --- @field rails rails
 
 --- General information about the level
@@ -34,7 +34,15 @@ local ldtk = {}
 --- @param path string
 --- @return load_result
 ldtk.load = function(path)
-  local definition = love.filesystem.load(path .. "/init.lua")() --[[@as level_definition]]
+  local init_path = path .. "/init.lua"
+  if not love.filesystem.getInfo(init_path) then
+    error(string.format(
+      "There is no level definition at %q. The file should return a table of type level_definition.",
+      init_path
+    ))
+  end
+
+  local definition = love.filesystem.load(init_path)() --[[@as level_definition]]
   local json = read_json(definition.ldtk_path)
   coroutine.yield("json", 1)
   local preload_data = preload(json)
