@@ -4,7 +4,8 @@
 local read_json = function(path)
   local start_t = love.timer.getTime()
 
-  local content = love.filesystem.read(path)
+  local content, err = love.filesystem.read(path)  --[[@as string?, string]]
+  if not content then error(err) end
   coroutine.yield("json", 0)
 
   local json_thread = love.thread.newThread [[
@@ -23,7 +24,7 @@ local read_json = function(path)
       Log.info("%.2f s | Read & parsed JSON %q", love.timer.getTime() - start_t, path)
       return result
     end
-    local err = json_thread:getError()
+    err = json_thread:getError()
     if err then
       error(err)
     end
