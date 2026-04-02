@@ -22,21 +22,20 @@ local load_pack
 
 --- @alias atlas_n integer|"directional"|"no_atlas"
 
+--- @param entity table
 --- @param path string
 --- @param atlas_n? atlas_n if nil or "directional", interprets animation atlas as directional; if "no_atlas", uses the frame as a whole; else, uses nth cell from each frame
 --- @param color? vector
---- @return table
-animated.mixin = function(path, atlas_n, color)
+animated.mix_in = function(entity, path, atlas_n, color)
   local pack = load_pack(path, atlas_n or "directional", color)
-  return Table.extend({
-    animation = {
-      pack = pack,
-      paused = false,
-      next = "idle",
-      _end_promise = nil,
-    },
-    sprite = select(2, next(pack))[1],
-  }, methods)
+  entity.animation = {
+    pack = pack,
+    paused = false,
+    next = "idle",
+    _end_promise = nil,
+  }
+  entity.sprite = select(2, next(pack))[1]
+  Table.extend(entity, methods)
 end
 
 --- @param entity entity
@@ -60,7 +59,8 @@ end
 --- @param layer? layer
 --- @return entity
 animated.fx = function(path, position, layer)
-  local result = animated.mixin(path, "no_atlas")
+  local result = {}
+  animated.mix_in(result, path, "no_atlas")
 
   local _, _, head = path:find("/?([^/]+)$")
   result.codename = head and (head .. "_fx") or "unnamed_fx"
@@ -279,5 +279,7 @@ load_pack = function(path, atlas_n, color)
   return pack
 end
 
-Ldump.mark(animated, {}, ...)
+Ldump.mark(animated, {
+  mix_in = {methods = "const"},
+}, ...)
 return animated

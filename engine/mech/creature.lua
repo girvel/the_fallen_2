@@ -8,37 +8,25 @@ local creature = {}
 --- @class _creature_methods
 local methods = {}
 
---- @return entity
-creature.mixin = function()
-  local result = Table.extend({
-    resources = {},
-    inventory = {},
-    perks = {},
-    conditions = {},
-    sounds = {
-      hit = sound.multiple("engine/assets/sounds/hit/body", .3),
-    },
-    transparent_flag = true,
-    moving_flag = true,
-    xp = 0,
-  }, methods)
-
-  return result
-end
-
---- @param entity entity
-creature.init = function(entity)
+--- @param entity table
+creature.mix_in = function(entity)
   Table.assert_fields(entity, {"base_abilities", "level"})
+
+  entity.resources = {}
+  entity.inventory = {}
+  entity.perks = {}
+  entity.conditions = {}
+  entity.sounds = {
+    hit = sound.multiple("engine/assets/sounds/hit/body", .3),
+  }
+  entity.transparent_flag = true
+  entity.moving_flag = true
+  entity.xp = 0
+
+  Table.extend(entity, methods)
+
   entity:rest("full")
   entity:rotate(entity.direction or Vector.right)
-end
-
---- @param ... table
---- @return entity
-creature.make = function(...)
-  local result = Table.extend(creature.mixin(), ...)
-  creature.init(result)
-  return result
 end
 
 --- @alias creature_modification
@@ -311,6 +299,6 @@ methods.is_free = function(self)
 end
 
 Ldump.mark(creature, {
-  mixin = {methods = "const"},
+  mix_in = {methods = "const"},
 }, ...)
 return creature

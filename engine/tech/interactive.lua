@@ -30,11 +30,11 @@ interactive.get_at = function(position)
   end
 end
 
+--- @parama entity table
 --- @param callback? fun(entity, entity)
-interactive.mixin = function(callback)
-  return Table.extend({
-    on_interact = callback,
-  }, methods)
+interactive.mix_in = function(entity, callback)
+  entity.on_interact = callback
+  Table.extend(entity, methods)
 end
 
 --- @param self entity
@@ -60,6 +60,6 @@ methods.interact = function(self, other)
 end
 
 Ldump.mark(interactive, {
-  mixin = {methods = "const"},
+  mix_in = {methods = "const"},
 }, ...)
 return interactive

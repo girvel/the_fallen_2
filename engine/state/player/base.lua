@@ -31,30 +31,28 @@ local base = {}
 --- @field type "options"
 --- @field options table<integer, string>
 
-base.mixin = function()
-  local result = Table.extend(creature.mixin(), {
-    codename = "player",
-    player_flag = true,
-    fov_r = 16,
-    curtain_color = Vector.transparent,
-    bag = {money = 0},
+--- @param entity table
+base.mix_in = function(entity)
+  creature.mix_in(entity)
+  entity.codename = "player"
+  entity.player_flag = true
+  entity.fov_r = 16
+  entity.curtain_color = Vector.transparent
+  entity.bag = {money = 0}
 
-    ai = ai.new(),
-    immovable_flag = true,
+  entity.ai = ai.new()
+  entity.immovable_flag = true
 
-    is_memory_enabled = true,
-    is_blind = false,
-    is_deaf = false,
-    on_add = function(self)
-      self.memory = love.graphics.newCanvas(unpack(
-        State.level.grid_size * Constants.cell_size * State.camera.SCALE
-      ))
-    end,
+  entity.is_memory_enabled = true
+  entity.is_blind = false
+  entity.is_deaf = false
+  entity.on_add = function(self)
+    self.memory = love.graphics.newCanvas(unpack(
+      State.level.grid_size * Constants.cell_size * State.camera.SCALE
+    ))
+  end
 
-    creator_model = nil,
-  })
-
-  return result
+  entity.creator_model = nil
 end
 
 --- @type action

@@ -38,13 +38,13 @@ humanoid.add_body = function(self)
   return e
 end
 
-humanoid.mixin = function()
-  local result = animated.mixin("engine/assets/sprites/animations/humanoid")
-  result.transparent_flag = true
-  result.cues = humanoid.cues
-  result.on_half_hp = humanoid.add_blood_mark
-  result.on_death = humanoid.add_body
-  return result
+--- @param entity table
+humanoid.mix_in = function(entity)
+  animated.mix_in(entity, "engine/assets/sprites/animations/humanoid")
+  entity.transparent_flag = true
+  entity.cues = humanoid.cues
+  entity.on_half_hp = humanoid.add_blood_mark
+  entity.on_death = humanoid.add_body
 end
 
 Ldump.mark(humanoid, {}, ...)

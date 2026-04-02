@@ -24,33 +24,29 @@ item.DROPPING_SLOTS = {"hand", "offhand", "head", "body"}
 --- @alias inventory_slot "hand"|"offhand"|"head"|"right_pocket"|"hair"|"skin"|"body"|"bag"|cue_slot
 --- @alias item_slot "hands"|inventory_slot
 
-item.mixin = function(animation_path)
-  return Table.extend(
-    animated.mixin(animation_path),
-    interactive.mixin(function(self, other)
-      if not item.give(other, self) then return end
-      level.remove(self)
-      self.position = nil
-      State:add(self)
-    end),
-    {
-      inventory = {
-        highlight = item.cues.highlight(),
-      },
-      tags = {},
-      direction = Vector.right,  -- needed to initially animate into idle_right instead of idle
-    }
-  )
+--- @param entity table
+--- @param animation_path string
+item.mix_in = function(entity, animation_path)
+  animated.mix_in(entity, animation_path)
+  interactive.mix_in(entity, function(self, other)
+    if not item.give(other, self) then return end
+    level.remove(self)
+    self.position = nil
+    State:add(self)
+  end)
+  entity.inventory = {
+    highlight = item.cues.highlight(),
+  }
+  entity.tags = {}
+  entity.direction = Vector.right  -- needed to initially animate into idle_right instead of idle
 end
 
+--- @param entity table
 --- @param slot string
---- @return item
-item.mixin_min = function(slot)
-  return {
-    tags = {},
-    direction = Vector.right,
-    slot = slot,
-  }
+item.mix_min = function(entity, slot)
+  entity.tags = {}
+  entity.direction = Vector.right
+  entity.slot = slot
 end
 
 --- @param damage_roll d
@@ -208,16 +204,15 @@ item.existing_cues = {
 
 item.cues = {
   highlight = function()
-    return Table.extend(
-      animated.mixin("engine/assets/sprites/animations/highlight", 1),
-      {
-        name = "Хайлайт",
-        codename = "highlight",
-        slot = "highlight",
-        animated_independently_flag = true,
-        boring_flag = true,
-      }
-    )
+    local result = {
+      name = "Хайлайт",
+      codename = "highlight",
+      slot = "highlight",
+      animated_independently_flag = true,
+      boring_flag = true,
+    }
+    animated.mix_in(result, "engine/assets/sprites/animations/highlight", 1)
+    return result
   end,
 }
 

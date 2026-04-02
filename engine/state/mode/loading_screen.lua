@@ -30,7 +30,11 @@ local STAGES = {
   rails_init = {start = .95, finish = 1},
 }
 
-local bar_animation = animated.mixin("engine/assets/sprites/gui/loading_bar", "no_atlas").animation.pack.second
+local bar_animation do
+  local result = {}
+  animated.mix_in(result, "engine/assets/sprites/gui/loading_bar", "no_atlas")
+  bar_animation = result.animation.pack.second
+end
 
 methods.draw_gui = function(self)
   local frame do
