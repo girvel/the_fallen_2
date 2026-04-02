@@ -60,8 +60,8 @@ methods._act = function(self, entity)
   api.rotate(entity, self.target)
   entity:animate("gesture")
   health.heal(self.target, (D(4) * self.level + entity:get_modifier("wis")):roll())
-  animated.add_fx("engine/assets/sprites/animations/healing_word_target", self.target.position)
-  animated.add_fx("engine/assets/sprites/animations/healing_word_spell", entity.position)
+  animated.add_fx("engine/assets/animations/healing_word_target", self.target.position)
+  animated.add_fx("engine/assets/animations/healing_word_spell", entity.position)
   return true
 end
 

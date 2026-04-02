@@ -114,7 +114,7 @@ draw_top_bars = function()
     if ui.mouse().is_mouse_over then
       hint = "броня"
     end
-    ui.image("engine/assets/sprites/gui/shield.png")
+    ui.image("engine/assets/gui/shield.png")
   ui.finish_frame()
 
   ui.start_frame(HP_BAR_W + 8, -4, 64, 64)
@@ -155,7 +155,7 @@ draw_action_grid = function(self)
   cost = nil
 
   ui.start_frame(-16, -4)
-    ui.image("engine/assets/sprites/gui/action_grid_bg.png")
+    ui.image("engine/assets/gui/action_grid_bg.png")
   ui.finish_frame()
 
   ui.start_frame(4)
@@ -717,7 +717,7 @@ use_mouse = function(self)
       end
 
       if path and (rmb and not solid or lmb and interaction_target) then
-        animated.add_fx("engine/assets/sprites/animations/underfoot_circle", position)
+        animated.add_fx("engine/assets/animations/underfoot_circle", position)
         set_mouse_task(function()
           local ok = api.follow_path(State.player, path, false, 8)
           api.rotate(State.player, position)
@@ -760,7 +760,7 @@ use_mouse = function(self)
             :any(function(a) return a:enough_resources(State.player) end)
           then
             set_mouse_task(function()
-              animated.add_fx("engine/assets/sprites/animations/underfoot_circle", position)
+              animated.add_fx("engine/assets/animations/underfoot_circle", position)
               local ok = not path or api.follow_path(State.player, path, false, 8)
               api.rotate(State.player, position)
               if ok then
@@ -815,7 +815,7 @@ render_path = function(path, max_length)
     end
 
     ui.start_frame(math.min(px, sx), math.min(py, sy))
-      ui.image(("engine/assets/sprites/gui/path_%s.png"):format(postfix))
+      ui.image(("engine/assets/gui/path_%s.png"):format(postfix))
     ui.finish_frame()
 
     px = sx

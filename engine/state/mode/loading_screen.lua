@@ -32,7 +32,7 @@ local STAGES = {
 
 local bar_animation do
   local result = {}
-  animated.mix_in(result, "engine/assets/sprites/gui/loading_bar", "no_atlas")
+  animated.mix_in(result, "engine/assets/gui/loading_bar", "no_atlas")
   bar_animation = result.animation.pack.second
 end
 
@@ -52,7 +52,7 @@ methods.draw_gui = function(self)
 
   ui.start_alignment("center")
     ui.start_frame(nil, bar_y - 8)
-      ui.image("engine/assets/sprites/gui/loading_bar_bg.png")
+      ui.image("engine/assets/gui/loading_bar_bg.png")
     ui.finish_frame()
     ui.start_frame(nil, bar_y)
       ui.image(bar_animation[frame].image)

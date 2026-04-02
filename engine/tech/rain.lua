@@ -55,7 +55,7 @@ end
 
 local BUFFER_K = 2
 local DIRECTION = V(1, 1):normalized_mut()
-local IMAGE = love.graphics.newImage("assets/sprites/standalone/rain_particle.png")
+local IMAGE = love.graphics.newImage("assets/sprites/rain_particle.png")
 
 --- @param self sprite_rendered
 --- @param entity rain
@@ -144,7 +144,7 @@ rain.render = function(self, entity, dt)
         Table.remove_breaking_at(state._particles, i)
         state._touched_ground = true
         if p.is_visible then
-          animated.add_fx("assets/sprites/animations/rain_impact", p.position / Constants.cell_size, "weather")
+          animated.add_fx("assets/animations/rain_impact", p.position / Constants.cell_size, "weather")
         end
       end
     end

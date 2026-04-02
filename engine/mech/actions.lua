@@ -122,7 +122,7 @@ actions.dash = Table.extend({
   end,
 
   _act = function(self, entity)
-    State:add(animated.fx("engine/assets/sprites/animations/dash", entity.position))
+    State:add(animated.fx("engine/assets/animations/dash", entity.position))
     self.sounds:play_at(entity.position)
     return true
   end,

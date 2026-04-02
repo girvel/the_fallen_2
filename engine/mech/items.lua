@@ -19,7 +19,7 @@ items.hair = function(type, color)
 
   return Table.extend(
     item.mixin_min("hair"),
-    animated.mixin("assets/sprites/animations/" .. type, "directional", color),
+    animated.mixin("assets/animations/" .. type, "directional", color),
     {
       anchor = "head",
     }
@@ -28,7 +28,7 @@ end
 
 --- @param type "snake_tatoo"|"cheek_scar"|"eye_scar"
 items.skin = function(type)
-  return Table.extend(item.mixin("assets/sprites/animations/" .. type), {
+  return Table.extend(item.mixin("assets/animations/" .. type), {
     codename = type,
     slot = "skin",
     anchor = "head",

@@ -186,7 +186,7 @@ return Tiny.processingSystem {
 
     current = State.combat:get_current()
     Log.info("--- %s's turn ---", Name.code(current))
-    State:add(animated.fx("engine/assets/sprites/animations/underfoot_circle", current.position))
+    State:add(animated.fx("engine/assets/animations/underfoot_circle", current.position))
   end,
 
   _finish_combat = function(self)

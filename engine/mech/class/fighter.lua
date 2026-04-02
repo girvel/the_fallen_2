@@ -36,7 +36,7 @@ fighter.action_surge = Table.extend({
   _is_available = function() return State.combat end,
 
   _act = function(self, entity)
-    State:add(animated.fx("engine/assets/sprites/animations/action_surge", entity.position))
+    State:add(animated.fx("engine/assets/animations/action_surge", entity.position))
     self.sounds:play_at(entity.position)
     return true
   end,
@@ -68,7 +68,7 @@ fighter.second_wind = Table.extend({
   _is_available = function(self, entity) return entity.hp < entity:get_max_hp() end,
 
   _act = function(self, entity)
-    State:add(animated.fx("engine/assets/sprites/animations/second_wind", entity.position))
+    State:add(animated.fx("engine/assets/animations/second_wind", entity.position))
     self.sounds:play_at(entity.position)
     health.heal(entity, self:get_roll(entity.level):roll())
     return true
@@ -117,7 +117,7 @@ fighter.fighting_spirit = Table.extend({
   _is_available = function(self, entity) return State.combat end,
 
   _act = function(self, entity)
-    State:add(animated.fx("engine/assets/sprites/animations/fighting_spirit", entity.position))
+    State:add(animated.fx("engine/assets/animations/fighting_spirit", entity.position))
     self.sounds:play_at(entity.position)
     table.insert(entity.conditions, fighting_spirit_condition())
     health.set_hp(entity, entity.hp + 5)

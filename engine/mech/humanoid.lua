@@ -8,7 +8,7 @@ local humanoid = {}
 humanoid.cues = {
   blood = function()
     return Table.extend(
-      animated.mixin("engine/assets/sprites/animations/blood"),
+      animated.mixin("engine/assets/animations/blood"),
       {
         name = "Кровь",
         codename = "blood",
@@ -20,7 +20,7 @@ humanoid.cues = {
 }
 
 local blood_mark = function()
-  local atlas = love.image.newImageData("engine/assets/sprites/standalone/blood_mark.png")
+  local atlas = love.image.newImageData("engine/assets/sprites/blood_mark.png")
   return {
     codename = "blood_mark",
     boring_flag = true,
@@ -40,7 +40,7 @@ end
 
 --- @param entity table
 humanoid.mix_in = function(entity)
-  animated.mix_in(entity, "engine/assets/sprites/animations/humanoid")
+  animated.mix_in(entity, "engine/assets/animations/humanoid")
   entity.transparent_flag = true
   entity.cues = humanoid.cues
   entity.on_half_hp = humanoid.add_blood_mark

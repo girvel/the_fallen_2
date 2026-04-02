@@ -104,7 +104,7 @@ methods.player_has_died = function(self)
   self:_set_mode(STATES.death.new())
   level.remove(State.player)
   State.player:rotate(Vector.left)
-  animated.change_pack(State.player, "engine/assets/sprites/animations/skeleton")
+  animated.change_pack(State.player, "engine/assets/animations/skeleton")
 end
 
 methods.to_start_screen = function(self)

@@ -238,7 +238,7 @@ tk.popup = function(position, text)
   local h = ui.predict_text_size(text, w)
 
   ui.start_frame(sx - w/2 - padding, sy - h - padding, w + padding, h + padding)
-    ui.tile("engine/assets/sprites/gui/black_bg.png")
+    ui.tile("engine/assets/gui/black_bg.png")
     ui.start_frame(padding, padding)
       ui.text(text)
     ui.finish_frame()

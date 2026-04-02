@@ -211,7 +211,7 @@ item.cues = {
       animated_independently_flag = true,
       boring_flag = true,
     }
-    animated.mix_in(result, "engine/assets/sprites/animations/highlight", 1)
+    animated.mix_in(result, "engine/assets/animations/highlight", 1)
     return result
   end,
 }

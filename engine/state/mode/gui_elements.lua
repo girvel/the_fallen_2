@@ -1,7 +1,7 @@
 local sprite = require("engine.tech.sprite")
 
 
-local ICON_ATLAS = love.image.newImageData("engine/assets/sprites/gui/icons.png")
+local ICON_ATLAS = love.image.newImageData("engine/assets/gui/icons.png")
 
 local nth = function(index)
   return love.graphics.newImage(sprite.utility.select(ICON_ATLAS, index))
@@ -50,14 +50,14 @@ local gui_elements = {
 
   fighting_styles = nth(49),
 
-  window_bg = "engine/assets/sprites/gui/window_bg.png",
-  bar_bg = "engine/assets/sprites/gui/bar_bg.png",
-  hp_bar = "engine/assets/sprites/gui/hp_bar.png",
-  hp_bar_min = "engine/assets/sprites/gui/hp_bar_min.png",
-  hp_bar_extra = "engine/assets/sprites/gui/hp_bar_extra.png",
-  xp_bar = "engine/assets/sprites/gui/xp_bar.png",
-  xp_bar_min = "engine/assets/sprites/gui/xp_bar_min.png",
-  sidebar_block_bg = "engine/assets/sprites/gui/sidebar_block_bg.png",
+  window_bg = "engine/assets/gui/window_bg.png",
+  bar_bg = "engine/assets/gui/bar_bg.png",
+  hp_bar = "engine/assets/gui/hp_bar.png",
+  hp_bar_min = "engine/assets/gui/hp_bar_min.png",
+  hp_bar_extra = "engine/assets/gui/hp_bar_extra.png",
+  xp_bar = "engine/assets/gui/xp_bar.png",
+  xp_bar_min = "engine/assets/gui/xp_bar_min.png",
+  sidebar_block_bg = "engine/assets/gui/sidebar_block_bg.png",
 }
 
 

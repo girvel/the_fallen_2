@@ -40,7 +40,7 @@ methods._act = function(self, entity)
 
   State:remove(self.target)
   entity:animate("gesture")
-  local fx = animated.add_fx("engine/assets/sprites/animations/skeleton_raise", position, "solids")
+  local fx = animated.add_fx("engine/assets/animations/skeleton_raise", position, "solids")
   fx.on_remove = function()
     State:add(npcs.skeleton_heavy(), {
       position = position,

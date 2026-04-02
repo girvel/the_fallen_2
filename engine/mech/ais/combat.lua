@@ -49,7 +49,7 @@ methods.init = function(self, entity)
     then
       State.hostility:set(entity.faction, attacker.faction, "enemy")
       if not State:in_combat(entity) then
-        State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
+        State:add(animated.fx("engine/assets/animations/aggression", entity.position))
         State:start_combat({entity, attacker})
       end
     end
@@ -127,7 +127,7 @@ methods.observe = function(self, entity, dt)
       if State.hostility:get(entity, e) == "ally"
         and (entity.position - e.position):abs2() <= self.targeting.support_range
       then
-        State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
+        State:add(animated.fx("engine/assets/animations/aggression", entity.position))
         State:start_combat({entity})
       end
     end
@@ -136,7 +136,7 @@ methods.observe = function(self, entity, dt)
   if not self.starts_no_fights then
     local new_target = tk.find_target(entity, self.targeting.scan_range, self._vision_map)
     if new_target and not State:in_combat(new_target) then
-      State:add(animated.fx("engine/assets/sprites/animations/aggression", entity.position))
+      State:add(animated.fx("engine/assets/animations/aggression", entity.position))
       State:start_combat({new_target, entity})
     end
   end

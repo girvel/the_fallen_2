@@ -75,15 +75,15 @@ local context
 
 --- @enum (key) ui_cursor_type
 local CURSORS = {
-  normal = love.mouse.newCursor("engine/assets/sprites/gui/cursor/normal.png"),
-  target_active = love.mouse.newCursor("engine/assets/sprites/gui/cursor/target_active.png", 8, 8),
-  target_inactive = love.mouse.newCursor("engine/assets/sprites/gui/cursor/target_inactive.png", 8, 8),
-  walk = love.mouse.newCursor("engine/assets/sprites/gui/cursor/walk.png", 8, 8),
+  normal = love.mouse.newCursor("engine/assets/gui/cursor/normal.png"),
+  target_active = love.mouse.newCursor("engine/assets/gui/cursor/target_active.png", 8, 8),
+  target_inactive = love.mouse.newCursor("engine/assets/gui/cursor/target_inactive.png", 8, 8),
+  walk = love.mouse.newCursor("engine/assets/gui/cursor/walk.png", 8, 8),
   hand = love.mouse.getSystemCursor("hand"),
 }
 
-local FRAME = "engine/assets/sprites/gui/button_frame.png"
-local ACTIVE_FRAME = "engine/assets/sprites/gui/active_button_frame.png"
+local FRAME = "engine/assets/gui/button_frame.png"
+local ACTIVE_FRAME = "engine/assets/gui/active_button_frame.png"
 
 local LINE_K = love.system.getOS() == "Windows" and 1 or 1.25
 
