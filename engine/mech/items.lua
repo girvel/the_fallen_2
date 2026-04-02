@@ -26,4 +26,13 @@ items.hair = function(type, color)
   )
 end
 
+--- @param type "snake_tatoo"|"cheek_scar"|"eye_scar"
+items.skin = function(type)
+  return Table.extend(item.mixin("assets/sprites/animations/" .. type), {
+    codename = type,
+    slot = "skin",
+    anchor = "head",
+  })
+end
+
 return items
