@@ -1,3 +1,4 @@
+local abilities = require("engine.mech.abilities")
 local ai = require("engine.state.player.ai")
 local action = require("engine.tech.action")
 local creature = require "engine.mech.creature"

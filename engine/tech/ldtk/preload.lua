@@ -218,11 +218,11 @@ end
 put_entities = function(layer, offset, captures, entities)
   local layer_name do
     layer_name = layer.__identifier
-    local PREFIX = "_entities"
-    if not layer_name:ends_with(PREFIX) then
-      Error("Expected Entities layer identfier to end with %q, got %q", PREFIX, layer_name)
+    local POSTFIX = "_e"
+    if not layer_name:ends_with(POSTFIX) then
+      Error("Expected Entities layer identfier to end with %q, got %q", POSTFIX, layer_name)
     else
-      layer_name = layer_name:sub(1, -#PREFIX - 1)
+      layer_name = layer_name:sub(1, -#POSTFIX - 1)
     end
   end
 
@@ -252,11 +252,11 @@ put_tiles = function(layer, offset, captures, entities, is_auto)
   local layer_name do
     layer_name = layer.__identifier
     if is_auto then
-      local PREFIX = "_auto"
-      if not layer_name:ends_with(PREFIX) then
-        Error("Expected IntGrid layer identfier to end with %q, got %q", PREFIX, layer_name)
+      local POSTFIX = "_a"
+      if not layer_name:ends_with(POSTFIX) then
+        Error("Expected IntGrid layer identfier to end with %q, got %q", POSTFIX, layer_name)
       else
-        layer_name = layer_name:sub(1, -#PREFIX - 1)
+        layer_name = layer_name:sub(1, -#POSTFIX - 1)
       end
     end
   end

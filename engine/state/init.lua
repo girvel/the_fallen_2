@@ -222,7 +222,9 @@ methods.load_level = function(self, path)
   local add_t = love.timer.getTime()
   Log.info("%.2f s | Added %s entities", add_t - read_t, #load_data.entities)
 
-  self.rails:init(self.args.checkpoint)
+  if self.rails.init then
+    self.rails:init(self.args.checkpoint)
+  end
 
   local end_t = love.timer.getTime()
   Log.info("%.2f s | Initialized rails", end_t - add_t)

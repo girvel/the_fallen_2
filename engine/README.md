@@ -19,7 +19,7 @@ echo 'require("engine.kernel.main")' | tee main.lua
 love .
 ```
 
-Then follow the error messages
+Then follow the error messages. Even though the fallen engine is open-source, I highly doubt that anybody except me/potential collaborators would use it, so there's no documentation and the error messages are not excessively nice.
 
 ## Build system dependencies
 
