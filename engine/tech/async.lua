@@ -16,7 +16,7 @@ async.resume = function(coroutine_, ...)
   local ok = table.remove(result, 1)
   if not ok then
     local message = ("Coroutine error:\n\t%s\ncoroutine %s"):format(result[1], debug.traceback(coroutine_))
-    if State.debug then
+    if Kernel.debug then
       error(message)
     else
       Log.error(message)

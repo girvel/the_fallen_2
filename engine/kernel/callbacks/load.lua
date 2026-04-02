@@ -8,6 +8,8 @@ return function(args)
   Log.info("Started love.load")
 
   args = cli.parse(args)
+  Kernel.args = args
+  Kernel.debug = args.debug
   Log.info("CLI args: %s", args)
 
   if args.profiler then

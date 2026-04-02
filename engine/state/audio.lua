@@ -34,7 +34,7 @@ methods._update = function(self, dt)
     love.audio.setPosition(-1000, -1000, 0)
   end
 
-  if State.args.disable_ambient then return end
+  if Kernel.args.disable_ambient then return end
 
   local last_track = self._current
 

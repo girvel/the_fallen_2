@@ -99,10 +99,10 @@ creator.new = function(prev)
     if not model then
       model = {
         [0] = {
-          base_abilities = State.debug
+          base_abilities = Kernel.debug
             and abilities.new(15, 15, 15, 8, 8, 8)
             or abilities.new(8, 8, 8, 8, 8, 8),
-          points = State.debug and 0 or 27,
+          points = Kernel.debug and 0 or 27,
           race = RACES[1],
           skill_1 = SKILLS[1],
           skill_2 = SKILLS[2],

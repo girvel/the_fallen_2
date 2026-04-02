@@ -4,7 +4,7 @@ return function(msg)
   -- saves.write({State}, "last_crash.ldump.gz")
   -- love.window.requestAttention()
 
-  if State.debug then return end
+  if Kernel.debug then return end
 
   local FONT = love.graphics.newFont("engine/assets/fonts/clacon2.ttf", 48)
 

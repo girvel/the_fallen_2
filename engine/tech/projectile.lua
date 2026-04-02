@@ -26,7 +26,7 @@ projectile.launch = function(parent, slot, target, speed)
           target_position = target.position + V(.5, .5)
         end
 
-        if State.debug then
+        if Kernel.debug then
           State.debug_overlay.points.projectile_target = {
             position = target_position,
             color = Vector.white,

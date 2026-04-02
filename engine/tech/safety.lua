@@ -22,7 +22,7 @@ local built_in_assert = assert
 --- @param message? string
 --- @return T
 safety.assert = function(condition, message)
-  if State.debug then
+  if Kernel.debug then
     -- without this if, single argument assert attaches no stacktrace
     if message then
       return built_in_assert(condition, message)
@@ -50,7 +50,7 @@ safety.error = function(fmt, ...)
     message = Log.format(fmt, ...)
   end
 
-  if State.debug then
+  if Kernel.debug then
     error(message, 1)
   else
     Log.log("error", 1, message)
@@ -61,7 +61,7 @@ end
 --- @param ... any
 --- @return any
 safety.call = function(f, ...)
-  if State.debug then
+  if Kernel.debug then
     return f(...)
   end
 

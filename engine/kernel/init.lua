@@ -10,6 +10,8 @@ local kernel = {}
 --- @field cpu_time number
 --- @field start_time number
 --- @field screenshot love.Canvas
+--- @field debug boolean
+--- @field args table CLI args
 local methods = {}
 local mt = {__index = methods}
 
@@ -51,7 +53,7 @@ methods.get_key_rate = function(self, key)
 end
 
 methods.report = function(self)
-  if State.args.profiler then
+  if Kernel.args.profiler then
     Log.info(Profile.report(100))
   end
 

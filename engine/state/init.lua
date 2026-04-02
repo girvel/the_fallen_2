@@ -21,8 +21,6 @@ local state = {}
 --- @field uid state_uid
 --- @field stats state_stats
 --- @field shader shader?
---- @field debug boolean
---- @field args table CLI args
 --- @field rails rails
 --- @field grids table<grid_layer, grid<entity>>
 --- @field grid_size vector
@@ -45,7 +43,7 @@ local replace_modules = function(self)
   self.quests = require("engine.state.quests").new()
   self.hostility = require("engine.state.hostility").new()
   self.audio = require("engine.state.audio").new()
-  self.debug_overlay = require("engine.state.debug_overlay").new(self.debug)
+  self.debug_overlay = require("engine.state.debug_overlay").new(Kernel.debug)
   self.period = require("engine.state.period").new()
   self.uid = require("engine.state.uid").new()
   self.stats = require("engine.state.stats").new()
@@ -53,10 +51,8 @@ end
 
 --- @param systems table[]
 --- @return state
-state.new = function(systems, args)
+state.new = function(systems)
   local result = setmetatable({
-    debug = args.debug,
-    args = args,
     is_loaded = false,
 
     _world = Tiny.world(unpack(systems)),
