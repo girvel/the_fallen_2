@@ -212,6 +212,10 @@ methods.load_level = function(self, path)
     end
   end
 
+  if not self.player then
+    error("There's no player in the level")
+  end
+
   self.camera:immediate_center()
 
   coroutine.yield("add", 1)
