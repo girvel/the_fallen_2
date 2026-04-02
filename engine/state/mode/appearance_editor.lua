@@ -1,4 +1,4 @@
-local items_entities = require("level.palette.items_entities")
+local items = require("engine.mech.items")
 local ui = require("engine.tech.ui")
 local tk = require("engine.state.mode.tk")
 
@@ -106,7 +106,7 @@ methods.draw_gui = function(self, dt)
     end
 
     inventory.hair = hair_type ~= "none"
-      and State:add(items_entities.hair(hair_type, hair_color))
+      and State:add(items.hair(hair_type, hair_color))
       or nil
 
     State.player:rotate()
@@ -120,7 +120,7 @@ methods.draw_gui = function(self, dt)
     end
 
     inventory.skin = skin ~= "none"
-      and State:add(items_entities.skin(skin))
+      and State:add(items.skin(skin))
       or nil
 
     State.player:rotate()
