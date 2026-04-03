@@ -1,3 +1,4 @@
+local health = require("engine.mech.health")
 local factoring = require("engine.tech.factoring")
 local sound = require("engine.tech.sound")
 local async = require("engine.tech.async")
@@ -24,7 +25,7 @@ for y = 1, 4 do
       return {
         boring_flag = true,
         codename = "ancient_wall",
-        name = "Стена",
+        name = "стена",
         sprite = this_sprite,
       }
     end
@@ -36,7 +37,7 @@ for y = 1, 4 do
       return {
         boring_flag = true,
         codename = "hut_wall",
-        name = "Стена",
+        name = "стена",
         sprite = this_sprite,
       }
     end
@@ -51,7 +52,7 @@ for y = 1, 4 do
       return {
         boring_flag = true,
         codename = "ancient_wall_ornament",
-        name = "Стена",
+        name = "стена",
         sprite = this_sprite,
       }
     end
@@ -65,7 +66,7 @@ for y = 1, 4 do
         low_flag = true,
         transparent_flag = true,
         codename = "stage",
-        name = "Платформа",
+        name = "платформа",
         sprite = this_sprite,
       }
     end
@@ -85,7 +86,7 @@ for y = 1, 4 do
         low_flag = true,
         transparent_flag = true,
         codename = "fence",
-        name = "Забор",
+        name = "забор",
         sprite = this_sprite,
       }
     end
@@ -94,9 +95,9 @@ end
 
 --- @param factory function
 --- @param grid_layer grid_layer
---- @param sound_path string
+--- @param sound_path string?
 local get_open = Memoize(function(factory, grid_layer, sound_path)
-  local sounds = sound.multiple(sound_path, .8)
+  local sounds = sound_path and sound.multiple(sound_path, .8)
 
   return function(self)
     local open_itself = function()
@@ -116,10 +117,12 @@ local get_open = Memoize(function(factory, grid_layer, sound_path)
 end)
 
 for _, tuple in ipairs {
-  {5, "cabinet_green", "Шкаф", "assets/sounds/cabinet/open"},
-  {7, "shelf_green", "Полки", "assets/sounds/cabinet/open"},
-  {13, "cabinet_blue", "Шкаф", "assets/sounds/cabinet/open"},
-  {15, "shelf_blue", "Полки", "assets/sounds/cabinet/open"},
+  {5, "cabinet_green", "шкаф", "assets/sounds/cabinet/open"},
+  {7, "shelf_green", "полки", "assets/sounds/cabinet/open"},
+  {13, "cabinet_blue", "шкаф", "assets/sounds/cabinet/open"},
+  {15, "shelf_blue", "полки", "assets/sounds/cabinet/open"},
+  {21, "chest", "сундук", "assets/sounds/chest/open"},
+  {23, "bin", "урна", false},
 } do
   local index, codename, name, sound_path = unpack(tuple --[=[@as [integer, string, string, string]]=])
   local codename_open = codename .. "_open"
@@ -151,6 +154,125 @@ for _, tuple in ipairs {
     return e
   end
 end
+
+packer.offset = 128
+
+local cobweb_on_death = function(self)
+  for _, d in ipairs(Vector.directions) do
+    local e = State.grids[self.grid_layer]:slow_get(self.position + d)
+    if e and e._cobweb_flag and e.hp > 0 then
+      health.damage(e, 1)
+    end
+  end
+end
+for x = 1, 3 do
+  for y = 1, 2 do
+    local i, this_sprite = packer:get(x, y)
+    solids[i] = function()
+      return {
+        boring_flag = true,
+        low_flag = true,
+        transparent_flag = true,
+        _cobweb_flag = true,
+        codename = "cobweb",
+        name = "паутина",
+        sprite = this_sprite,
+        hp = 1,
+        on_death = cobweb_on_death,
+      }
+    end
+  end
+end
+
+for _, tuple in ipairs {
+  {4, "table", "стол"},
+  {5, "table", "стол"},
+  {6, "stool", "табурет"},
+  {7, "hut_wall_transparent", "стена"},
+  {8, "hut_wall_transparent", "стена"},
+  {12, "table", "стол"},
+  {13, "bed", "кровать"},
+  {14, "bed_rough", "кровать"},
+  {18, "table", "стол"},
+  {19, "table", "стол"},
+  {20, "table", "стол"},
+  {22, "candles", "свечи"},
+  {23, "candles", "свечи"},
+  {24, "candles", "свечи"},
+} do
+  local index, codename, name = unpack(tuple --[[@as table]])
+  local i, this_sprite = packer:geti(index)
+  solids[i] = function()
+    return {
+      boring_flag = true,
+      transparent_flag = true,
+      codename = codename,
+      name = name,
+      sprite = this_sprite,
+    }
+  end
+end
+
+packer.offset = 160
+
+for _, index in ipairs {1, 2, 3, 4, 9, 10, 11, 12, 17, 18, 25, 26} do
+  local i, this_sprite = packer:geti(index)
+  solids[i] = function()
+    return {
+      boring_flag = true,
+      transparent_flag = true,
+      low_flag = true,
+      codename = "slope",
+      name = "склон",
+      sprite = this_sprite,
+    }
+  end
+end
+
+for _, tuple in ipairs {
+  {5, "campfire", "костёр", true},
+  {6, "log", "бревно", true},
+  {13, "rubble", "обломки", true},
+  {14, "log", "бревно", true},
+  {19, "bush", "куст", true},
+  {20, "bush", "куст", true},
+  {21, "bush", "куст", false},
+  {22, "log", "бревно", true},
+  {27, "bush", "куст", true},
+  {28, "bush", "куст", true},
+  {29, "bush", "куст", false},
+  {30, "log", "бревно", true},
+  {31, "log", "бревно", true},
+  {32, "log", "бревно", true},
+} do
+  local index, codename, name, is_transparent = unpack(tuple --[[@as table]])
+  local i, this_sprite = packer:geti(index)
+  solids[i] = function()
+    return {
+      boring_flag = true,
+      transparent_flag = is_transparent or nil,
+      codename = codename,
+      name = name,
+      sprite = this_sprite,
+    }
+  end
+end
+
+for x = 7, 8 do
+  for y = 1, 3 do
+    local i, this_sprite = packer:get(x, y)
+    solids[i] = function()
+      return {
+        boring_flag = true,
+        _tree_flag = true,
+        codename = "trunk",
+        name = "Ствол",
+        sprite = this_sprite,
+      }
+    end
+  end
+end
+
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Entities
