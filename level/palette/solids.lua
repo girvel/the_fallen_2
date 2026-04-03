@@ -1,7 +1,7 @@
+local sprite = require("engine.tech.sprite")
 local sound = require("engine.tech.sound")
 local async = require("engine.tech.async")
 local interactive = require("engine.tech.interactive")
-local factoring = require("engine.tech.factoring")
 local abilities = require("engine.mech.abilities")
 local humanoid = require("engine.mech.humanoid")
 local player_base = require("engine.state.player.base")
@@ -13,33 +13,99 @@ local solids = {}
 -- [SECTION] Atlas
 ----------------------------------------------------------------------------------------------------
 
-local containers = "cab1 cab2 shelf1 shelf2 chest bin"
+solids.ATLAS_IMAGE = love.graphics.newImage("assets/atlases/solids.png")
 
-local opening_sounds = {
-  cabinet = sound.multiple("assets/sounds/cabinet/open", .8),
-  shelf   = sound.multiple("assets/sounds/cabinet/open", .8),
-  chest   = sound.multiple("assets/sounds/chest/open",   .8),
-}
-
---- @param prefix string
---- @param type "container"
-local get_open = Memoize(function(prefix, type)
-  local sounds = opening_sounds[prefix]
-  local factory, layer
-  if type == "container" then
-    factory = solids[prefix .. "o"]
-    layer = "solids"
-  else
-    assert(false)
+local offset = 0
+for y = 1, 4 do
+  for x = 1, 4 do
+    local i = offset + x + (y - 1) * 8
+    local this_sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE)
+    solids[i] = function()
+      return {
+        boring_flag = true,
+        codename = "ancient_wall",
+        name = "Стена",
+        sprite = this_sprite,
+      }
+    end
   end
+
+  for x = 5, 8 do
+    local i = offset + x + (y - 1) * 8
+    local this_sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE)
+    solids[i] = function()
+      return {
+        boring_flag = true,
+        codename = "hut_wall",
+        name = "Стена",
+        sprite = this_sprite,
+      }
+    end
+  end
+end
+
+offset = 32
+for y = 1, 4 do
+  for x = 1, 4 do
+    local i = offset + x + (y - 1) * 8
+    local this_sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE)
+    solids[i] = function()
+      return {
+        boring_flag = true,
+        codename = "ancient_wall_ornament",
+        name = "Стена",
+        sprite = this_sprite,
+      }
+    end
+  end
+
+  for x = 5, 8 do
+    local i = offset + x + (y - 1) * 8
+    local this_sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE)
+    solids[i] = function()
+      return {
+        boring_flag = true,
+        low_flag = true,
+        transparent_flag = true,
+        codename = "stage",
+        name = "Платформа",
+        sprite = this_sprite,
+      }
+    end
+  end
+end
+
+offset = 64
+-- nothing yet --
+
+offset = 96
+for y = 1, 4 do
+  for x = 1, 4 do
+    local i = offset + x + (y - 1) * 8
+    local this_sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE)
+    solids[i] = function()
+      return {
+        boring_flag = true,
+        low_flag = true,
+        transparent_flag = true,
+        codename = "fence",
+        name = "Забор",
+        sprite = this_sprite,
+      }
+    end
+  end
+end
+
+--- @param factory function
+--- @param grid_layer grid_layer
+--- @param sound_path string
+local get_open = Memoize(function(factory, grid_layer, sound_path)
+  local sounds = sound.multiple(sound_path, .8)
 
   return function(self)
     local open_itself = function()
       State:remove(self)
-      local e = factory()
-      e.position = self.position
-      e.grid_layer = layer
-      State:add(e)
+      State:add_at(factory(), self.position, grid_layer)
     end
 
     local _, scene = State.runner:run_task(function()
@@ -53,38 +119,41 @@ local get_open = Memoize(function(prefix, type)
   end
 end)
 
-factoring.use_atlas(solids, "assets/atlases/solids.png", {
-  false, false, false, false, false, false, false, false,
-  false, false, false, false, false, false, false, false,
-  false, false, false, false, false, false, false, false,
-  false, false, false, false, false, false, false, false,
+for _, tuple in ipairs {
+  {5, "cabinet_green", "Шкаф", "assets/sounds/cabinet/open"},
+  {7, "shelf_green", "Полки", "assets/sounds/cabinet/open"},
+  {13, "cabinet_blue", "Шкаф", "assets/sounds/cabinet/open"},
+  {15, "shelf_blue", "Полки", "assets/sounds/cabinet/open"},
+} do
+  local i, codename, name, sound_path = unpack(tuple --[=[@as [integer, string, string, string]]=])
+  local codename_open = codename .. "_open"
+  i = i + offset
 
-  false, false, false, false, false, false, false, false,
-  false, false, false, false, false, false, false, false,
-  false, false, false, false, false, false, false, false,
-  false, false, false, false, false, false, false, false,
-
-  false, false, false, false, false, false, false, false,
-  false, false, false, false, false, false, false, false,
-  false, false, false, false, false, false, false, false,
-  false, false, false, false, false, false, false, false,
-
-  false, false, false, false, "cab1c", "cab1o", "shelf1c", "shelf1o",
-  false, false, false, false, "cab2c", "cab2o", "shelf2c", "shelf2o",
-}, function(codename)
-  local e = {}
-  e.boring_flag = true
-
-  -- NEXT it's really inefficient
-  for _, prefix in ipairs(containers:tokens()) do
-    if codename == prefix .. "c" then
-      interactive.mix_in(e, get_open(prefix, "container"))
-      break
-    end
+  solids[i + 1] = function()
+    return {
+      boring_flag = true,
+      low_flag = true,
+      transparent_flag = true,
+      codename = codename_open,
+      name = name,
+      sprite = sprite.from_atlas(i + 1, Constants.cell_size, solids.ATLAS_IMAGE),
+    }
   end
 
-  return e
-end)
+  local open = get_open(solids[i + 1], "solids", sound_path)
+  solids[i] = function()
+    local e = {
+      boring_flag = true,
+      low_flag = true,
+      transparent_flag = true,
+      codename = "cabinet_green",
+      name = "Шкаф",
+      sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE),
+    }
+    interactive.mix_in(e, open)
+    return e
+  end
+end
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Entities

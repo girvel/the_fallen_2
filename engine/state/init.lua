@@ -84,6 +84,20 @@ methods.add = function(self, entity, ...)
   return entity
 end
 
+--- Schedules entity to be added
+--- @generic T: entity
+--- @param self state
+--- @param entity T
+--- @param position vector
+--- @param grid_layer grid_layer
+--- @return T
+methods.add_at = function(self, entity, position, grid_layer)
+  --- @cast entity entity
+  entity.position = position
+  entity.grid_layer = grid_layer
+  return self:add(entity)
+end
+
 --- Schedules entity to be removed
 --- @generic T: entity
 --- @param self state
