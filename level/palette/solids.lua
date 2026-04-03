@@ -1,9 +1,37 @@
+local factoring = require("engine.tech.factoring")
 local abilities = require("engine.mech.abilities")
 local humanoid = require("engine.mech.humanoid")
 local player_base = require("engine.state.player.base")
 
 
 local solids = {}
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Atlas
+----------------------------------------------------------------------------------------------------
+
+factoring.use_atlas(solids, "assets/atlases/solids.png", {
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, false, false, false, false,
+  false, false, false, false, "cabinet", "cabinet", "shelf", "shelf",
+  false, false, false, false, "cabinet", "cabinet", "shelf", "shelf",
+}, function(codename)
+  return {}
+end)
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Entities
+----------------------------------------------------------------------------------------------------
 
 solids.player = function()
   local result = {

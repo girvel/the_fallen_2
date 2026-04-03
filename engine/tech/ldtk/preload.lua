@@ -251,13 +251,14 @@ end
 put_tiles = function(layer, offset, captures, entities, is_auto)
   local layer_name do
     layer_name = layer.__identifier
-    if is_auto then
-      local POSTFIX = "_a"
-      if not layer_name:ends_with(POSTFIX) then
-        Error("Expected IntGrid layer identfier to end with %q, got %q", POSTFIX, layer_name)
-      else
-        layer_name = layer_name:sub(1, -#POSTFIX - 1)
-      end
+    local POSTFIX = is_auto and "_a" or "_t"
+    if not layer_name:ends_with(POSTFIX) then
+      Error(
+        "Expected %s layer identfier to end with %q, got %q",
+        is_auto and "auto" or "tile", POSTFIX, layer_name
+      )
+    else
+      layer_name = layer_name:sub(1, -#POSTFIX - 1)
     end
   end
 
