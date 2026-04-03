@@ -1,4 +1,4 @@
-local sprite = require("engine.tech.sprite")
+local factoring = require("engine.tech.factoring")
 local sound = require("engine.tech.sound")
 local async = require("engine.tech.async")
 local interactive = require("engine.tech.interactive")
@@ -14,12 +14,12 @@ local solids = {}
 ----------------------------------------------------------------------------------------------------
 
 solids.ATLAS_IMAGE = love.graphics.newImage("assets/atlases/solids.png")
+local packer = factoring.packer(solids.ATLAS_IMAGE)
 
-local offset = 0
+packer.offset = 0
 for y = 1, 4 do
   for x = 1, 4 do
-    local i = offset + x + (y - 1) * 8
-    local this_sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE)
+    local i, this_sprite = packer:get(x, y)
     solids[i] = function()
       return {
         boring_flag = true,
@@ -31,8 +31,7 @@ for y = 1, 4 do
   end
 
   for x = 5, 8 do
-    local i = offset + x + (y - 1) * 8
-    local this_sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE)
+    local i, this_sprite = packer:get(x, y)
     solids[i] = function()
       return {
         boring_flag = true,
@@ -44,11 +43,10 @@ for y = 1, 4 do
   end
 end
 
-offset = 32
+packer.offset = 32
 for y = 1, 4 do
   for x = 1, 4 do
-    local i = offset + x + (y - 1) * 8
-    local this_sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE)
+    local i, this_sprite = packer:get(x, y)
     solids[i] = function()
       return {
         boring_flag = true,
@@ -60,8 +58,7 @@ for y = 1, 4 do
   end
 
   for x = 5, 8 do
-    local i = offset + x + (y - 1) * 8
-    local this_sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE)
+    local i, this_sprite = packer:get(x, y)
     solids[i] = function()
       return {
         boring_flag = true,
@@ -75,14 +72,13 @@ for y = 1, 4 do
   end
 end
 
-offset = 64
+packer.offset = 64
 -- nothing yet --
 
-offset = 96
+packer.offset = 96
 for y = 1, 4 do
   for x = 1, 4 do
-    local i = offset + x + (y - 1) * 8
-    local this_sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE)
+    local i, this_sprite = packer:get(x, y)
     solids[i] = function()
       return {
         boring_flag = true,
@@ -125,30 +121,31 @@ for _, tuple in ipairs {
   {13, "cabinet_blue", "Шкаф", "assets/sounds/cabinet/open"},
   {15, "shelf_blue", "Полки", "assets/sounds/cabinet/open"},
 } do
-  local i, codename, name, sound_path = unpack(tuple --[=[@as [integer, string, string, string]]=])
+  local index, codename, name, sound_path = unpack(tuple --[=[@as [integer, string, string, string]]=])
   local codename_open = codename .. "_open"
-  i = i + offset
 
-  solids[i + 1] = function()
+  local i_open, sprite_open = packer:geti(index + 1)
+  solids[i_open] = function()
     return {
       boring_flag = true,
       low_flag = true,
       transparent_flag = true,
       codename = codename_open,
       name = name,
-      sprite = sprite.from_atlas(i + 1, Constants.cell_size, solids.ATLAS_IMAGE),
+      sprite = sprite_open,
     }
   end
 
-  local open = get_open(solids[i + 1], "solids", sound_path)
-  solids[i] = function()
+  local open = get_open(solids[i_open], "solids", sound_path)
+  local i_closed, sprite_closed = packer:geti(index)
+  solids[i_closed] = function()
     local e = {
       boring_flag = true,
       low_flag = true,
       transparent_flag = true,
-      codename = "cabinet_green",
-      name = "Шкаф",
-      sprite = sprite.from_atlas(i, Constants.cell_size, solids.ATLAS_IMAGE),
+      codename = codename,
+      name = name,
+      sprite = sprite_closed,
     }
     interactive.mix_in(e, open)
     return e
