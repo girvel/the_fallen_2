@@ -99,6 +99,12 @@ string.split = function(str, pat, plain)
 end
 
 --- @param str string
+--- @return string[]
+string.tokens = function(str)
+  return str:strip():split("%s+")
+end
+
+--- @param str string
 --- @param int integer
 --- @param padstr? string
 --- @return string
