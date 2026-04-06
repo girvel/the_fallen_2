@@ -65,9 +65,11 @@ health.set_hp = function(target, value)
   end
 
   if target.hp > 0 then
-    local half = target:get_max_hp() / 2
-    if target.on_half_hp and before and before > half and target.hp <= half then
-      target:on_half_hp()
+    if target.get_max_hp then
+      local half = target:get_max_hp() / 2
+      if target.on_half_hp and before and before > half and target.hp <= half then
+        target:on_half_hp()
+      end
     end
     return false
   end
