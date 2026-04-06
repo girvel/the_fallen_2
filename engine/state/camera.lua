@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local camera = {}
 
 
@@ -38,7 +39,7 @@ end
 --- @return number sx, number sy
 methods.game_to_screen = function(self, gx, gy)
   local dx, dy = unpack(self.offset)
-  local k = State.camera.SCALE * Constants.cell_size
+  local k = State.camera.SCALE * sprite.cell_size
   return dx + k * gx, dy + k * gy
 end
 
@@ -87,7 +88,7 @@ methods._update = function(self, dt)
   end
 
   do
-    local total_scale = self.SCALE * Constants.cell_size
+    local total_scale = self.SCALE * sprite.cell_size
     self.vision_start = -(State.camera.offset / total_scale):map(math.ceil)
     self.vision_end = V(love.graphics.getWidth() - self.sidebar_w, love.graphics.getHeight())
       :div_mut(total_scale)
@@ -105,7 +106,7 @@ end
 --- @param y number
 --- @return number, number
 methods._center = function(self, x, y)
-  local k = Constants.cell_size * self.SCALE
+  local k = sprite.cell_size * self.SCALE
   return
     math.floor((love.graphics.getWidth() - self.sidebar_w) / 2 - (x + .5) * k),
     math.floor(love.graphics.getHeight() / 2 - (y + .5) * k)

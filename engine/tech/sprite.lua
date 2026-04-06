@@ -5,6 +5,9 @@ local sprite = {utility = {}}
 
 local transform_colors, cut_out
 
+--- Width/height of a sprite fitting in a single grid cell
+sprite.cell_size = 16
+
 --- @alias sprite sprite_image | sprite_atlas | sprite_text | sprite_grid | sprite_rendered
 
 --- @class sprite_rendered
@@ -90,7 +93,7 @@ end
 --- @param base love.ImageData
 --- @param n integer
 sprite.utility.select = function(base, n)
-  local w, h = Constants.cell_size, Constants.cell_size
+  local w, h = sprite.cell_size, sprite.cell_size
   local result = love.image.newImageData(w, h)
   local base_w = base:getWidth()
 

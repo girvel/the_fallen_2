@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local sound = require("engine.tech.sound")
 local animated = require("engine.tech.animated")
 local api = require("engine.tech.api")
@@ -47,7 +48,7 @@ rain.new = function(density, speed)
     _rain_state = {
       _particles = {},
       _player_position = nil,
-      _canvas = love.graphics.newCanvas(unpack(State.level.grid_size * Constants.cell_size)),
+      _canvas = love.graphics.newCanvas(unpack(State.level.grid_size * sprite.cell_size)),
       _touched_ground = false,
     },
   }
@@ -82,8 +83,8 @@ rain.render = function(self, entity, dt)
   end
 
   local start, finish do
-    local original_start = State.camera.vision_start * Constants.cell_size
-    local original_finish = (State.camera.vision_end + Vector.one) * Constants.cell_size
+    local original_start = State.camera.vision_start * sprite.cell_size
+    local original_finish = (State.camera.vision_end + Vector.one) * sprite.cell_size
 
     local d = (original_finish - original_start)
     start = original_finish - d * BUFFER_K
@@ -93,11 +94,11 @@ rain.render = function(self, entity, dt)
   local d, cells_n do
     local w, h = unpack(finish - start)
     d = math.max(w, h)
-    cells_n = w * h / Constants.cell_size^2
+    cells_n = w * h / sprite.cell_size^2
   end
 
-  local life_time = d / Constants.cell_size / entity.rain_speed
-  local velocity = DIRECTION * entity.rain_speed * Constants.cell_size
+  local life_time = d / sprite.cell_size / entity.rain_speed
+  local velocity = DIRECTION * entity.rain_speed * sprite.cell_size
 
   local did_vision_change do
     did_vision_change = state._player_position ~= State.player.position
@@ -106,7 +107,7 @@ rain.render = function(self, entity, dt)
 
   while State.period:absolute(life_time / entity.rain_density / cells_n, self, "emit_rain") do
     local target = Vector.use(Random.float, start, finish)
-    local target_cell = (target / Constants.cell_size):map(math.floor)
+    local target_cell = (target / sprite.cell_size):map(math.floor)
 
     if State.grids.shadows:slow_get(target_cell, true) then goto continue end
 
@@ -144,7 +145,7 @@ rain.render = function(self, entity, dt)
         Table.remove_breaking_at(state._particles, i)
         state._touched_ground = true
         if p.is_visible then
-          animated.add_fx("assets/animations/rain_impact", p.position / Constants.cell_size, "weather")
+          animated.add_fx("assets/animations/rain_impact", p.position / sprite.cell_size, "weather")
         end
       end
     end

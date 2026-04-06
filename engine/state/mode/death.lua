@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local ui = require("engine.tech.ui")
 local tk = require("engine.state.mode.tk")
 
@@ -9,7 +10,7 @@ local death = {}
 local methods = {}
 local mt = {__index = methods}
 
-local SCALE = Constants.cell_size
+local SCALE = sprite.cell_size
 
 methods.draw_gui = function(self)
   local w, h = love.graphics.getDimensions()

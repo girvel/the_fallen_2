@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local ui = require("engine.tech.ui")
 
 
@@ -52,7 +53,7 @@ draw_points = function(points)
   for k, point in pairs(points) do
     local v
     if point.view == "grid" then
-      v = point.position * 4 * Constants.cell_size + State.camera.offset
+      v = point.position * 4 * sprite.cell_size + State.camera.offset
     elseif point.view == "absolute" then
       v = point.position + State.camera.offset
     elseif point.view == "gui" then

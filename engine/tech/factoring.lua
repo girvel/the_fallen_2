@@ -32,7 +32,7 @@ end
 --- @return integer i
 --- @return sprite_atlas this_sprite
 packer_methods.geti = function(self, local_i)
-  return self.offset + local_i, sprite.from_atlas(self.offset + local_i, Constants.cell_size, self._atlas_image)
+  return self.offset + local_i, sprite.from_atlas(self.offset + local_i, sprite.cell_size, self._atlas_image)
 end
 
 Ldump.mark(factoring, {}, ...)

@@ -219,7 +219,7 @@ local load_pack_raw = Memoize(function(folder_path, is_atlas, color)
         h = next_h
 
         if is_atlas then
-          parts_n = w * h / Constants.cell_size / Constants.cell_size
+          parts_n = w * h / sprite.cell_size / sprite.cell_size
           for i = 1, parts_n do
             result[i] = {}
           end

@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local shaders = require("engine.tech.shaders.init")
 
 
@@ -11,7 +12,7 @@ water.new = Memoize(function(palette_path, palette_real_colors_n)
     love_shader = shaders.build("engine/tech/shaders/water.frag"),
 
     preprocess = function(self, entity, dt)
-      local offset = ((love.timer.getTime() * entity.water_velocity) % Constants.cell_size):map(math.floor) / Constants.cell_size
+      local offset = ((love.timer.getTime() * entity.water_velocity) % sprite.cell_size):map(math.floor) / sprite.cell_size
       self.love_shader:send("offset", offset)
       local image = self:_get_reflection_image(entity)
       self.love_shader:send("reflects", image ~= nil)

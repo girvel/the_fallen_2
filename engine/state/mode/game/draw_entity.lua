@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local tk = require("engine.state.mode.tk")
 
 
@@ -11,7 +12,7 @@ local draw_entity = function(self, entity, dt)
 
   local x, y = unpack(entity.position)
   local dx, dy = unpack(State.camera.offset)
-  local k = State.camera.SCALE * Constants.cell_size
+  local k = State.camera.SCALE * sprite.cell_size
   x = dx + x * k
   y = dy + y * k
 

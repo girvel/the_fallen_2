@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local class = require("engine.mech.class")
 local xp = require("engine.mech.xp")
 local colors = require("engine.tech.colors")
@@ -664,7 +665,7 @@ use_mouse = function(self)
 
     local position = V(love.mouse.getPosition())
       :sub_mut(State.camera.offset)
-      :div_mut(Constants.cell_size * 4)
+      :div_mut(sprite.cell_size * 4)
       :map_mut(math.floor)
     local solid = State.grids.solids:slow_get(position)
     local interaction_target = interactive.get_at(position)
@@ -823,7 +824,7 @@ render_path = function(path, max_length)
   end
 
   if max_length then
-    local n = State.camera.SCALE * Constants.cell_size
+    local n = State.camera.SCALE * sprite.cell_size
     ui.start_frame(px, py, n, n - 4)
     ui.start_alignment("center", "bottom")
       ui.text("%s/%s", #path, max_length)

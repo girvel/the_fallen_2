@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] External API
 ----------------------------------------------------------------------------------------------------
@@ -26,8 +27,8 @@ local preload = function(root)
   }  --[[@as preload_level]]
 
   for _, ldtk_level in ipairs(root.levels) do
-    local offset = V(ldtk_level.worldX, ldtk_level.worldY) / Constants.cell_size
-    local size   = V(ldtk_level.pxWid,  ldtk_level.pxHei)  / Constants.cell_size
+    local offset = V(ldtk_level.worldX, ldtk_level.worldY) / sprite.cell_size
+    local size   = V(ldtk_level.pxWid,  ldtk_level.pxHei)  / sprite.cell_size
     result.size = Vector.use(math.max, result.size, offset + size)
 
     local captures = Grid.new(size)  --[[@as grid<preload_capture>]]
@@ -94,8 +95,8 @@ end
 
 local absolute_position = function(instance)
   return V(
-    instance.__worldX / Constants.cell_size + 1,
-    instance.__worldY / Constants.cell_size + 1
+    instance.__worldX / sprite.cell_size + 1,
+    instance.__worldY / sprite.cell_size + 1
   )
 end
 
@@ -104,7 +105,7 @@ local relative_position = function(instance)
 end
 
 local tile_relative_position = function(instance)
-  return Vector.own(instance.px):div_mut(Constants.cell_size):add_mut(Vector.one)
+  return Vector.own(instance.px):div_mut(sprite.cell_size):add_mut(Vector.one)
 end
 
 local insert_position = function(collection, runner_name, position)

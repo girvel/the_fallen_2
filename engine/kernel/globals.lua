@@ -3,8 +3,6 @@ Ldump = require("engine.lib.ldump")
 local KB = 1024
 Ldump.upvalue_warning_threshold = 1024 * KB
 
-Constants = require("engine.tech.constants")
-
 
 Kernel = require("engine.kernel").new()
 

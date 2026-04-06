@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local colors = require("engine.tech.colors")
 local gui_elements = require("engine.state.mode.gui_elements")
 local ui = require("engine.tech.ui")
@@ -77,7 +78,7 @@ tk.draw_entity = function(entity, x, y, scale)
       local item_sprite = this_item.sprite
       if not item_sprite then return end
 
-      local dx, dy = unpack(item.anchor_offset(entity, slot):mul_mut(scale * Constants.cell_size))
+      local dx, dy = unpack(item.anchor_offset(entity, slot):mul_mut(scale * sprite.cell_size))
       local item_x = x + dx
       local item_y = y + dy
       love.graphics.draw(item_sprite.image, item_x, item_y, 0, scale)
@@ -121,7 +122,7 @@ tk.finish_block = function()
   local prev_frame = ui.finish_frame()
 
   local h = finish - ui.stack_pop("tk_block_start") + SIDEBAR_BLOCK_PADDING + 4
-  local k = Constants.cell_size
+  local k = sprite.cell_size
   ui.start_frame(-k, -k, prev_frame.w + 2*k, h + 2*k)
     ui.tile(gui_elements.sidebar_block_bg)
   ui.finish_frame()

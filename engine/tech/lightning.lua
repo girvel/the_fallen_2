@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local colors = require("engine.tech.colors")
 local lightning = {}
 
@@ -26,9 +27,9 @@ lightning.new = function(from, to)
     },
 
     _lightning_state = {
-      from = (from - start + V(.5, .5)) * Constants.cell_size,
-      to = (to - start + V(.5, .5)) * Constants.cell_size,
-      canvas = love.graphics.newCanvas(unpack((finish - start + Vector.one) * Constants.cell_size)),
+      from = (from - start + V(.5, .5)) * sprite.cell_size,
+      to = (to - start + V(.5, .5)) * sprite.cell_size,
+      canvas = love.graphics.newCanvas(unpack((finish - start + Vector.one) * sprite.cell_size)),
     },
   }
 end

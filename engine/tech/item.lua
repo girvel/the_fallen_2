@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local level = require("engine.tech.level")
 local animated = require "engine.tech.animated"
 local interactive = require "engine.tech.interactive"
@@ -80,7 +81,7 @@ item.anchor_offset = function(entity, slot)
   local item_anchor = this_item.sprite and this_item.sprite.anchors.parent
   if not item_anchor then return Vector.zero end
 
-  return (parent_anchor - item_anchor):div_mut(Constants.cell_size)
+  return (parent_anchor - item_anchor):div_mut(sprite.cell_size)
 end
 
 --- @param parent entity
