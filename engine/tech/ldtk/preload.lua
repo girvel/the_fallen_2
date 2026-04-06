@@ -20,6 +20,13 @@ local put_positions, put_entities, put_tiles
 --- @return preload_level
 local preload = function(root)
   local start_t = love.timer.getTime()
+
+  local total_offset = Vector.zero
+  for _, ldtk_level in ipairs(root.levels) do
+    local offset = V(ldtk_level.worldX, ldtk_level.worldY):div_mut(-sprite.cell_size)
+    total_offset = Vector.use(math.max, total_offset, offset)
+  end
+
   local result = {
     size = Vector.zero,
     positions = {},
@@ -27,8 +34,11 @@ local preload = function(root)
   }  --[[@as preload_level]]
 
   for _, ldtk_level in ipairs(root.levels) do
-    local offset = V(ldtk_level.worldX, ldtk_level.worldY) / sprite.cell_size
-    local size   = V(ldtk_level.pxWid,  ldtk_level.pxHei)  / sprite.cell_size
+    local offset = V(ldtk_level.worldX, ldtk_level.worldY)
+      :div_mut(sprite.cell_size)
+      :add_mut(total_offset)
+    local size = V(ldtk_level.pxWid, ldtk_level.pxHei)
+      :div_mut(sprite.cell_size)
     result.size = Vector.use(math.max, result.size, offset + size)
 
     local captures = Grid.new(size)  --[[@as grid<preload_capture>]]
