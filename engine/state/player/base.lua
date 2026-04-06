@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local abilities = require("engine.mech.abilities")
 local ai = require("engine.state.player.ai")
 local action = require("engine.tech.action")
@@ -6,7 +7,7 @@ local creature = require "engine.mech.creature"
 
 local base = {}
 
---- @class base_player: entity_strict
+--- @class player_base: entity_strict
 --- @field fov_r integer
 --- @field ai player_ai
 --- @field bag table<string, integer>
@@ -48,7 +49,7 @@ base.mix_in = function(entity)
   entity.is_deaf = false
   entity.on_add = function(self)
     self.memory = love.graphics.newCanvas(unpack(
-      State.level.grid_size * Constants.cell_size * State.camera.SCALE
+      State.level.grid_size * sprite.cell_size * State.camera.SCALE
     ))
   end
 

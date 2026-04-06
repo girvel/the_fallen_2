@@ -293,6 +293,8 @@ end
 -- [SECTION] Entities
 ----------------------------------------------------------------------------------------------------
 
+--- @class player: player_base
+
 solids.player = function()
   local result = {
     name = "Протагонист",
