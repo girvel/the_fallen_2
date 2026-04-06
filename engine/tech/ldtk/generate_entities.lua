@@ -1,3 +1,4 @@
+local async = require("engine.tech.async")
 local level = require "engine.tech.level"
 
 
@@ -77,7 +78,7 @@ local generate_entities = function(palette, preload_entities)
 
       table.insert(result.entities, entity)
 
-      if i % 100 == 0 and love.timer.getTime() - last_yield_t >= Constants.yield_period then
+      if i % 100 == 0 and love.timer.getTime() - last_yield_t >= async.yield_period then
         coroutine.yield("generate", counter / layers_n)
         last_yield_t = love.timer.getTime()
       end

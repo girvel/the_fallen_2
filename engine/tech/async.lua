@@ -2,6 +2,9 @@ local async = {}
 
 async.lag_threshold = 1
 
+--- Reference period to yield from coroutine for it to be smooth (for loading screens & like)
+async.yield_period = 1/60
+
 --- @param coroutine_ thread
 --- @param ... any
 --- @return any ...
@@ -55,7 +58,7 @@ sometimes_methods.yield = function(self, ...)
   if self.counter % self.k ~= 0 then return end
 
   local now = love.timer.getTime()
-  if now - self.last_t >= Constants.yield_period then
+  if now - self.last_t >= async.yield_period then
     self.last_t = now
     coroutine.yield(...)
   end
