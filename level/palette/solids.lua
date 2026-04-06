@@ -273,6 +273,21 @@ for x = 7, 8 do
   end
 end
 
+packer.offset = 192
+
+do
+  local i, this_sprite = packer:geti(1)
+  solids[i] = function()
+    return {
+      boring_flag = true,
+      sokoban_flag = true,
+      transparent_flag = true,
+      codename = "boulder",
+      name = "камень",
+      sprite = this_sprite,
+    }
+  end
+end
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Entities
@@ -282,7 +297,7 @@ solids.player = function()
   local result = {
     name = "Протагонист",
     base_abilities = abilities.new(8, 8, 8, 8, 8, 8),
-    level = 0,
+    level = 1,
     perks = {},
     faction = "player",
   }
