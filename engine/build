@@ -4,7 +4,7 @@ local log = require("engine.lib.log")
 local argparse = require("engine.lib.argparse")
 
 local read_run = function(command, ...)
-  local f = assert(io.popen("zsh -c '" .. command:format(...) .. "'"))
+  local f = assert(io.popen("zsh -c '" .. command:format(...) .. "' 2>/dev/null"))
   local result = f:read("*a")
   f:close()
   if result:sub(-1, -1) == "\n" then
@@ -78,32 +78,36 @@ cli.stat = function(args)
     local palette = read_run("cat level/palette/**/*.lua | wc -l")
     local other = total - engine - scripts - palette
 
-    print("# Code")
+    print("  CODE")
     print("Engine:  " .. engine)
     print("Scripts: " .. scripts)
     print("Palette: " .. palette)
     print("Other:   " .. other)
-    print()
     print("Total:   " .. total)
   end
 
   do
-    local dot_commits = read_run("git log --oneline --graph | wc -l")
-    local engine_commits = read_run("cd engine; git log --oneline --graph | wc -l")
-    local tags = read_run("git tag -l | wc -l")
+    local the_fallen_2 = read_run("git log --oneline --graph | wc -l")
+    local the_fallen_1 = 1602
+    local fallen = 1321
+    local fallen_python = 629
 
     print()
-    print("# Git")
-    print("Commits: " .. dot_commits + engine_commits)
-    print("DOT:     " .. dot_commits)
-    print("Engine:  " .. engine_commits)
-    print("Tags:    " .. tags)
+    print("  COMMITS")
+    print("The Fallen II:   " .. the_fallen_2)
+    print("The Fallen I:    " .. the_fallen_1)
+    print("Fallen:          " .. fallen)
+    print("Fallen (python): " .. fallen_python)
+    print("Total:           " .. the_fallen_2 + the_fallen_1 + fallen + fallen_python)
+
+    -- local tags = read_run("git tag -l | wc -l")
+    -- print("Tags:    " .. tags)
   end
 
   do
-    local words = tonumber(read_run("cat **/*.ms | wc -w"))
+    local words = tonumber(read_run("cat assets/screenplay/**/*.ms | wc -w"))
     print()
-    print("# Screenplay")
+    print("  SCREENPLAY")
     print("Words:", words)
   end
 end

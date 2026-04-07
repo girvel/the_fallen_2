@@ -181,17 +181,17 @@ end
 local input = {value = ""}
 
 report_console = function()
+  if ui.keyboard("return") then
+    command(input.value)
+    input.value = ""
+  end
+
   ui.br()
   ui.text("[F6] Console:")
   ui.start_line()
     ui.selector()
     ui.field(input, "value")
   ui.finish_line()
-
-  if ui.keyboard("return") then
-    command(input.value)
-    input.value = ""
-  end
 end
 
 --- @class overlay_point
