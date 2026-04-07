@@ -180,12 +180,16 @@ transform_colors = function(base, target_color)
   local main_color
   for i = 0, w * h - 1 do
     local color = pixels[i]
-    if color.a > 0
-      and Fun.iter(anchors):all(function(_, a) return not color_eq(a, color) end)
-    then
+    if color.a == 0 then goto continue end
+    for _, anchor in pairs(anchors) do
+      if color_eq(anchor, color) then
+        goto continue
+      end
       main_color = color
       break
     end
+
+    ::continue::
   end
 
   if not main_color then return end
@@ -196,9 +200,13 @@ transform_colors = function(base, target_color)
     for y = 0, h - 1 do
       local i = y * w + x
       local color = pixels[i]
-      local anchor_name = Fun.iter(anchors)
-        :filter(function(_, v) return color_eq(v, color) end)
-        :nth(1)
+      local anchor_name
+      for name, anchor in ipairs(anchors) do
+        if color_eq(anchor, color) then
+          anchor_name = name
+          break
+        end
+      end
 
       if anchor_name then
         result[anchor_name] = V(x, y)
