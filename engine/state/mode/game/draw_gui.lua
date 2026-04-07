@@ -664,7 +664,7 @@ use_mouse = function(self)
     if self.input_mode == "target" then ui.cursor("target_inactive") end
 
     local position = V(love.mouse.getPosition())
-      :sub_mut(State.camera.offset)
+      :add_mut(State.camera.offset)
       :div_mut(sprite.cell_size * 4)
       :map_mut(math.floor)
     local solid = State.grids.solids:slow_get(position)

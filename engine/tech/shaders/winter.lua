@@ -79,7 +79,7 @@ winter.new = function()
 end
 
 methods.update = function(self, dt)
-  self.love_shader:send("offset", -State.camera.offset)
+  self.love_shader:send("offset", State.camera.offset)
 end
 
 Ldump.mark(winter, "const", ...)

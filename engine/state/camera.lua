@@ -22,7 +22,7 @@ camera.new = function()
   return setmetatable({
     is_moving = false,
     is_camera_following = true,
-    camera_offset = Vector.zero,
+    offset = Vector.zero,
     vision_start = Vector.zero,
     vision_end = Vector.zero,
     sidebar_w = 0,
@@ -79,7 +79,8 @@ methods._update = function(self, dt)
           - math.min(1, (Kernel._delays.w or 0) * Kernel:get_key_rate("w"))
       end
 
-      self.offset = V(smooth_camera_offset:next(tx, ty, px, py, dt))
+      local x, y = self:_center(tx, ty)
+      self.offset = V(smooth_camera_offset:next(x, y, px, py, dt))
     end
 
     self.is_moving = prev_offset ~= self.offset
@@ -89,7 +90,7 @@ methods._update = function(self, dt)
 
   do
     local total_scale = self.SCALE * sprite.cell_size
-    self.vision_start = -(State.camera.offset / total_scale):map(math.ceil)
+    self.vision_start = (self.offset / total_scale):map(math.ceil):sub_mut(Vector.one)
     self.vision_end = V(love.graphics.getWidth() - self.sidebar_w, love.graphics.getHeight())
       :div_mut(total_scale)
       :map_mut(math.ceil)
@@ -104,12 +105,13 @@ end
 
 --- @param x number
 --- @param y number
---- @return number, number
+--- @return number x
+--- @return number y
 methods._center = function(self, x, y)
   local k = sprite.cell_size * self.SCALE
   return
-    math.floor((love.graphics.getWidth() - self.sidebar_w) / 2 - (x + .5) * k),
-    math.floor(love.graphics.getHeight() / 2 - (y + .5) * k)
+    math.floor((x + .5) * k - (love.graphics.getWidth() - self.sidebar_w) / 2),
+    math.floor((y + .5) * k - love.graphics.getHeight() / 2)
 end
 
 local SPRING_STIFFNESS = 100
@@ -118,11 +120,9 @@ local DAMPING_K = 2 * math.sqrt(SPRING_STIFFNESS)
 smooth_camera_offset = {
   vx = 0,
   vy = 0,
-  next = function(self, tx, ty, px, py, dt)
-    local dest_x, dest_y = State.camera:_center(tx, ty)
-
-    local dx = dest_x - px
-    local dy = dest_y - py
+  next = function(self, x, y, px, py, dt)
+    local dx = x - px
+    local dy = y - py
 
     local ax = SPRING_STIFFNESS * dx - DAMPING_K * self.vx
     local ay = SPRING_STIFFNESS * dy - DAMPING_K * self.vy
