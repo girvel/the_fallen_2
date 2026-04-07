@@ -1,6 +1,5 @@
 local inspect = require("engine.lib.inspect")
 local name = require("engine.lib.name")
-require("engine.lib.string")
 
 
 local log = {}

@@ -15,7 +15,7 @@ end
 
 local run = function(command, ...)
   command = command:format(...)
-  log.debug(command)
+  log.log("debug", 2, command)
   local exit_code = os.execute(command)
   if exit_code ~= 0 then
     log.fatal("Command exited with code %s", exit_code)
@@ -46,6 +46,9 @@ local parse_cli = function()
 
   parser:command("issues")
     :description("List issues")
+
+  parser:command("test")
+    :description("Run tests")
 
   return parser:parse()
 end
@@ -183,6 +186,12 @@ cli.issues = function(args)
   for _, source in ipairs {".", "engine", "engine/lib/moonspeak", "engine/lib/ldump"} do
     run("cd %s; gh issue list --state all --json number,title,body,comments -L 999 | jq 'map({number, title, body, comments: (.comments | map(.body))})' | cat", source)
   end
+end
+
+cli.test = function(args)
+  run("busted engine/lib/_tests -p test_ --verbose")
+  run("cd engine/lib/ldump; busted tests -p test_ --verbose")
+  run("cd engine/lib/moonspeak; busted tests -p test_ --verbose")
 end
 
 local args = parse_cli()
