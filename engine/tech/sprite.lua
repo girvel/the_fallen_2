@@ -201,7 +201,7 @@ transform_colors = function(base, target_color)
       local i = y * w + x
       local color = pixels[i]
       local anchor_name
-      for name, anchor in ipairs(anchors) do
+      for name, anchor in pairs(anchors) do
         if color_eq(anchor, color) then
           anchor_name = name
           break
