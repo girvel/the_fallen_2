@@ -299,7 +299,7 @@ solids.player = function()
   local result = {
     name = "Протагонист",
     base_abilities = abilities.new(8, 8, 8, 8, 8, 8),
-    level = 1,
+    level = 0,
     perks = {},
     faction = "player",
   }
