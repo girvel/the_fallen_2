@@ -1,3 +1,9 @@
+local item = require("engine.tech.item")
+local perks = require("engine.mech.perks")
+local animated = require("engine.tech.animated")
+local creature = require("engine.mech.creature")
+local wandering = require("engine.mech.ais.wandering")
+local combat_ai = require("engine.mech.ais.combat")
 local health = require("engine.mech.health")
 local factoring = require("engine.tech.factoring")
 local sound = require("engine.tech.sound")
@@ -306,6 +312,79 @@ solids.player = function()
   player_base.mix_in(result)
   humanoid.mix_in(result)
   return result
+end
+
+local PIG_CUES = {
+  blood = function()
+    local e = {
+      name = "Кровь свиньи",
+      codename = "pig_blood",
+      slot = "blood",
+      anchor = "head",
+      boring_flag = true,
+    }
+    animated.mix_in(e, "assets/animations/pig_blood")
+    return e
+  end,
+}
+
+solids.pig = function()
+  local e = {
+    name = "Свинья",
+    codename = "pig",
+    base_abilities = abilities.new(10, 14, 10, 4, 10, 6),
+    level = 1,
+    ai = wandering.new(),
+    max_hp = 4,
+    faction = "pigs",
+    cues = PIG_CUES,
+    perks = {
+      perks.passive,
+    },
+    on_half_hp = humanoid.add_blood_mark,
+    on_death = humanoid.add_blood_mark,
+  }
+  creature.mix_in(e)
+  animated.mix_in(e, "assets/animations/pig")
+  return e
+end
+
+local tusks = function()
+  local e = {
+    name = "Клыки",
+    codename = "tusks",
+    boring_flag = true,
+    slot = "head",
+    no_drop_flag = true,
+    tags = {},
+  }
+  animated.mix_in(e, "assets/animations/tusks")
+  return e
+end
+
+solids.boar = function()
+  local e = {
+    name = "Кабан",
+    codename = "boar",
+    base_abilities = abilities.new(13, 12, 12, 2, 9, 5),
+    level = 1,
+    ai = combat_ai.new({scan_range = 5}),
+    max_hp = 11,
+    faction = "predators",
+    inventory = {
+      head = tusks(),
+      hand = item.natural_weapon(D(6)),
+    },
+    cues = PIG_CUES,
+    perks = {
+      perks.relentless,
+    },
+    on_half_hp = humanoid.add_blood_mark,
+    on_death = humanoid.add_blood_mark,
+  }
+  creature.mix_in(e)
+  animated.mix_in(e, "assets/animations/pig")
+  return e
 end
 
 Ldump.mark(solids, {}, ...)
