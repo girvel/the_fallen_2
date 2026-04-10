@@ -12,16 +12,18 @@ local methods = {}
 creature.mix_in = function(entity)
   Table.assert_fields(entity, {"base_abilities", "level"})
 
-  entity.resources = {}
-  entity.inventory = {}
-  entity.perks = {}
-  entity.conditions = {}
-  entity.sounds = {
-    hit = sound.multiple("engine/assets/sounds/hit/body", .3),
-  }
-  entity.transparent_flag = true
-  entity.moving_flag = true
-  entity.xp = 0
+  if entity.resources == nil then entity.resources = {} end
+  if entity.inventory == nil then entity.inventory = {} end
+  if entity.perks == nil then entity.perks = {} end
+  if entity.conditions == nil then entity.conditions = {} end
+  if entity.transparent_flag == nil then entity.transparent_flag = true end
+  if entity.moving_flag == nil then entity.moving_flag = true end
+  if entity.xp == nil then entity.xp = 0 end
+  if entity.sounds == nil then
+    entity.sounds = {
+      hit = sound.multiple("engine/assets/sounds/hit/body", .3),
+    }
+  end
 
   Table.extend(entity, methods)
 
