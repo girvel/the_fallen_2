@@ -7,15 +7,14 @@ local humanoid = {}
 
 humanoid.cues = {
   blood = function()
-    return Table.extend(
-      animated.mixin("engine/assets/animations/blood"),
-      {
-        name = "Кровь",
-        codename = "blood",
-        slot = "blood",
-        boring_flag = true,
-      }
-    )
+    local e = {
+      name = "Кровь",
+      codename = "blood",
+      slot = "blood",
+      boring_flag = true,
+    }
+    animated.mix_in(e, "engine/assets/animations/blood")
+    return e
   end,
 }
 
