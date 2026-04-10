@@ -5,9 +5,9 @@ local tk = require("engine.state.mode.tk")
 
 local HAIR_TYPES = {
   {codename = "none", name = "Лысый"},
-  {codename = "short_hair_1", name = "Короткие (1)"},
-  {codename = "short_hair_2", name = "Короткие (2)"},
-  {codename = "short_hair_3", name = "Короткие (3)"},
+  {codename = "hair_short_1", name = "Короткие (1)"},
+  {codename = "hair_short_2", name = "Короткие (2)"},
+  {codename = "hair_short_3", name = "Короткие (3)"},
 }
 
 local HAIR_COLORS = {
@@ -18,9 +18,9 @@ local HAIR_COLORS = {
 
 local SKIN = {
   {codename = "none", name = "Чистая"},
-  {codename = "cheek_scar", name = "Шрам на щеке"},
-  {codename = "eye_scar", name = "Шрам у глаза"},
-  {codename = "snake_tatoo", name = "Татуировка змеи"},
+  {codename = "scar_cheek", name = "Шрам на щеке"},
+  {codename = "scar_eye", name = "Шрам у глаза"},
+  {codename = "tatoo_snake", name = "Татуировка змеи"},
 }
 
 local appearance_editor = {}

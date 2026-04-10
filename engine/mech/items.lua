@@ -4,7 +4,7 @@ local item = require("engine.tech.item")
 
 local items = {}
 
---- @alias hair_type "short_hair_1"|"short_hair_2"|"short_hair_3"|"long_hair"
+--- @alias hair_type "hair_short_1"|"hair_short_2"|"hair_short_3"|"hair_long"
 --- @enum (key) hair_color
 local hair_colors = {
   gray = Vector.hex("4f5a5c"),
@@ -16,23 +16,23 @@ local hair_colors = {
 --- @param color hair_color|vector
 items.hair = function(type, color)
   color = hair_colors[color] or color  --- @cast color vector
-
-  return Table.extend(
-    item.mixin_min("hair"),
-    animated.mixin("assets/animations/" .. type, "directional", color),
-    {
-      anchor = "head",
-    }
-  )
+  local e = {
+    anchor = "head"
+  }
+  item.mix_min(e, "hair")
+  animated.mix_in(e, "engine/assets/animations/" .. type, "directional", color)
+  return e
 end
 
---- @param type "snake_tatoo"|"cheek_scar"|"eye_scar"
+--- @param type "tatoo_snake"|"scar_cheek"|"scar_eye"
 items.skin = function(type)
-  return Table.extend(item.mixin("assets/animations/" .. type), {
+  local e = {
     codename = type,
     slot = "skin",
     anchor = "head",
-  })
+  }
+  item.mix_in(e, "engine/assets/animations/" .. type)
+  return e
 end
 
 return items
