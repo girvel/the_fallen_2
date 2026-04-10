@@ -4,6 +4,7 @@ local animated = require("engine.tech.animated")
 --- All perks except feats
 local perks = {}
 
+--- Does not use opportunity attacks
 perks.passive = {
   modify_activation = function(self, entity, value, codename)
     if codename == "opportunity_attack" then
@@ -15,6 +16,7 @@ perks.passive = {
 
 perks.relentless = {
   modify_hp = function(self, entity, value)
+    --- TODO relentless charge instead of State.period
     if value <= 0 and State.period:once(perks.relentless, State.combat, entity) then
       State:add(animated.fx("engine/assets/animations/relentless", entity.position))
       -- SOUND relentless
