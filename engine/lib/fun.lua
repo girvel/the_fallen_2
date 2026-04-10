@@ -847,7 +847,7 @@ end
 local map = function(fun, gen, param, state)
     return wrap(map_gen, {gen, param, fun}, state)
 end
---- @type fun(self: fun_iter, f: fun(...): any): fun_iter
+--- @type fun(self: fun_iter, f: fun(...): ...): fun_iter
 methods.map = method1(map)
 exports.map = export1(map)
 
