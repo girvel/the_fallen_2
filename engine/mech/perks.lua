@@ -15,9 +15,16 @@ perks.passive = {
 }
 
 perks.relentless = {
+  modify_resources = function(self, entity, resources, rest_type)
+    if rest_type == "long" then
+      resources.relentless = (resources.relentless or 0) + 1
+    end
+    return resources
+  end,
+
   modify_hp = function(self, entity, value)
-    --- TODO relentless charge instead of State.period
-    if value <= 0 and State.period:once(perks.relentless, State.combat, entity) then
+    if value <= 0 and entity.resources.relentless > 0 then
+      entity.resources.relentless = entity.resources.relentless - 1
       State:add(animated.fx("engine/assets/animations/relentless", entity.position))
       -- SOUND relentless
       return 1
