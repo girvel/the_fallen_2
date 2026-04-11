@@ -25,5 +25,12 @@ methods._act = function(self, entity)
   health.attack(entity, self.target, attack_roll, damage_roll)
 end
 
+eldritch_blast.perk = {
+  modify_additional_actions = function(self, entity, list)
+    table.insert(list, self)
+    return list
+  end,
+end
+
 Ldump.mark(eldritch_blast, {mt = "const"}, ...)
 return eldritch_blast

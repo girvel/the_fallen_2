@@ -315,28 +315,6 @@ base_attack = function(entity, slot)
   end)
 end
 
-actions.bow_attack_base = Table.extend({
-  name = "выстрелить",
-  codename = "bow_attack",
-
-  cost = {
-    actions = 1,
-  },
-
-  _is_available = function(self, entity)
-    return entity.inventory
-      and entity.inventory.offhand
-      and entity.inventory.offhand.tags.ranged
-  end,
-
-  get_hint = function(self, entity)
-    return ("%s (%s)"):format(
-      Name.game(self),
-      entity:get_damage_roll("offhand"):simplified()
-    )
-  end
-}, action.base)
-
 actions.BOW_ATTACK_RANGE = 15
 
 actions.bow_attack = function(target)
@@ -400,6 +378,30 @@ actions.bow_attack = function(target)
     end,
   })
 end
+
+actions.bow_attack_base = Table.extend({
+  name = "выстрелить",
+  codename = "bow_attack",
+  parameter_type = "entity_target",
+  produce = actions.bow_attack,
+
+  cost = {
+    actions = 1,
+  },
+
+  _is_available = function(self, entity)
+    return entity.inventory
+      and entity.inventory.offhand
+      and entity.inventory.offhand.tags.ranged
+  end,
+
+  get_hint = function(self, entity)
+    return ("%s (%s)"):format(
+      Name.game(self),
+      entity:get_damage_roll("offhand"):simplified()
+    )
+  end
+}, action.base)
 
 --- @type action
 actions.interact = Table.extend({

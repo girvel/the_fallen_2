@@ -21,7 +21,8 @@ local api         = require("engine.tech.api")
 --   internal state -> game mode fields
 
 -- Internal state
-local cost, hint, mouse_task, mouse_task_path, is_compact, open_escape_menu
+local input_mode, cost, hint, mouse_task, mouse_task_path, is_compact, target_action
+input_mode = "normal"
 
 -- Utility functions
 local action_button, set_mouse_task
@@ -35,7 +36,6 @@ local draw_gui, draw_sidebar, draw_top_bars, draw_action_grid, draw_resources, d
 --- @param dt number
 draw_gui = function(self, dt)
   is_compact = love.graphics.getHeight() < 900
-  open_escape_menu = false
   hint = nil
 
   draw_curtain()
@@ -97,7 +97,14 @@ action_button = function(action, hotkey)
   local codename = is_available and action.codename or (action.codename .. "_inactive")
   local button = ui.key_button(gui_elements[codename], hotkey, not is_available)
   if button.is_clicked then
-    player.ai:plan_action(action)
+    if action.parameter_type == nil then
+      player.ai:plan_action(action)
+    elseif action.parameter_type == "entity_target" then
+      input_mode = "target"
+      target_action = action
+    else
+      Error("Unsupported action's .parameter_type %s", action.parameter_type)
+    end
   end
   if button.is_mouse_over then
     cost = action.cost
@@ -160,10 +167,10 @@ draw_action_grid = function(self)
   ui.finish_frame()
 
   ui.start_frame(4)
-    if self.input_mode == "normal" then
+    if input_mode == "normal" then
       draw_keyboard_action_grid(self)
     else
-      assert(self.input_mode == "target")
+      assert(input_mode == "target")
       draw_mouse_action_grid(self)
     end
   ui.finish_frame()
@@ -253,21 +260,23 @@ draw_keyboard_action_grid = function(self)
   ui.start_line()
     local offhand = State.player.inventory.offhand
     if offhand and offhand.tags.ranged then
-      -- when there would be multiple parametrized actions, we can redo this hardcode into an
-      -- action_button branch; instead of base action + action factory we can do like an action
-      -- class with static methods and like .producer_flag = true; if action_button receives an
-      -- action, it does action; if it receives a producer, it does parametrized two-step action.
-      local is_available = actions.bow_attack_base:is_available(State.player)
-      local image = is_available
-        and gui_elements.bow_attack
-        or gui_elements.bow_attack_inactive
-      local button = ui.key_button(image, "1", not is_available)
-      if button.is_clicked then
-        self.input_mode = "target"
-      end
-      if button.is_mouse_over then
-        hint = actions.bow_attack_base:get_hint(State.player)
-      end
+      action_button(actions.bow_attack_base, "1")
+
+      -- -- when there would be multiple parametrized actions, we can redo this hardcode into an
+      -- -- action_button branch; instead of base action + action factory we can do like an action
+      -- -- class with static methods and like .producer_flag = true; if action_button receives an
+      -- -- action, it does action; if it receives a producer, it does parametrized two-step action.
+      -- local is_available = actions.bow_attack_base:is_available(State.player)
+      -- local image = is_available
+      --   and gui_elements.bow_attack
+      --   or gui_elements.bow_attack_inactive
+      -- local button = ui.key_button(image, "1", not is_available)
+      -- if button.is_clicked then
+      --   input_mode = "target"
+      -- end
+      -- if button.is_mouse_over then
+      --   hint = actions.bow_attack_base:get_hint(State.player)
+      -- end
     else
       action_button(actions.hand_attack, "1")
     end
@@ -298,7 +307,7 @@ end
 draw_mouse_action_grid = function(self)
   local escape_button = ui.key_button(gui_elements.escape, "escape")
   if escape_button.is_clicked then
-    self.input_mode = "normal"
+    input_mode = "normal"
   end
   if escape_button.is_mouse_over then
     hint = "отмена"
@@ -661,7 +670,7 @@ use_mouse = function(self)
   end
 
   ui.start_frame(nil, nil, love.graphics.getWidth() - State.camera.sidebar_w)
-    if self.input_mode == "target" then ui.cursor("target_inactive") end
+    if input_mode == "target" then ui.cursor("target_inactive") end
 
     local position = V(love.mouse.getPosition())
       :add_mut(State.camera.offset)
@@ -673,13 +682,13 @@ use_mouse = function(self)
     local lmb = ui.mousedown(1)
     local rmb = ui.mousedown(2)
 
-    if self.input_mode == "target" then
+    if input_mode == "target" then
       if rmb then
-        self.input_mode = "normal"
+        input_mode = "normal"
       end
 
       if solid then
-        local action = actions.bow_attack(solid)
+        local action = target_action.produce(solid)
 
         if action:is_available(State.player) then
           ui.cursor("target_active")

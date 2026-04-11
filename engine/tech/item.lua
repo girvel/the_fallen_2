@@ -35,19 +35,20 @@ item.mix_in = function(entity, animation_path)
     self.position = nil
     State:add(self)
   end)
-  entity.inventory = {
+  entity.inventory = entity.inventory or {
     highlight = item.cues.highlight(),
   }
-  entity.tags = {}
-  entity.direction = Vector.right  -- needed to initially animate into idle_right instead of idle
+  entity.tags = entity.tags or {}
+  entity.direction = entity.direction or Vector.right
+    -- needed to initially animate into idle_right instead of idle
 end
 
 --- @param entity table
 --- @param slot string
 item.mix_min = function(entity, slot)
-  entity.tags = {}
-  entity.direction = Vector.right
-  entity.slot = slot
+  entity.tags = entity.tags or {}
+  entity.direction = entity.direction or Vector.right
+  entity.slot = entity.slot or slot
 end
 
 --- @param damage_roll d

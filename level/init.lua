@@ -2,5 +2,5 @@
 return {
   ldtk_path = "level/level.ldtk",
   palette = Table.do_folder("level/palette"),
-  rails = {},
+  rails = require("level.rails").new(),
 }

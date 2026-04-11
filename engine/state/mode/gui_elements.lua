@@ -49,6 +49,7 @@ local gui_elements = {
   great_weapon_master_inactive = nth(44),
 
   fighting_styles = nth(49),
+  eldritch_blast = nth(65),
 
   window_bg = "engine/assets/gui/window_bg.png",
   bar_bg = "engine/assets/gui/bar_bg.png",
