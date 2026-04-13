@@ -1,5 +1,4 @@
 local healing_word = require("engine.mech.spells.healing_word")
-local animate_dead = require("engine.mech.spells.animate_dead")
 local fighter = require("engine.mech.class.fighter")
 local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
@@ -85,24 +84,6 @@ end
 tk.heal = function(entity)
   if entity.hp <= entity:get_max_hp() / 2 and fighter.second_wind:act(entity) then
     async.sleep(.2)
-  end
-
-  do
-    if animate_dead.base:is_available(entity) then
-      for v in Iteration.rhombus(20) do
-        local p = v:add_mut(entity.position)
-        local target = State.grids.marks:slow_get(p)
-        local spell = animate_dead.new(target)
-
-        if spell:is_available(entity) then
-          if not spell:act(entity) then break end
-          entity.animation._end_promise:wait()
-          if not animate_dead.base:is_available(entity) then
-            break
-          end
-        end
-      end
-    end
   end
 
   for spell_level = 2, 1, -1 do

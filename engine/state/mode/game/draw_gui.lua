@@ -1,3 +1,4 @@
+local level = require("engine.tech.level")
 local sprite = require("engine.tech.sprite")
 local class = require("engine.mech.class")
 local xp = require("engine.mech.xp")
@@ -97,10 +98,10 @@ action_button = function(action, hotkey)
   local codename = is_available and action.codename or (action.codename .. "_inactive")
   local image = gui_elements[codename]
   if not image then
-    Error("Missing image for action %s", codename)
-    return
+    Log.warn_once("Missing image for action %s", codename)
+    image = gui_elements.unknown
   end
-  local button = ui.key_button(gui_elements[codename], hotkey, not is_available)
+  local button = ui.key_button(image, hotkey, not is_available)
   if button.is_clicked then
     if action.parameter_type == nil then
       player.ai:plan_action(action)
@@ -692,12 +693,14 @@ use_mouse = function(self)
         input_mode = "normal"
       end
 
-      if solid then
-        if target_action:target_filter(State.player, solid) then
+      for _, grid_layer in ipairs(level.grid_layers) do
+        local target = State.grids[grid_layer]:slow_get(position)
+        if target and target_action:target_filter(State.player, target) then
           ui.cursor("target_active")
           if rmb then
-            State.player.ai:plan_action(target_action, solid)
+            State.player.ai:plan_action(target_action, target)
           end
+          break
         end
       end
     else

@@ -163,6 +163,21 @@ log.warn = function(fmt, ...)
   return log.log("warn", 1, fmt, ...)
 end
 
+local warned = {}
+
+--- @generic T
+--- @param fmt any
+--- @param ... T
+--- @return T
+log.warn_once = function(fmt, ...)
+  if select("#", ...) > 0 then
+    fmt = fmt:format(...)
+  end
+  if warned[fmt] then return ... end
+  warned[fmt] = true
+  return log.log("warn", 1, fmt)
+end
+
 --- @generic T
 --- @param fmt any
 --- @param ... T

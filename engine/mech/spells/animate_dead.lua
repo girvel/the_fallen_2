@@ -1,55 +1,39 @@
+local monsters = require("engine.mech.monsters")
 local animated = require("engine.tech.animated")
 local action = require("engine.tech.action")
 
 
-local animate_dead = {}
-
---- @class spells_animate_dead: action
---- @field target entity
-local methods = {}
-animate_dead.mt = {__index = methods}
-
---- @type spells_animate_dead|table
-animate_dead.base = Table.extend({
+local animate_dead = {
   codename = "animate_dead",
 
   cost = {
     actions = 1,
-    spell_slots_3 = 1,
+    -- NEXT uncomment
+    -- spell_slots_3 = 1,
   },
-}, action.base)
 
---- @param target entity
---- @return spells_animate_dead
-animate_dead.new = function(target)
-  return setmetatable(Table.extend({
-    target = target
-  }, animate_dead.base), animate_dead.mt)
-end
+  is_available = action.make_is_available(),
 
-methods._is_available = function(self, entity)
-  if not (State:exists(self.target) and self.target.body_flag) then return false end
-  return true
-end
+  parameter_type = "entity_target",
+  target_filter = function(self, entity, target)
+    return State:exists(target) and target.body_flag
+  end,
 
-methods._act = function(self, entity)
-  -- TODO remove reference to game code by extracting commonly used monsters & items
-  local npcs = require("level.palette.npcs")
-  local position = State.grids.solids:find_free_position(self.target.position)
-  if not position then return false end
+  act = action.make_act(function(self, entity, target)
+    -- TODO remove reference to game code by extracting commonly used monsters & items
+    local position = State.grids.solids:find_free_position(target.position)
+    if not position then return false end
 
-  State:remove(self.target)
-  entity:animate("gesture")
-  local fx = animated.add_fx("engine/assets/animations/skeleton_raise", position, "solids")
-  fx.on_remove = function()
-    State:add(npcs.skeleton_heavy(), {
-      position = position,
-      grid_layer = "solids",
-      faction = entity.faction
-    })
-  end
-  return true
-end
+    State:remove(target)
+    entity:animate("gesture")
+    local fx = animated.add_fx("engine/assets/animations/skeleton_raise", position, "solids")
+    fx.on_remove = function()
+      local e = State:add_at(monsters.skeleton_heavy(), position, "solids")
+      e.faction = entity.faction
+    end
+    return true
+  end),
+}
 
-Ldump.mark(animate_dead, {mt = "const"}, ...)
+Ldump.mark(animate_dead, "const", ...)
 return animate_dead

@@ -36,7 +36,9 @@ local gui_elements = {
   escape_inactive = nth(29),
 
   bow_attack = nth(22),
+  unknown = nth(23),
   bow_attack_inactive = nth(30),
+  unknown_inactive = nth(31),
 
   second_wind = nth(33),
   action_surge = nth(34),

@@ -1,3 +1,4 @@
+local animate_dead = require("engine.mech.spells.animate_dead")
 local eldritch_blast = require("engine.mech.spells.eldritch_blast")
 local item = require("engine.tech.item")
 local perks = require("engine.mech.perks")
@@ -316,7 +317,7 @@ solids.player = function()
     name = "Протагонист",
     base_abilities = abilities.new(8, 8, 8, 8, 8, 8),
     level = 0,
-    perks = {provide(eldritch_blast)},
+    perks = {provide(eldritch_blast), provide(animate_dead)},
     faction = "player",
   }
   player_base.mix_in(result)
@@ -352,7 +353,7 @@ solids.pig = function()
       perks.passive,
     },
     on_half_hp = humanoid.add_blood_mark,
-    on_death = humanoid.add_blood_mark,
+    on_death = humanoid.add_body,
   }
   creature.mix_in(e)
   animated.mix_in(e, "assets/animations/pig")
@@ -390,7 +391,7 @@ solids.boar = function()
       perks.relentless,
     },
     on_half_hp = humanoid.add_blood_mark,
-    on_death = humanoid.add_blood_mark,
+    on_death = humanoid.add_body,
   }
   creature.mix_in(e)
   animated.mix_in(e, "assets/animations/pig")
