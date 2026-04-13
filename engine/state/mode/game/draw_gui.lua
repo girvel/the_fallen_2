@@ -95,6 +95,11 @@ action_button = function(action, hotkey)
   local player = State.player
   local is_available = action:is_available(player) and State.player:can_act()
   local codename = is_available and action.codename or (action.codename .. "_inactive")
+  local image = gui_elements[codename]
+  if not image then
+    Error("Missing image for action %s", codename)
+    return
+  end
   local button = ui.key_button(gui_elements[codename], hotkey, not is_available)
   if button.is_clicked then
     if action.parameter_type == nil then
@@ -260,7 +265,7 @@ draw_keyboard_action_grid = function(self)
   ui.start_line()
     local offhand = State.player.inventory.offhand
     if offhand and offhand.tags.ranged then
-      action_button(actions.bow_attack_base, "1")
+      action_button(actions.bow_attack, "1")
 
       -- -- when there would be multiple parametrized actions, we can redo this hardcode into an
       -- -- action_button branch; instead of base action + action factory we can do like an action
@@ -688,12 +693,10 @@ use_mouse = function(self)
       end
 
       if solid then
-        local action = target_action.produce(solid)
-
-        if action:is_available(State.player) then
+        if target_action:target_filter(State.player, solid) then
           ui.cursor("target_active")
           if rmb then
-            State.player.ai:plan_action(action)
+            State.player.ai:plan_action(target_action, solid)
           end
         end
       end
@@ -747,12 +750,14 @@ use_mouse = function(self)
           or player_hostility == nil and State.hostility:get(solid, State.player) == "enemy"
         )
       end
-      local bow_attack = actions.bow_attack(solid)
 
-      if bow_attack:is_available(State.player) and is_a_potential_target then
+      if is_a_potential_target
+        and actions.bow_attack:is_available(State.player)
+        and actions.bow_attack:target_filter(State.player, solid)
+      then
         ui.cursor("target_active")
         if rmb then
-          State.player.ai:plan_action(bow_attack)
+          State.player.ai:plan_action(actions.bow_attack, solid)
         end
       end
 

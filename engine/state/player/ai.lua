@@ -7,6 +7,7 @@ local ai = {}
 --- @class player_ai
 --- @field finish_turn boolean?
 --- @field _next_actions action[]
+--- @field _next_parameters {value: any}[]
 --- @field _action_promises promise[]
 --- @field _vision_map tcod_map
 local methods = {}
@@ -17,6 +18,7 @@ ai.new = function()
   return setmetatable({
     finish_turn = nil,
     _next_actions = {},
+    _next_parameters = {},
     _action_promises = {},
 
     target = true,  -- a little hack for ally combat AI to follow the player when hesitant
@@ -41,10 +43,11 @@ methods.control = function(self, entity)
 
   while true do
     for i, a in ipairs(self._next_actions) do
-      local ok = a:act(entity)
+      local ok = a:act(entity, self._next_parameters[i].value)
       self._action_promises[i]:resolve(ok)
     end
     self._next_actions = {}
+    self._next_parameters = {}
     self._action_promises = {}
 
     if not State.combat or self.finish_turn then break end
@@ -73,11 +76,13 @@ end
 ---
 --- Promise resolves with false if can't act
 --- @param action action
+--- @param parameter? any
 --- @return promise?
-methods.plan_action = function(self, action)
+methods.plan_action = function(self, action, parameter)
   -- TODO maybe not needed, we've got State.runner now?
   local promise = Promise.new()
   table.insert(self._next_actions, action)
+  table.insert(self._next_parameters, {value = parameter})
   table.insert(self._action_promises, promise)
   return promise
 end

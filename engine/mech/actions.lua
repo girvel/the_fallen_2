@@ -403,6 +403,86 @@ actions.bow_attack_base = Table.extend({
   end
 }, action.base)
 
+actions.bow_attack = {
+  name = "выстрелить",
+  codename = "bow_attack",
+  sounds = sound.multiple("engine/assets/sounds/bow"),
+  cost = {
+    actions = 1,
+  },
+
+  get_hint = function(self, entity)
+    return ("%s (%s)"):format(
+      Name.game(self),
+      entity:get_damage_roll("offhand"):simplified()
+    )
+  end,
+
+  is_available = action.make_is_available(function(self, entity)
+    return entity.inventory
+      and entity.inventory.offhand
+      and entity.inventory.offhand.tags.ranged
+      or false
+  end),
+
+  parameter_type = "entity_target",
+  target_filter = function(self, entity, target)
+    if not (actions.bow_attack_base:_is_available(entity)
+      and target
+      and target.hp
+      and State.hostility:get(entity, target) ~= "ally")
+    then return false end
+
+    local result do
+      local vision_map = tcod.map(State.grids.solids)
+      vision_map:refresh_fov(entity.position, actions.BOW_ATTACK_RANGE)
+      result = vision_map:is_visible_unsafe(unpack(target.position))
+      vision_map:free()
+    end
+
+    return result
+  end,
+
+  act = action.make_act(function(self, entity, target)
+    local d = (target.position - entity.position)
+    if d ~= Vector.zero then
+      entity:rotate(d:normalized2())
+    end
+
+    local arrow = State:add(entity.inventory.offhand.projectile_factory())
+    arrow.direction = entity.direction
+    assert(not entity.inventory.hand)
+    entity.inventory.hand = arrow
+
+    entity:animate("bow_attack"):next(function()
+      if not State:exists(target) then
+        State:remove(entity.inventory.hand)
+        entity.inventory.hand = nil
+        return
+      end
+
+      local attack_roll = entity:get_attack_roll("offhand")
+      local damage_roll = entity:get_damage_roll("offhand")
+
+      self.sounds:play_at(entity.position, "medium")
+      projectile.launch(entity, "hand", target, damage_roll:max() * 2):next(function()
+        -- SOUND hit?
+        if d:abs2() == 1 then
+          attack_roll = attack_roll:set("disadvantage")
+        end
+        health.attack(
+          entity,
+          target,
+          attack_roll,
+          damage_roll
+        )
+        State.hostility:register(entity, target)
+      end)
+    end)
+    return true
+  end),
+}
+
 --- @type action
 actions.interact = Table.extend({
   name = "взаимодействовать",
