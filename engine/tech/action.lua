@@ -43,5 +43,9 @@ action.base = {
   end,
 }
 
+action.mix_in = function(t)
+  Table.defaults(t, action.base)
+end
+
 Ldump.mark(action, "const", ...)
 return action

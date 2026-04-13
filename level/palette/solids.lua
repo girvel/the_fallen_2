@@ -1,3 +1,4 @@
+local eldritch_blast = require("engine.mech.spells.eldritch_blast")
 local item = require("engine.tech.item")
 local perks = require("engine.mech.perks")
 local animated = require("engine.tech.animated")
@@ -306,7 +307,7 @@ solids.player = function()
     name = "Протагонист",
     base_abilities = abilities.new(8, 8, 8, 8, 8, 8),
     level = 0,
-    perks = {},
+    perks = {eldritch_blast.perk},
     faction = "player",
   }
   player_base.mix_in(result)
