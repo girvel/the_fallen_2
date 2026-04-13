@@ -315,6 +315,9 @@ base_attack = function(entity, slot)
   end)
 end
 
+-- TODO reconsider this constant
+actions.BOW_ATTACK_RANGE = 15
+
 actions.bow_attack = {
   name = "выстрелить",
   codename = "bow_attack",
@@ -339,8 +342,7 @@ actions.bow_attack = {
 
   parameter_type = "entity_target",
   target_filter = function(self, entity, target)
-    if not (actions.bow_attack_base:_is_available(entity)
-      and target
+    if not (target
       and target.hp
       and State.hostility:get(entity, target) ~= "ally")
     then return false end

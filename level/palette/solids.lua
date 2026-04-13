@@ -300,6 +300,15 @@ end
 -- [SECTION] Entities
 ----------------------------------------------------------------------------------------------------
 
+local provide = Memoize(function(action)
+  return {
+    modify_additional_actions = function(self, entity, list)
+      table.insert(list, action)
+      return list
+    end,
+  }
+end)
+
 --- @class player: player_base
 
 solids.player = function()
@@ -307,7 +316,7 @@ solids.player = function()
     name = "Протагонист",
     base_abilities = abilities.new(8, 8, 8, 8, 8, 8),
     level = 0,
-    perks = {eldritch_blast.perk},
+    perks = {provide(eldritch_blast)},
     faction = "player",
   }
   player_base.mix_in(result)

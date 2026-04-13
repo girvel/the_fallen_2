@@ -1,58 +1,46 @@
+local actions = require("engine.mech.actions")
+local tcod = require("engine.tech.tcod")
 local health = require("engine.mech.health")
 local xp = require("engine.mech.xp")
 local action = require("engine.tech.action")
 
 
-local eldritch_blast = {}
-
---- @class spells_eldritch_blast: action
---- @field target entity
-local methods = {}
-
---- @return spells_eldritch_blast
-eldritch_blast.new = function(target)
-  local t = {}
-  Table.extend(t, eldritch_blast.prelude)
-  Table.extend(t, methods)
-  t.target = target
-  return t
-end
-
-methods._act = function(self, entity)
-  local attack_roll = D(20)
-    + entity:get_modifier("cha")
-    + xp.get_proficiency_bonus(entity.level or 1)
-  local damage_roll = D(10)
-  health.attack(entity, self.target, attack_roll, damage_roll)
-  return true
-end
-
-eldritch_blast.prelude = {
+local eldritch_blast = {
   name = "мистический заряд",
   codename = "eldritch_blast",
-  parameter_type = "entity_target",
-  produce = eldritch_blast.new,
   cost = {
     actions = 1,
   },
 
-  _act = function()
-    Error("Attempting to call .act on prelude to an action")
+  parameter_type = "entity_target",
+  target_filter = function(self, entity, target)
+    -- TODO duplicated actions.bow_attack.target_filter, should be action.make_enemy_target_filter(range)
+    if not (target
+      and target.hp
+      and State.hostility:get(entity, target) ~= "ally")
+    then return false end
+
+    local result do
+      local vision_map = tcod.map(State.grids.solids)
+      vision_map:refresh_fov(entity.position, actions.BOW_ATTACK_RANGE)
+      result = vision_map:is_visible_unsafe(unpack(target.position))
+      vision_map:free()
+    end
+
+    return result
   end,
 
-  get_hint = function(self, entity)
-    return "TODO"
-  end,
+  is_available = action.make_is_available(),
+
+  act = action.make_act(function(self, entity, target)
+    local attack_roll = D(20)
+      + entity:get_modifier("cha")
+      + xp.get_proficiency_bonus(entity.level or 1)
+    local damage_roll = D(10)
+    health.attack(entity, target, attack_roll, damage_roll)
+    return true
+  end),
 }
 
-action.mix_in(eldritch_blast.prelude)
-
-eldritch_blast.perk = {
-  modify_additional_actions = function(self, entity, list)
-    table.insert(list, eldritch_blast.prelude)
-    return list
-  end,
-}
-
-Ldump.mark(eldritch_blast, {}, ...)
+Ldump.mark(eldritch_blast, "const", ...)
 return eldritch_blast
