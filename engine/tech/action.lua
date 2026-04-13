@@ -51,6 +51,8 @@ end
 --- @class action_strict
 --- @field codename? string
 --- @field cost? table<string, number>
+--- @field parameter_type? "entity_target"
+--- @field target_filter? fun(self: action, entity: entity, target: entity): boolean
 local action_methods = {
   --- @param entity entity
   is_available = function(self, entity) end,
