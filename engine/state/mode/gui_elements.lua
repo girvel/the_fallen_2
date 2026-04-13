@@ -50,6 +50,7 @@ local gui_elements = {
 
   fighting_styles = nth(49),
   eldritch_blast = nth(65),
+  eldritch_blast_inactive = nth(73),
 
   window_bg = "engine/assets/gui/window_bg.png",
   bar_bg = "engine/assets/gui/bar_bg.png",
