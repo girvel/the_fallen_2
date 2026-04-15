@@ -60,13 +60,10 @@ health.set_hp = function(target, value)
   local before = target.hp
   target.hp = value
 
-  if target.get_max_hp then
-    item.set_cue(target, "blood", target.hp <= target:get_max_hp() / 2)
-  end
-
   if target.hp > 0 then
     if target.get_max_hp then
       local half = target:get_max_hp() / 2
+      item.set_cue(target, "blood", target.hp <= half)
       if target.on_half_hp and before and before > half and target.hp <= half then
         target:on_half_hp()
       end
@@ -74,7 +71,7 @@ health.set_hp = function(target, value)
     return false
   end
 
-  if (before or before > 0) and target.on_death then
+  if before and before > 0 and target.on_death then
     target:on_death()
   end
 
