@@ -99,7 +99,7 @@ action_button = function(action, hotkey)
   local image = gui_elements[codename]
   if not image then
     Log.warn_once("Missing image for action %s", codename)
-    image = gui_elements.unknown
+    image = is_available and gui_elements.unknown or gui_elements.unknown_inactive
   end
   local button = ui.key_button(image, hotkey, not is_available)
   if button.is_clicked then
