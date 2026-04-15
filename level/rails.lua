@@ -29,6 +29,7 @@ init_debug = function()
   State.player.max_hp = 10  -- TODO RM
   State.player.resources.spell_slots_1 = 1
   State.player.resources.spell_slots_2 = 1
+  State.player.resources.spell_slots_3 = 1
   State.player.perks = {
     class.spell(spells.eldritch_blast),
     class.spell(spells.animate_dead),

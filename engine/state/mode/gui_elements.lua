@@ -52,7 +52,15 @@ local gui_elements = {
 
   fighting_styles = nth(49),
   eldritch_blast = nth(65),
+  animate_dead = nth(66),
+  healing_word_1 = nth(67),
+  healing_word_2 = nth(68),
+  healing_word_3 = nth(69),
   eldritch_blast_inactive = nth(73),
+  animate_dead_inactive = nth(74),
+  healing_word_1_inactive = nth(75),
+  healing_word_2_inactive = nth(76),
+  healing_word_3_inactive = nth(77),
 
   window_bg = "engine/assets/gui/window_bg.png",
   bar_bg = "engine/assets/gui/bar_bg.png",
