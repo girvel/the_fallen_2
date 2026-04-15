@@ -1,4 +1,3 @@
-local healing_word = require("engine.mech.spells.healing_word")
 local fighter = require("engine.mech.class.fighter")
 local async = require("engine.tech.async")
 local actions = require("engine.mech.actions")
