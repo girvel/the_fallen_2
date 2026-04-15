@@ -81,5 +81,7 @@ class.save_proficiency = function(ability)
   }
 end
 
+-- NEXT class.spell
+
 Ldump.mark(class, "const", ...)
 return class

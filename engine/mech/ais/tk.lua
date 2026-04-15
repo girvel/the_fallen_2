@@ -86,6 +86,8 @@ tk.heal = function(entity)
     async.sleep(.2)
   end
 
+  -- TODO redo tk.heal
+  do return end
   for spell_level = 2, 1, -1 do
     local base = healing_word.base(spell_level)
     if not base:is_available(entity) then goto continue end

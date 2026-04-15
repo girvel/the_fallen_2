@@ -1,3 +1,4 @@
+local healing_word = require("engine.mech.spells.healing_word")
 local animate_dead = require("engine.mech.spells.animate_dead")
 local eldritch_blast = require("engine.mech.spells.eldritch_blast")
 local item = require("engine.tech.item")
@@ -317,11 +318,12 @@ solids.player = function()
     name = "Протагонист",
     base_abilities = abilities.new(8, 8, 8, 8, 8, 8),
     level = 0,
-    perks = {provide(eldritch_blast), provide(animate_dead)},
+    perks = {provide(eldritch_blast), provide(animate_dead), provide(healing_word("wis", 1))},
     faction = "player",
   }
   player_base.mix_in(result)
   humanoid.mix_in(result)
+  result.max_hp = 10  -- TODO RM
   return result
 end
 
