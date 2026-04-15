@@ -81,7 +81,46 @@ class.save_proficiency = function(ability)
   }
 end
 
--- NEXT class.spell
+--- @return integer?
+local parse_slot_level = function(str)
+  local PREFIX = "spell_slots_"
+  if str:starts_with(PREFIX) then
+    return tonumber(str:sub(#PREFIX + 1))
+  end
+  return nil
+end
+
+--- @alias action_factory fun(mod?: ability, upcast_level?: integer): action
+--- @param spell action|action_factory
+--- @param mod? ability
+class.spell = Memoize(function(spell, mod)
+  local base_spell, base_slot_n
+  if type(spell) == "table" then
+    base_spell = spell
+  else
+    base_spell = spell(mod)
+    for resource_name in pairs(base_spell.cost) do
+      base_slot_n = parse_slot_level(resource_name)
+      if base_slot_n then break end
+    end
+  end
+
+  return {
+    modify_additional_actions = function(self, entity, list)
+      table.insert(list, base_spell)
+      if not base_slot_n then return list end
+      for resource_name in pairs(entity.resources) do
+        local spell_slot_n = parse_slot_level(resource_name)
+        if spell_slot_n and spell_slot_n > base_slot_n then
+          local this_spell = spell(mod, spell_slot_n)
+          this_spell.upcast_from = base_spell
+          table.insert(list, this_spell)
+        end
+      end
+      return list
+    end,
+  }
+end)
 
 Ldump.mark(class, "const", ...)
 return class

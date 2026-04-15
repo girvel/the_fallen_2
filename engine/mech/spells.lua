@@ -58,13 +58,12 @@ spells.eldritch_blast = {
 spells.healing_word = Memoize(function(mod, cast_level)
   cast_level = cast_level or 1
   return {
-    name = "Лечащее слово",
+    name = ("Лечащее слово (ур. %s)"):format(cast_level),
     codename = "healing_word_" .. cast_level,
 
     cost = {
       bonus_actions = 1,
-      -- NEXT RM
-      -- ["spell_slots_" .. cast_level] = 1,
+      ["spell_slots_" .. cast_level] = 1,
     },
 
     range = 40,
@@ -110,8 +109,7 @@ spells.animate_dead = {
 
   cost = {
     actions = 1,
-    -- NEXT uncomment
-    -- spell_slots_3 = 1,
+    spell_slots_3 = 1,
   },
 
   is_available = action.make_is_available(),

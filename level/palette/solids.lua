@@ -300,15 +300,6 @@ end
 -- [SECTION] Entities
 ----------------------------------------------------------------------------------------------------
 
-local provide = Memoize(function(action)
-  return {
-    modify_additional_actions = function(self, entity, list)
-      table.insert(list, action)
-      return list
-    end,
-  }
-end)
-
 --- @class player: player_base
 
 solids.player = function()
@@ -316,16 +307,10 @@ solids.player = function()
     name = "Протагонист",
     base_abilities = abilities.new(8, 8, 8, 8, 8, 8),
     level = 0,
-    perks = {
-      provide(spells.eldritch_blast),
-      provide(spells.animate_dead),
-      provide(spells.healing_word("wis", 1))
-    },
     faction = "player",
   }
   player_base.mix_in(result)
   humanoid.mix_in(result)
-  result.max_hp = 10  -- TODO RM
   return result
 end
 
