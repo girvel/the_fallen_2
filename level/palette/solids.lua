@@ -81,7 +81,19 @@ for y = 1, 4 do
 end
 
 packer.offset = 64
--- nothing yet --
+for y = 1, 4 do
+  for x = 1, 4 do
+    local i, this_sprite = packer:get(x, y)
+    solids[i] = function()
+      return {
+        boring_flag = true,
+        codename = "brick_wall",
+        name = "стена",
+        sprite = this_sprite,
+      }
+    end
+  end
+end
 
 packer.offset = 96
 for y = 1, 4 do
