@@ -23,7 +23,7 @@ spells.eldritch_blast = {
 
   parameter_type = "entity_target",
   target_filter = function(self, entity, target)
-    -- NEXT duplicated actions.bow_attack.target_filter, should be action.make_enemy_target_filter(range)
+    -- NEXT duplicated actions.bow_attack.target_filter, should be action.filters.make_enemy_target(range)
     if not (target
       and target.hp
       and State.hostility:get(entity, target) ~= "ally")
@@ -42,11 +42,16 @@ spells.eldritch_blast = {
   is_available = action.make_is_available(),
 
   act = action.make_act(function(self, entity, target)
-    local attack_roll = D(20)
-      + entity:get_modifier("cha")
-      + xp.get_proficiency_bonus(entity.level or 1)
-    local damage_roll = D(10)
-    health.attack(entity, target, attack_roll, damage_roll)
+    api.rotate(entity, target)
+    entity:animate("fast_gesture"):next(function()
+      local attack_roll = D(20)
+        + entity:get_modifier("cha")
+        + xp.get_proficiency_bonus(entity.level or 1)
+      local damage_roll = D(10)
+      if health.attack(entity, target, attack_roll, damage_roll) then
+        animated.add_fx("engine/assets/animations/eldritch_blast_target", target.position, "fx_over")
+      end
+    end)
     return true
   end),
 }

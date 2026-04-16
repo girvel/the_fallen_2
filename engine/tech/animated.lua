@@ -14,6 +14,7 @@ local animated = {}
 --- @field next animation_name
 --- @field frame number
 --- @field _end_promise promise
+--- @field _fx_flag boolean
 
 --- @class _animated_methods
 local methods = {}
@@ -60,7 +61,6 @@ end
 --- @return entity
 animated.fx = function(path, position, layer)
   local result = {}
-  animated.mix_in(result, path, "no_atlas")
 
   local _, _, head = path:find("/?([^/]+)$")
   result.codename = head and (head .. "_fx") or "unnamed_fx"
@@ -68,10 +68,8 @@ animated.fx = function(path, position, layer)
   result.position = position
   result.layer = layer or "fx_under"
 
-  result:animate():next(function()
-    result:animation_set_paused(true)
-    State:remove(result)
-  end)
+  animated.mix_in(result, path, "no_atlas")
+  result.animation._fx_flag = true
 
   return result
 end
@@ -149,6 +147,11 @@ methods.animation_update = function(self, dt)
   -- even if animation is 1 frame idle, still should play out for 1-frame FXs
   animation.frame = animation.frame + dt * DEFAULT_ANIMATION_FPS
   if math.floor(animation.frame) > #current_pack then
+    if animation._fx_flag then
+      State:remove(self)
+      return
+    end
+
     self:animate(animation.next)
     current_pack = animation.pack[animation.current]
   end
