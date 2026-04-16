@@ -3,6 +3,8 @@
 --- Contains additional functions for complex table manipulation
 local _table = {}
 
+-- TODO maybe split it into a Map & Array files -- one containing pairs functions, the other ipairs?
+
 --- Returns the pairs-based entry count
 --- @param t table
 --- @return integer

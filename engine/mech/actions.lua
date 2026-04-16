@@ -340,22 +340,23 @@ actions.bow_attack = {
       or false
   end),
 
-  parameter_type = "entity_target",
-  target_filter = function(self, entity, target)
-    if not (target
-      and target.hp
-      and State.hostility:get(entity, target) ~= "ally")
-    then return false end
+  parameters = {
+    entity_target = function(self, entity, target)
+      if not (target
+        and target.hp
+        and State.hostility:get(entity, target) ~= "ally")
+      then return false end
 
-    local result do
-      local vision_map = tcod.map(State.grids.solids)
-      vision_map:refresh_fov(entity.position, actions.BOW_ATTACK_RANGE)
-      result = vision_map:is_visible_unsafe(unpack(target.position))
-      vision_map:free()
-    end
+      local result do
+        local vision_map = tcod.map(State.grids.solids)
+        vision_map:refresh_fov(entity.position, actions.BOW_ATTACK_RANGE)
+        result = vision_map:is_visible_unsafe(unpack(target.position))
+        vision_map:free()
+      end
 
-    return result
-  end,
+      return result
+    end,
+  },
 
   act = action.make_act(function(self, entity, target)
     local d = (target.position - entity.position)

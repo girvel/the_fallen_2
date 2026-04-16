@@ -14,6 +14,7 @@ local spells = {}
 -- [SECTION] Cantrips
 ----------------------------------------------------------------------------------------------------
 
+--- @type action
 spells.eldritch_blast = {
   name = "мистический заряд",
   codename = "eldritch_blast",
@@ -21,23 +22,24 @@ spells.eldritch_blast = {
     actions = 1,
   },
 
-  parameter_type = "entity_target",
-  target_filter = function(self, entity, target)
-    -- NEXT duplicated actions.bow_attack.target_filter, should be action.filters.make_enemy_target(range)
-    if not (target
-      and target.hp
-      and State.hostility:get(entity, target) ~= "ally")
-    then return false end
+  parameters = {
+    entity_target = function(self, entity, target)
+      -- NEXT duplicated actions.bow_attack.target_filter, should be action.filters.make_enemy_target(range)
+      if not (target
+        and target.hp
+        and State.hostility:get(entity, target) ~= "ally")
+      then return false end
 
-    local result do
-      local vision_map = tcod.map(State.grids.solids)
-      vision_map:refresh_fov(entity.position, actions.BOW_ATTACK_RANGE)
-      result = vision_map:is_visible_unsafe(unpack(target.position))
-      vision_map:free()
-    end
+      local result do
+        local vision_map = tcod.map(State.grids.solids)
+        vision_map:refresh_fov(entity.position, actions.BOW_ATTACK_RANGE)
+        result = vision_map:is_visible_unsafe(unpack(target.position))
+        vision_map:free()
+      end
 
-    return result
-  end,
+      return result
+    end,
+  },
 
   is_available = action.make_is_available(),
 
@@ -60,6 +62,7 @@ spells.eldritch_blast = {
 -- [SECTION] Level 1
 ----------------------------------------------------------------------------------------------------
 
+--- @type action_factory
 spells.healing_word = Memoize(function(mod, cast_level)
   cast_level = cast_level or 1
   return {
@@ -73,23 +76,24 @@ spells.healing_word = Memoize(function(mod, cast_level)
 
     range = 40,
 
-    parameter_type = "entity_target",
-    target_filter = function(self, entity, target)
-      if not (target
-        and target.hp
-        and target.hp < target:get_max_hp())
-      then return false end
+    parameters = {
+      entity_target = function(self, entity, target)
+        if not (target
+          and target.hp
+          and target.hp < target:get_max_hp())
+        then return false end
 
-      -- NEXT repeating thing
-      local result do
-        local vision_map = tcod.map(State.grids.solids)
-        vision_map:refresh_fov(entity.position, self.range)
-        result = vision_map:is_visible_unsafe(unpack(target.position))
-        vision_map:free()
-      end
+        -- NEXT repeating thing
+        local result do
+          local vision_map = tcod.map(State.grids.solids)
+          vision_map:refresh_fov(entity.position, self.range)
+          result = vision_map:is_visible_unsafe(unpack(target.position))
+          vision_map:free()
+        end
 
-      return result
-    end,
+        return result
+      end,
+    },
 
     is_available = action.make_is_available(),
 
@@ -109,6 +113,7 @@ end)
 ----------------------------------------------------------------------------------------------------
 
 -- NEXT upcasting
+--- @type action
 spells.animate_dead = {
   codename = "animate_dead",
 
@@ -119,10 +124,11 @@ spells.animate_dead = {
 
   is_available = action.make_is_available(),
 
-  parameter_type = "entity_target",
-  target_filter = function(self, entity, target)
-    return State:exists(target) and target.body_flag
-  end,
+  parameters = {
+    entity_target = function(self, entity, target)
+      return State:exists(target) and target.body_flag
+    end,
+  },
 
   act = action.make_act(function(self, entity, target)
     local position = State.grids.solids:find_free_position(target.position)

@@ -103,9 +103,9 @@ action_button = function(action, hotkey)
   end
   local button = ui.key_button(image, hotkey, not is_available)
   if button.is_clicked then
-    if action.parameter_type == nil then
+    if action.parameters == nil or Table.count(action.parameters) == 0 then
       player.ai:plan_action(action)
-    elseif action.parameter_type == "entity_target" then
+    elseif action.parameters.entity_target then
       input_mode = "target"
       target_action = action
     else
@@ -679,7 +679,7 @@ use_mouse = function(self)
 
       for _, grid_layer in ipairs(level.grid_layers) do
         local target = State.grids[grid_layer]:slow_get(position)
-        if target and target_action:target_filter(State.player, target) then
+        if target and target_action.parameters.entity_target(target_action, State.player, target) then
           ui.cursor("target_active")
           if rmb then
             State.player.ai:plan_action(target_action, target)
@@ -740,7 +740,7 @@ use_mouse = function(self)
 
       if is_a_potential_target
         and actions.bow_attack:is_available(State.player)
-        and actions.bow_attack:target_filter(State.player, solid)
+        and actions.bow_attack.parameters.entity_target(actions.bow_attack, State.player, solid)
       then
         ui.cursor("target_active")
         if rmb then
