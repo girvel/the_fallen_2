@@ -175,8 +175,7 @@ draw_action_grid = function(self)
       assert(input_mode == "target")
       draw_mouse_action_grid(self)
     end
-  ui.finish_frame()
-  ui.offset(0, 208)
+  ui.finish_frame("push_cursor")
 
   for key, direction in pairs(Vector.wasd) do
     if ui.keyboard(key) then
@@ -346,7 +345,7 @@ end
 
 local RESOURCE_DISPLAY_ORDER = {
   "actions", "bonus_actions", "reactions", "movement",
-  -- "spell_slots_1", "spell_slots_2", "spell_slots_3",
+  "spell_slots_1", "spell_slots_2", "spell_slots_3",
   "hit_dice", "action_surge", "second_wind", "fighting_spirit",
 }
 
@@ -373,6 +372,28 @@ local PRIMITIVE_RESOURCES = {
   "reactions",
 }
 
+local SIDEBAR_BLOCK_PADDING = 10
+
+local start_block = function()
+  ui.stack_push("tk_block_start", ui.get_context().cursor_y)
+  ui.start_frame(
+    4 + SIDEBAR_BLOCK_PADDING, 4 + SIDEBAR_BLOCK_PADDING,
+    68 * 5 + 4  -- to match action grid
+  )
+end
+
+local finish_block = function()
+  local finish = ui.get_context().cursor_y
+  local prev_frame = ui.finish_frame()
+
+  local h = finish - ui.stack_pop("tk_block_start") + SIDEBAR_BLOCK_PADDING + 4
+  local k = sprite.cell_size
+  ui.start_frame(-k, -k, prev_frame.w + 2*k, h + 2*k)
+    ui.tile(gui_elements.sidebar_block_bg)
+  ui.finish_frame()
+  ui.offset(0, h)
+end
+
 draw_resources = function()
   local displayed_resources = {}
   for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
@@ -385,7 +406,7 @@ draw_resources = function()
   ui.br()
   if not is_compact then ui.br() end
 
-  tk.start_block()
+  start_block()
     if not is_compact then
       ui.start_alignment("center")
         ui.text("Ресурсы")
@@ -422,7 +443,7 @@ draw_resources = function()
       ui.text(translated:utf_capitalize())
     end
     love.graphics.setColor(Vector.white)
-  tk.finish_block()
+  finish_block()
 end
 
 local HOSTILITY_COLOR = {
@@ -436,7 +457,7 @@ draw_move_order = function()
   ui.br()
   if not is_compact then ui.br() end
 
-  tk.start_block()
+  start_block()
     if not is_compact then
       ui.start_alignment("center")
         ui.text("Очередь ходов")
@@ -481,7 +502,7 @@ draw_move_order = function()
         draw_item(i, list[i])
       end
     end
-  tk.finish_block()
+  finish_block()
 end
 
 draw_bag = function()
@@ -506,7 +527,7 @@ draw_bag = function()
   ui.br()
   if not is_compact then ui.br() end
 
-  tk.start_block()
+  start_block()
     if not is_compact then
       ui.start_alignment("center")
         ui.text("Сумка")
@@ -518,7 +539,7 @@ draw_bag = function()
       local k, v = unpack(t)
       ui.text("%s:%s %s", translation.bag[k] or k, " " * (max_length - k:utf_len()), v)
     end
-  tk.finish_block()  -- TODO UI make this stateless?
+  finish_block()  -- TODO UI make this stateless?
 end
 
 local draw_line, draw_options

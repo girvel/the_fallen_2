@@ -107,28 +107,6 @@ tk.draw_entity = function(entity, x, y, scale)
   end
 end
 
-local SIDEBAR_BLOCK_PADDING = 10
-
-tk.start_block = function()
-  ui.stack_push("tk_block_start", ui.get_context().cursor_y)
-  ui.start_frame(
-    4 + SIDEBAR_BLOCK_PADDING, 4 + SIDEBAR_BLOCK_PADDING,
-    -2 * SIDEBAR_BLOCK_PADDING - 8
-  )
-end
-
-tk.finish_block = function()
-  local finish = ui.get_context().cursor_y
-  local prev_frame = ui.finish_frame()
-
-  local h = finish - ui.stack_pop("tk_block_start") + SIDEBAR_BLOCK_PADDING + 4
-  local k = sprite.cell_size
-  ui.start_frame(-k, -k, prev_frame.w + 2*k, h + 2*k)
-    ui.tile(gui_elements.sidebar_block_bg)
-  ui.finish_frame()
-  ui.offset(0, h)
-end
-
 --- @param w integer
 --- @param h integer
 --- @param value integer
