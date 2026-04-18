@@ -168,10 +168,6 @@ draw_action_grid = function(self)
 
   cost = nil
 
-  ui.start_frame(-16, -4)
-    ui.image("engine/assets/gui/action_grid_bg.png")
-  ui.finish_frame()
-
   ui.start_frame(4)
     if input_mode == "normal" then
       draw_keyboard_action_grid(self)
@@ -190,7 +186,49 @@ draw_action_grid = function(self)
   end
 end
 
+local line = function(x1, y1, x2, y2)
+  love.graphics.rectangle("fill", x1, y1, x2 - x1 + 4, y2 - y1 + 4)
+end
+
+local dot = function(x, y)
+  love.graphics.rectangle("fill", x, y, 4, 4)
+end
+
+local draw_bg_grid = function(rows_n)
+  local context = ui.get_context()
+  local start_x = context.cursor_x - 4
+  local start_y = context.cursor_y - 4
+  local finish_x = start_x + 68 * 5
+  local finish_y = start_y + rows_n * 68
+
+  love.graphics.setColor(Vector.hex("2f292c"))
+    line(start_x - 8, start_y, start_x, start_y)
+    line(start_x - 8, finish_y, start_x, finish_y)
+    line(finish_x, start_y, finish_x + 8, start_y)
+    line(finish_x, finish_y, finish_x + 8, finish_y)
+
+    dot(start_x - 16, start_y)
+    dot(start_x - 16, finish_y)
+    dot(finish_x + 16, start_y)
+    dot(finish_x + 16, finish_y)
+
+    for k = 0, 5 do
+      local x = start_x + 68 * k
+      line(x, start_y, x, finish_y)
+    end
+
+    for k = 0, rows_n do
+      local y = start_y + 68 * k
+      line(start_x, y, finish_x, y)
+    end
+  love.graphics.setColor(Vector.white)
+end
+
 draw_keyboard_action_grid = function(self)
+  local additional_actions = State.player:modify("additional_actions", {})
+
+  draw_bg_grid(3 + math.ceil((#additional_actions - 3) / 5))
+
   ui.start_line()
     do
       local button = ui.key_button(gui.escape_menu, "escape")
@@ -282,10 +320,11 @@ draw_keyboard_action_grid = function(self)
     end
     ui.offset(4)
 
-    for i, action in ipairs(State.player:modify("additional_actions", {})) do
+    for i, action in ipairs(additional_actions) do
       action_button(action, tostring(2 + i))
       if i % 5 == 3 then
         ui.finish_line()
+        ui.offset(0, 4)
         ui.start_line()
       else
         ui.offset(4)
@@ -295,6 +334,7 @@ draw_keyboard_action_grid = function(self)
 end
 
 draw_mouse_action_grid = function(self)
+  draw_bg_grid(3)
   local escape_button = ui.key_button(gui_elements.escape, "escape")
   if escape_button.is_clicked then
     input_mode = "normal"
@@ -306,6 +346,7 @@ end
 
 local RESOURCE_DISPLAY_ORDER = {
   "actions", "bonus_actions", "reactions", "movement",
+  -- "spell_slots_1", "spell_slots_2", "spell_slots_3",
   "hit_dice", "action_surge", "second_wind", "fighting_spirit",
 }
 
@@ -333,6 +374,14 @@ local PRIMITIVE_RESOURCES = {
 }
 
 draw_resources = function()
+  local displayed_resources = {}
+  for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
+    if State.player.resources[r] and (State.combat or not Table.contains(PRIMITIVE_RESOURCES, r)) then
+      table.insert(displayed_resources, r)
+    end
+  end
+  if #displayed_resources == 0 then return end
+
   ui.br()
   if not is_compact then ui.br() end
 
@@ -344,11 +393,8 @@ draw_resources = function()
       ui.br()
     end
 
-    for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
+    for _, r in ipairs(displayed_resources) do
       local amount = State.player.resources[r]
-      if not amount or (not State.combat and Table.contains(PRIMITIVE_RESOURCES, r)) then
-        goto continue
-      end
 
       ui.start_frame(180)
       ui.start_line()
@@ -372,9 +418,8 @@ draw_resources = function()
       ui.finish_line()
       ui.finish_frame()
 
-      ui.text(translation.resources[r]:utf_capitalize())
-
-      ::continue::
+      local translated = translation.resources[r] or r
+      ui.text(translated:utf_capitalize())
     end
     love.graphics.setColor(Vector.white)
   tk.finish_block()

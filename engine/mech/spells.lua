@@ -112,7 +112,7 @@ end)
 -- [SECTION] Level 3
 ----------------------------------------------------------------------------------------------------
 
--- NEXT upcasting
+-- TODO upcasting
 --- @type action
 spells.animate_dead = {
   codename = "animate_dead",
