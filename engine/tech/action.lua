@@ -50,6 +50,7 @@ end
 --- @alias action table|action_strict
 --- @class action_strict
 --- @field codename? string
+--- @field upcast_from? action
 --- @field cost? table<string, number>
 --- @field parameters? {entity_target: fun(self: action, entity: entity, target: entity): any}
 local action_methods = {

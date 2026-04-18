@@ -21,8 +21,9 @@ local api         = require("engine.tech.api")
 --   render functions, utility functions -> game mode as separate file-functions
 --   internal state -> game mode fields
 
+-- TODO target_action & upcasting_group should be joined w/ input_mode
 -- Internal state
-local input_mode, cost, hint, mouse_task, mouse_task_path, is_compact, target_action
+local input_mode, cost, hint, mouse_task, mouse_task_path, is_compact, target_action, upcasting_group
 input_mode = "normal"
 
 -- Utility functions
@@ -31,7 +32,7 @@ local action_button, set_mouse_task
 -- Render functions
 local draw_gui, draw_sidebar, draw_top_bars, draw_action_grid, draw_resources, draw_move_order,
   draw_bag, draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
-  draw_mouse_action_grid, use_mouse, draw_curtain
+  draw_mouse_action_grid, draw_upcast_action_grid, use_mouse, draw_curtain
 
 --- @param self state_mode_game
 --- @param dt number
@@ -92,10 +93,19 @@ draw_sidebar = function(self)
   tk.finish_window()
 end
 
-action_button = function(action, hotkey)
+action_button = function(displayed_action, hotkey, this_upcasting_group)
   local player = State.player
-  local is_available = action:is_available(player) and State.player:can_act()
-  local codename = is_available and action.codename or (action.codename .. "_inactive")
+  if this_upcasting_group and not displayed_action:is_available(player) then
+    for _, this_action in ipairs(this_upcasting_group) do
+      if this_action:is_available(player) then
+        displayed_action = this_action
+        break
+      end
+    end
+  end
+
+  local is_available = displayed_action:is_available(player) and State.player:can_act()
+  local codename = is_available and displayed_action.codename or (displayed_action.codename .. "_inactive")
   local image = gui_elements[codename]
   if not image then
     Log.warn_once("Missing image for action %s", codename)
@@ -103,18 +113,21 @@ action_button = function(action, hotkey)
   end
   local button = ui.key_button(image, hotkey, not is_available)
   if button.is_clicked then
-    if action.parameters == nil or Table.count(action.parameters) == 0 then
-      player.ai:plan_action(action)
-    elseif action.parameters.entity_target then
+    if this_upcasting_group then
+      input_mode = "upcast"
+      upcasting_group = this_upcasting_group
+    elseif displayed_action.parameters == nil or Table.count(displayed_action.parameters) == 0 then
+      player.ai:plan_action(displayed_action)
+    elseif displayed_action.parameters.entity_target then
       input_mode = "target"
-      target_action = action
+      target_action = displayed_action
     else
-      Error("Unsupported action's .parameter_type %s", action.parameter_type)
+      Error("Unsupported action's .parameter_type %s", displayed_action.parameter_type)
     end
   end
   if button.is_mouse_over then
-    cost = action.cost
-    hint = action.get_hint and action:get_hint(State.player) or action.name
+    cost = displayed_action.cost
+    hint = displayed_action.get_hint and displayed_action:get_hint(State.player) or displayed_action.name
   end
 end
 
@@ -171,9 +184,12 @@ draw_action_grid = function(self)
   ui.start_frame(4)
     if input_mode == "normal" then
       draw_keyboard_action_grid(self)
-    else
-      assert(input_mode == "target")
+    elseif input_mode == "target" then
       draw_mouse_action_grid(self)
+    elseif input_mode == "upcast" then
+      draw_upcast_action_grid(self)
+    else
+      assert(false)
     end
   ui.finish_frame("push_cursor")
 
@@ -224,7 +240,23 @@ local draw_bg_grid = function(rows_n)
 end
 
 draw_keyboard_action_grid = function(self)
-  local additional_actions = State.player:modify("additional_actions", {})
+  local additional_actions, upcasts do
+    local source = State.player:modify("additional_actions", {}) --[=[@as action[]]=]
+    additional_actions = {}
+    upcasts = {}
+    for _, this_action in ipairs(source) do
+      local upcast_source = this_action.upcast_from
+      if upcast_source then
+        if not upcasts[upcast_source] then
+          upcasts[upcast_source] = {upcast_source, this_action}
+        else
+          table.insert(upcasts[upcast_source], this_action)
+        end
+      else
+        table.insert(additional_actions, this_action)
+      end
+    end
+  end
 
   draw_bg_grid(3 + math.ceil((#additional_actions - 3) / 5))
 
@@ -320,7 +352,7 @@ draw_keyboard_action_grid = function(self)
     ui.offset(4)
 
     for i, action in ipairs(additional_actions) do
-      action_button(action, tostring(2 + i))
+      action_button(action, tostring(2 + i), upcasts[action])
       if i % 5 == 3 then
         ui.finish_line()
         ui.offset(0, 4)
@@ -333,7 +365,7 @@ draw_keyboard_action_grid = function(self)
 end
 
 draw_mouse_action_grid = function(self)
-  draw_bg_grid(3)
+  draw_bg_grid(1)
   local escape_button = ui.key_button(gui_elements.escape, "escape")
   if escape_button.is_clicked then
     input_mode = "normal"
@@ -341,6 +373,16 @@ draw_mouse_action_grid = function(self)
   if escape_button.is_mouse_over then
     hint = "отмена"
   end
+end
+
+draw_upcast_action_grid = function(self)
+  draw_bg_grid(math.ceil(#upcasting_group / 5))
+  ui.start_line()
+    for i, this_action in ipairs(upcasting_group) do
+      action_button(this_action, tostring(i))
+      ui.offset(4)  -- TODO maybe do grid utility function
+    end
+  ui.finish_line()
 end
 
 local RESOURCE_DISPLAY_ORDER = {
