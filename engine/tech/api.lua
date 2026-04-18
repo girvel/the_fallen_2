@@ -1,3 +1,4 @@
+local tcod = require("engine.tech.tcod")
 local ui = require("engine.tech.ui")
 local animated = require("engine.tech.animated")
 local level = require("engine.tech.level")
@@ -516,6 +517,21 @@ api.is_visible = function(target)
 
   if not State.grids.solids:can_fit(target) then return false end
   return player_vision:is_visible_unsafe(unpack(target))
+end
+
+--- @param source vector|entity
+--- @param target vector|entity
+--- @param range integer
+--- @return boolean
+api.can_see = function(source, target, range)
+  local source_v = api.to_vector(source)
+  local target_v = api.to_vector(target)
+  local result
+  local vision_map = tcod.map(State.grids.solids)
+  vision_map:refresh_fov(source_v, range)
+  result = vision_map:is_visible_unsafe(unpack(target_v))
+  vision_map:free()
+  return result
 end
 
 --- @param entity entity

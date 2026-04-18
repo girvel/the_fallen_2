@@ -5,7 +5,8 @@ local health = require "engine.mech.health"
 local sound  = require "engine.tech.sound"
 local animated = require "engine.tech.animated"
 local interactive = require "engine.tech.interactive"
-local tcod        = require "engine.tech.tcod" local projectile  = require "engine.tech.projectile"
+local tcod        = require "engine.tech.tcod"
+local projectile  = require "engine.tech.projectile"
 
 
 local actions = {}
@@ -342,19 +343,11 @@ actions.bow_attack = {
 
   parameters = {
     entity_target = function(self, entity, target)
-      if not (target
+      local api = require("engine.tech.api")
+      return target
         and target.hp
-        and State.hostility:get(entity, target) ~= "ally")
-      then return false end
-
-      local result do
-        local vision_map = tcod.map(State.grids.solids)
-        vision_map:refresh_fov(entity.position, actions.BOW_ATTACK_RANGE)
-        result = vision_map:is_visible_unsafe(unpack(target.position))
-        vision_map:free()
-      end
-
-      return result
+        and State.hostility:get(entity, target) ~= "ally"
+        and api.can_see(entity, target, actions.BOW_ATTACK_RANGE)
     end,
   },
 

@@ -25,19 +25,10 @@ spells.eldritch_blast = {
   parameters = {
     entity_target = function(self, entity, target)
       -- NEXT duplicated actions.bow_attack.target_filter, should be action.filters.make_enemy_target(range)
-      if not (target
+      return target
         and target.hp
-        and State.hostility:get(entity, target) ~= "ally")
-      then return false end
-
-      local result do
-        local vision_map = tcod.map(State.grids.solids)
-        vision_map:refresh_fov(entity.position, actions.BOW_ATTACK_RANGE)
-        result = vision_map:is_visible_unsafe(unpack(target.position))
-        vision_map:free()
-      end
-
-      return result
+        and State.hostility:get(entity, target) ~= "ally"
+        and api.can_see(entity, target, actions.BOW_ATTACK_RANGE)
     end,
   },
 
@@ -78,20 +69,10 @@ spells.healing_word = Memoize(function(mod, cast_level)
 
     parameters = {
       entity_target = function(self, entity, target)
-        if not (target
+        return target
           and target.hp
-          and target.hp < target:get_max_hp())
-        then return false end
-
-        -- NEXT repeating thing
-        local result do
-          local vision_map = tcod.map(State.grids.solids)
-          vision_map:refresh_fov(entity.position, self.range)
-          result = vision_map:is_visible_unsafe(unpack(target.position))
-          vision_map:free()
-        end
-
-        return result
+          and target.hp < target:get_max_hp()
+          and api.can_see(entity, target, self.range)
       end,
     },
 
