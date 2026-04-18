@@ -266,7 +266,6 @@ actions.shove = Table.extend({
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
     local direction = entity.direction
     entity:animate("offhand_attack"):next(function()
-      State.hostility:register(entity, target)
       local dc = target:get_roll("acrobatics"):roll()
       local distance = math.ceil(entity:get_modifier("athletics") / 4)
 
@@ -300,8 +299,6 @@ base_attack = function(entity, slot)
 
   entity:animate(slot .. "_attack"):next(function()
     if not State:exists(target) then return end
-
-    State.hostility:register(entity, target)
 
     if not health.attack(
       entity,
@@ -384,7 +381,6 @@ actions.bow_attack = {
           attack_roll,
           damage_roll
         )
-        State.hostility:register(entity, target)
       end)
     end)
     return true

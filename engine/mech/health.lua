@@ -32,6 +32,10 @@ health.damage = function(target, amount, source, is_critical)
   amount = math.max(0, amount)
   Log.debug("%s damage to %s", amount, Name.code(target))
 
+  if source then
+    State.hostility:register(source, target)
+  end
+
   local repr = tostring(amount)
   if is_critical then
     repr = repr .. "!"
