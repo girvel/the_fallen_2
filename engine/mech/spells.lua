@@ -96,12 +96,12 @@ end)
 -- NEXT PLAN
 -- + sketch
 -- + saving throw
+-- + exiting upcasting
 -- - blinding
 -- - target argument -> params table
 -- - direction
 -- - icons
 -- - eldritch blast can be obstructed by melee
--- - exiting upcasting
 -- - name formatting?
 
 --- @type action_factory

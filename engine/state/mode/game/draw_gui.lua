@@ -6,7 +6,6 @@ local colors = require("engine.tech.colors")
 local animated = require("engine.tech.animated")
 local sound = require("engine.tech.sound")
 local base_player = require("engine.state.player.base")
-local gui_elements = require("engine.state.mode.gui_elements")
 local ui = require("engine.tech.ui")
 local actions = require("engine.mech.actions")
 local translation  = require("engine.tech.translation")
@@ -106,10 +105,10 @@ action_button = function(displayed_action, hotkey, this_upcasting_group)
 
   local is_available = displayed_action:is_available(player) and State.player:can_act()
   local codename = is_available and displayed_action.codename or (displayed_action.codename .. "_inactive")
-  local image = gui_elements[codename]
+  local image = gui[codename]
   if not image then
     Log.warn_once("Missing image for action %s", codename)
-    image = is_available and gui_elements.unknown or gui_elements.unknown_inactive
+    image = is_available and gui.unknown or gui.unknown_inactive
   end
   local button = ui.key_button(image, hotkey, not is_available)
   if button.is_clicked then
@@ -367,7 +366,7 @@ end
 
 draw_mouse_action_grid = function(self)
   draw_bg_grid(1)
-  local escape_button = ui.key_button(gui_elements.escape, "escape")
+  local escape_button = ui.key_button(gui.escape, "escape")
   if escape_button.is_clicked then
     input_mode = "normal"
   end
@@ -377,11 +376,17 @@ draw_mouse_action_grid = function(self)
 end
 
 draw_upcast_action_grid = function(self)
-  draw_bg_grid(math.ceil(#upcasting_group / 5))
+  draw_bg_grid(math.ceil(#upcasting_group / 5) + 1)
   ui.start_line()
     for i, this_action in ipairs(upcasting_group) do
       action_button(this_action, tostring(i))
-      ui.offset(4)  -- NEXT do grid utility functions, like :start_grid, :finish_grid, :grid_item
+      ui.offset(4)  -- NEXT do grid utility functions, like :start_grid, :finish_grid, :grid_item, :grid_line_break
+    end
+  ui.finish_line()
+  ui.offset(0, 4)
+  ui.start_line()
+    if ui.key_button(gui.escape, "escape").is_clicked then
+      input_mode = "normal"
     end
   ui.finish_line()
 end
@@ -432,7 +437,7 @@ local finish_block = function()
   local h = finish - ui.stack_pop("tk_block_start") + SIDEBAR_BLOCK_PADDING + 4
   local k = sprite.cell_size
   ui.start_frame(-k, -k, prev_frame.w + 2*k, h + 2*k)
-    ui.tile(gui_elements.sidebar_block_bg)
+    ui.tile(gui.sidebar_block_bg)
   ui.finish_frame()
   ui.offset(0, h)
 end
