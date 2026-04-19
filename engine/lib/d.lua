@@ -102,7 +102,7 @@ d.mt.__sub = function(self, other)
 end
 
 d.mt.__mul = function(self, other)
-  assert(type(other) == "number")
+  assert(type(other) == "number", "Wrong order of multiplication for D")
   return d.new(
     Fun.iter(self.dice)
       :cycle()

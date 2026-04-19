@@ -26,14 +26,15 @@ end
 
 init_debug = function()
   item.give(State.player, State:add(items.short_bow()))
-  State.player.max_hp = 10  -- TODO RM
+  State.player.hp = 10
   State.player.resources.spell_slots_1 = 1
   State.player.resources.spell_slots_2 = 1
   State.player.resources.spell_slots_3 = 1
   State.player.perks = {
     class.spell(spells.eldritch_blast),
     class.spell(spells.animate_dead),
-    class.spell(spells.healing_word, "wis")
+    class.spell(spells.healing_word, "wis"),
+    class.spell(spells.spray_of_cards, "cha"),
   }
 end
 

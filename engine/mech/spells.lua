@@ -90,6 +90,48 @@ spells.healing_word = Memoize(function(mod, cast_level)
 end)
 
 ----------------------------------------------------------------------------------------------------
+-- [SECTION] Level 2
+----------------------------------------------------------------------------------------------------
+
+-- NEXT
+-- + sketch
+-- - saving throw
+-- - name formatting?
+-- - blinding
+-- - target argument -> params table
+-- - direction
+
+--- @type action_factory
+spells.spray_of_cards = Memoize(function(mod, cast_level)
+  cast_level = cast_level or 2
+  return {
+    name = ("Веер карт (ур. %s)"):format(cast_level),
+    codename = "spray_of_cards_" .. cast_level,
+
+    cost = {
+      actions = 1,
+      ["spell_slots_" .. cast_level] = 1,
+    },
+
+    is_available = action.make_is_available(),
+
+    act = action.make_act(function(self, entity)
+      local damage = (D(10) * cast_level):roll()
+      local d = entity.direction
+      for _, delta in ipairs {
+        d, 2 * d, d:rotate() + d, -d:rotate() + d,
+      } do
+        local target = State.grids.solids:slow_get(delta + entity.position)
+        if target and target.hp then
+          health.damage(target, damage, entity)
+        end
+      end
+      return true
+    end),
+  }
+end)
+
+----------------------------------------------------------------------------------------------------
 -- [SECTION] Level 3
 ----------------------------------------------------------------------------------------------------
 
