@@ -17,19 +17,17 @@ local interactive = require("engine.tech.interactive")
 local api         = require("engine.tech.api")
 
 
--- Refactor plan:
---   render functions, utility functions -> game mode as separate file-functions
---   internal state -> game mode fields
+-- Internal state --
 
--- TODO target_action & upcasting_group should be joined w/ input_mode
--- Internal state
+-- NEXT target_action & upcasting_group should be joined w/ input_mode;
+-- TODO there should be a sequence to input modes for potential multiple parameters (but maybe later)
 local input_mode, cost, hint, mouse_task, mouse_task_path, is_compact, target_action, upcasting_group
 input_mode = "normal"
 
--- Utility functions
+-- Utility functions --
 local action_button, set_mouse_task
 
--- Render functions
+-- Render functions --
 local draw_gui, draw_sidebar, draw_top_bars, draw_action_grid, draw_resources, draw_move_order,
   draw_bag, draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
   draw_mouse_action_grid, draw_upcast_action_grid, use_mouse, draw_curtain
@@ -93,6 +91,9 @@ draw_sidebar = function(self)
   tk.finish_window()
 end
 
+--- NEXT structure: helper functions, state, display functions
+
+--- @return boolean
 action_button = function(displayed_action, hotkey, this_upcasting_group)
   local player = State.player
   if this_upcasting_group and not displayed_action:is_available(player) then
@@ -129,6 +130,7 @@ action_button = function(displayed_action, hotkey, this_upcasting_group)
     cost = displayed_action.cost
     hint = displayed_action.get_hint and displayed_action:get_hint(State.player) or displayed_action.name
   end
+  return button.is_clicked
 end
 
 local HP_BAR_W = SIDEBAR_INNER_W - 64
@@ -379,8 +381,10 @@ draw_upcast_action_grid = function(self)
   draw_bg_grid(math.ceil(#upcasting_group / 5))
   ui.start_line()
     for i, this_action in ipairs(upcasting_group) do
-      action_button(this_action, tostring(i))
-      ui.offset(4)  -- TODO maybe do grid utility function
+      if action_button(this_action, tostring(i)) then
+        input_mode = "normal"
+      end
+      ui.offset(4)  -- NEXT do grid utility functions, like :start_grid, :finish_grid, :grid_item
     end
   ui.finish_line()
 end
