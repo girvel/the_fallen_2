@@ -93,14 +93,16 @@ end)
 -- [SECTION] Level 2
 ----------------------------------------------------------------------------------------------------
 
--- NEXT
+-- NEXT PLAN
 -- + sketch
 -- + saving throw
--- - name formatting?
 -- - blinding
 -- - target argument -> params table
 -- - direction
 -- - icons
+-- - eldritch blast can be obstructed by melee
+-- - exiting upcasting
+-- - name formatting?
 
 --- @type action_factory
 spells.spray_of_cards = Memoize(function(mod, cast_level)

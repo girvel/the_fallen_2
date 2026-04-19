@@ -158,7 +158,7 @@ health.attack_save = function(source, target, ability, save_dc, damage)
   if success then
     damage = math.floor(damage / 2)
   end
-  health.damage(target, damage, source)
+  health.damage(target, damage, source, not success)
   return not success
 end
 
