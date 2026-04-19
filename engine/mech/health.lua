@@ -116,7 +116,8 @@ end
 --- @param attack_roll table
 --- @return boolean did_hit true if attack landed
 health.attack = function(source, target, attack_roll, damage_roll)
-  local attack = attack_roll:roll() local is_nat = attack == attack_roll:max()
+  local attack = attack_roll:roll()
+  local is_nat = attack == attack_roll:max()
   local is_nat_miss = attack == attack_roll:min()
   local ac = target.get_armor and target:get_armor() or target.armor or 0
 
@@ -145,17 +146,21 @@ health.attack = function(source, target, attack_roll, damage_roll)
   return true
 end
 
--- health.attack_save = function(target, ability, save_dc, damage_roll)
---   local success = abilities.saving_throw(target, ability, save_dc)
--- 
---   if success then
---     State:add(gui.floating_damage("-", target.position))
---     return false
---   end
--- 
---   health.damage(target, damage_roll:roll())
---   return true
--- end
+--- Attacks through making the target roll the saving throw; halves the damage on success
+--- @param source entity
+--- @param target entity
+--- @param ability ability
+--- @param save_dc integer
+--- @param damage integer (because the roll is typically shared & unmodified for any separate target)
+--- @return boolean did_fail whether the target failed the saving throw
+health.attack_save = function(source, target, ability, save_dc, damage)
+  local success = target.saving_throw and target:saving_throw(ability, save_dc)
+  if success then
+    damage = math.floor(damage / 2)
+  end
+  health.damage(target, damage, source)
+  return not success
+end
 
 Ldump.mark(health, {}, ...)
 return health

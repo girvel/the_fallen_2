@@ -238,7 +238,7 @@ methods.load_level = function(self, path)
 
   local end_t = love.timer.getTime()
   Log.info("%.2f s | Initialized rails", end_t - add_t)
-  Log.info("%.2f s | Loaded the level", end_t - start_t)
+  Log.info("%.2f s | (Total) Loaded the level", end_t - start_t)
 
   self.is_loaded = true
   async.lag_threshold = .1

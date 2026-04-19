@@ -95,11 +95,12 @@ end)
 
 -- NEXT
 -- + sketch
--- - saving throw
+-- + saving throw
 -- - name formatting?
 -- - blinding
 -- - target argument -> params table
 -- - direction
+-- - icons
 
 --- @type action_factory
 spells.spray_of_cards = Memoize(function(mod, cast_level)
@@ -123,7 +124,7 @@ spells.spray_of_cards = Memoize(function(mod, cast_level)
       } do
         local target = State.grids.solids:slow_get(delta + entity.position)
         if target and target.hp then
-          health.damage(target, damage, entity)
+          health.attack_save(entity, target, "dex", entity:get_spell_dc(mod), damage)
         end
       end
       return true

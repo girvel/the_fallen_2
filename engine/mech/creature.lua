@@ -245,6 +245,12 @@ methods.get_combat_modifier = function(self, weapon)
 end
 
 --- @param self entity
+--- @param mod ability
+methods.get_spell_dc = function(self, mod)
+  return 10 + xp.get_proficiency_bonus(self.level or 1) + self:get_modifier(mod)
+end
+
+--- @param self entity
 --- @param slot string
 --- @return d
 methods.get_attack_roll = function(self, slot)
