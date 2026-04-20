@@ -175,6 +175,29 @@ health.attack = function(source, target, attack_roll, damage_roll)
   return did_hit
 end
 
+--- @param source entity
+--- @param target entity
+--- @param ability ability
+--- @param save_dc integer
+--- @param damage integer (because the roll is typically shared & unmodified for any separate target)
+--- @return boolean fail
+--- @return integer damage
+health.attack_save_precog = function(source, target, ability, save_dc, damage)
+  local fail = not target.saving_throw or not target:saving_throw(ability, save_dc)
+  if not fail then
+    damage = math.floor(damage / 2)
+  end
+  return fail, damage
+end
+
+--- @param source entity
+--- @param target entity
+--- @param fail boolean
+--- @param damage integer
+health.attack_save_enact = function(source, target, fail, damage)
+  health.damage(target, damage, source, fail)
+end
+
 --- Attacks through making the target roll the saving throw; halves the damage on success
 --- @param source entity
 --- @param target entity
@@ -183,12 +206,9 @@ end
 --- @param damage integer (because the roll is typically shared & unmodified for any separate target)
 --- @return boolean did_fail whether the target failed the saving throw
 health.attack_save = function(source, target, ability, save_dc, damage)
-  local success = target.saving_throw and target:saving_throw(ability, save_dc)
-  if success then
-    damage = math.floor(damage / 2)
-  end
-  health.damage(target, damage, source, not success)
-  return not success
+  local fail, damage_final = health.attack_save_precog(source, target, ability, save_dc, damage)
+  health.attack_save_enact(source, target, fail, damage_final)
+  return fail
 end
 
 Ldump.mark(health, {}, ...)

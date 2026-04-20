@@ -108,6 +108,7 @@ end)
 -- - fx
 -- - eldritch blast can be obstructed by melee
 -- - name formatting?
+-- - level 5, eldritch blast x2
 
 --- @type action_factory
 spells.spray_of_cards = Memoize(function(mod, cast_level)
@@ -125,8 +126,20 @@ spells.spray_of_cards = Memoize(function(mod, cast_level)
 
     act = action.make_act(function(self, entity)
       local damage = (D(10) * cast_level):roll()
+      local dc = entity:get_spell_dc(mod)
+
       local d = entity.direction
       local dr = d:rotate()
+      local damages = {}
+      for _, delta in ipairs {
+        d, 2 * d, dr + d, -dr + d,
+      } do
+        local target = State.grids.solids:slow_get(delta + entity.position)
+        if target and target.hp then
+          damages[target] = {health.attack_save_precog(entity, target, "dex", dc, damage)}
+        end
+      end
+
       entity:animate("throw"):next(function()
         local offset
         if d == Vector.up then offset = V(-1, -2)
@@ -140,15 +153,10 @@ spells.spray_of_cards = Memoize(function(mod, cast_level)
         )
         fx.rotation = d:angle()
 
-        for _, delta in ipairs {
-          d, 2 * d, dr + d, -dr + d,
-        } do
-          local target = State.grids.solids:slow_get(delta + entity.position)
-          if target and target.hp then
-            -- NEXT split to two parts
-            if health.attack_save(entity, target, "dex", entity:get_spell_dc(mod), damage) and target.conditions then
-              table.insert(target.conditions, blinded.new())
-            end
+        for target, t in pairs(damages) do
+          health.attack_save_enact(entity, target, unpack(t))
+          if target.conditions then
+            table.insert(target.conditions, blinded.new())
           end
         end
       end)
