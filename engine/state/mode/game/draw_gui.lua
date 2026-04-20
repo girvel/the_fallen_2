@@ -18,10 +18,11 @@ local api         = require("engine.tech.api")
 
 -- Internal state --
 
--- NEXT target_action & upcasting_group should be joined w/ input_mode;
 -- TODO there should be a sequence to input modes for potential multiple parameters (but maybe later)
-local input_mode, cost, hint, mouse_task, mouse_task_path, is_compact, target_action, upcasting_group
-input_mode = "normal"
+local input_state = {
+  mode = "normal"
+}
+local cost, hint, mouse_task, mouse_task_path, is_compact
 
 -- Utility functions --
 local action_button, set_mouse_task
@@ -113,14 +114,18 @@ action_button = function(displayed_action, hotkey, this_upcasting_group)
   local button = ui.key_button(image, hotkey, not is_available)
   if button.is_clicked then
     if this_upcasting_group then
-      input_mode = "upcast"
-      upcasting_group = this_upcasting_group
+      input_state = {
+        mode = "upcast",
+        group = this_upcasting_group,
+      }
     elseif displayed_action.parameters == nil or Table.count(displayed_action.parameters) == 0 then
       player.ai:plan_action(displayed_action)
-      input_mode = "normal"
+      input_state = {mode = "normal"}
     elseif displayed_action.parameters.entity_target then
-      input_mode = "target"
-      target_action = displayed_action
+      input_state = {
+        mode = "entity_target",
+        action = displayed_action,
+      }
     else
       Error("Unsupported action's .parameter_type %s", displayed_action.parameter_type)
     end
@@ -182,11 +187,12 @@ draw_action_grid = function(self)
   cost = nil
 
   ui.start_frame(4)
-    if input_mode == "normal" then
+    local mode = input_state.mode
+    if mode == "normal" then
       draw_keyboard_action_grid(self)
-    elseif input_mode == "target" then
+    elseif mode == "entity_target" then
       draw_mouse_action_grid(self)
-    elseif input_mode == "upcast" then
+    elseif mode == "upcast" then
       draw_upcast_action_grid(self)
     else
       assert(false)
@@ -368,7 +374,7 @@ draw_mouse_action_grid = function(self)
   draw_bg_grid(1)
   local escape_button = ui.key_button(gui.escape, "escape")
   if escape_button.is_clicked then
-    input_mode = "normal"
+    input_state = {mode = "normal"}
   end
   if escape_button.is_mouse_over then
     hint = "отмена"
@@ -376,9 +382,9 @@ draw_mouse_action_grid = function(self)
 end
 
 draw_upcast_action_grid = function(self)
-  draw_bg_grid(math.ceil(#upcasting_group / 5) + 1)
+  draw_bg_grid(math.ceil(#input_state.group / 5) + 1)
   ui.start_line()
-    for i, this_action in ipairs(upcasting_group) do
+    for i, this_action in ipairs(input_state.group) do
       action_button(this_action, tostring(i))
       ui.offset(4)  -- NEXT do grid utility functions, like :start_grid, :finish_grid, :grid_item, :grid_line_break
     end
@@ -386,7 +392,7 @@ draw_upcast_action_grid = function(self)
   ui.offset(0, 4)
   ui.start_line()
     if ui.key_button(gui.escape, "escape").is_clicked then
-      input_mode = "normal"
+      input_state = {mode = "normal"}
     end
   ui.finish_line()
 end
@@ -774,7 +780,7 @@ use_mouse = function(self)
   end
 
   ui.start_frame(nil, nil, love.graphics.getWidth() - State.camera.sidebar_w)
-    if input_mode == "target" then ui.cursor("target_inactive") end
+    if input_state.mode == "entity_target" then ui.cursor("target_inactive") end
 
     local position = V(love.mouse.getPosition())
       :add_mut(State.camera.offset)
@@ -786,20 +792,20 @@ use_mouse = function(self)
     local lmb = ui.mousedown(1)
     local rmb = ui.mousedown(2)
 
-    if input_mode == "target" then
-      if rmb then
-        input_mode = "normal"
-      end
-
+    if input_state.mode == "entity_target" then
       for _, grid_layer in ipairs(level.grid_layers) do
         local target = State.grids[grid_layer]:slow_get(position)
-        if target and target_action.parameters.entity_target(target_action, State.player, target) then
+        if target and input_state.action.parameters.entity_target(input_state.action, State.player, target) then
           ui.cursor("target_active")
           if rmb then
-            State.player.ai:plan_action(target_action, {entity_target = target})
+            State.player.ai:plan_action(input_state.action, {entity_target = target})
           end
           break
         end
+      end
+
+      if rmb then
+        input_state = {mode = "normal"}
       end
     else
       -- TODO OPT cache with mouse_x, mouse_y and invalidate on tcod map changes
