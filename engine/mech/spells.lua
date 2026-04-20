@@ -106,9 +106,9 @@ end)
 -- + split health.attack into health.attack_precog & health.attack_enact
 -- + eldritch blast can be obstructed by melee
 -- + target argument -> params table
+-- + fx
+-- + icons
 -- - direction
--- - icons
--- - fx
 -- - name formatting?
 -- - level 5, eldritch blast x2
 
