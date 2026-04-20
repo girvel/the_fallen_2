@@ -16,18 +16,142 @@ local interactive = require("engine.tech.interactive")
 local api         = require("engine.tech.api")
 
 
--- Internal state --
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Internal state
+----------------------------------------------------------------------------------------------------
 
 -- TODO there should be a sequence to input modes for potential multiple parameters (but maybe later)
 local input_state = {
   mode = "normal"
 }
+
 local cost, hint, mouse_task, mouse_task_path, is_compact
 
--- Utility functions --
-local action_button, set_mouse_task
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Helper functions
+----------------------------------------------------------------------------------------------------
 
--- Render functions --
+local action_button = function(displayed_action, hotkey, this_upcasting_group)
+  local player = State.player
+  if this_upcasting_group and not displayed_action:is_available(player) then
+    for _, this_action in ipairs(this_upcasting_group) do
+      if this_action:is_available(player) then
+        displayed_action = this_action
+        break
+      end
+    end
+  end
+
+  local is_available = displayed_action:is_available(player) and State.player:can_act()
+  local codename = is_available and displayed_action.codename or (displayed_action.codename .. "_inactive")
+  local image = gui[codename]
+  if not image then
+    Log.warn_once("Missing image for action %s", codename)
+    image = is_available and gui.unknown or gui.unknown_inactive
+  end
+  local button = ui.key_button(image, hotkey, not is_available)
+  if button.is_clicked then
+    if this_upcasting_group then
+      input_state = {
+        mode = "upcast",
+        group = this_upcasting_group,
+      }
+    elseif displayed_action.parameters == nil or Table.count(displayed_action.parameters) == 0 then
+      player.ai:plan_action(displayed_action)
+      input_state = {mode = "normal"}
+    elseif displayed_action.parameters.entity_target then
+      input_state = {
+        mode = "entity_target",
+        action = displayed_action,
+      }
+    else
+      Error("Unsupported action's .parameter_type %s", displayed_action.parameter_type)
+    end
+  end
+  if button.is_mouse_over then
+    cost = displayed_action.cost
+    hint = displayed_action.get_hint and displayed_action:get_hint(State.player) or displayed_action.name
+  end
+end
+
+--- @param task? fun(scene: any, characters: any)
+--- @param path? vector[]
+local set_mouse_task = function(task, path)
+  State.runner:stop(mouse_task, false, true)
+  if task then
+    local promise
+    promise, mouse_task = State.runner:run_task(task)
+    promise:next(function()
+      mouse_task_path = nil
+    end)
+  end
+  mouse_task_path = path
+end
+
+local line = function(x1, y1, x2, y2)
+  love.graphics.rectangle("fill", x1, y1, x2 - x1 + 4, y2 - y1 + 4)
+end
+
+local dot = function(x, y)
+  love.graphics.rectangle("fill", x, y, 4, 4)
+end
+
+local draw_bg_grid = function(rows_n)
+  local context = ui.get_context()
+  local start_x = context.cursor_x - 4
+  local start_y = context.cursor_y - 4
+  local finish_x = start_x + 68 * 5
+  local finish_y = start_y + rows_n * 68
+
+  love.graphics.setColor(Vector.hex("2f292c"))
+    line(start_x - 8, start_y, start_x, start_y)
+    line(start_x - 8, finish_y, start_x, finish_y)
+    line(finish_x, start_y, finish_x + 8, start_y)
+    line(finish_x, finish_y, finish_x + 8, finish_y)
+
+    dot(start_x - 16, start_y)
+    dot(start_x - 16, finish_y)
+    dot(finish_x + 16, start_y)
+    dot(finish_x + 16, finish_y)
+
+    for k = 0, 5 do
+      local x = start_x + 68 * k
+      line(x, start_y, x, finish_y)
+    end
+
+    for k = 0, rows_n do
+      local y = start_y + 68 * k
+      line(start_x, y, finish_x, y)
+    end
+  love.graphics.setColor(Vector.white)
+end
+
+local SIDEBAR_BLOCK_PADDING = 10
+
+local start_block = function()
+  ui.stack_push("tk_block_start", ui.get_context().cursor_y)
+  ui.start_frame(
+    4 + SIDEBAR_BLOCK_PADDING, 4 + SIDEBAR_BLOCK_PADDING,
+    68 * 5 + 4  -- to match action grid
+  )
+end
+
+local finish_block = function()
+  local finish = ui.get_context().cursor_y
+  local prev_frame = ui.finish_frame()
+
+  local h = finish - ui.stack_pop("tk_block_start") + SIDEBAR_BLOCK_PADDING + 4
+  local k = sprite.cell_size
+  ui.start_frame(-k, -k, prev_frame.w + 2*k, h + 2*k)
+    ui.tile(gui.sidebar_block_bg)
+  ui.finish_frame()
+  ui.offset(0, h)
+end
+
+----------------------------------------------------------------------------------------------------
+-- [SECTION] Display functions
+----------------------------------------------------------------------------------------------------
+
 local draw_gui, draw_sidebar, draw_top_bars, draw_action_grid, draw_resources, draw_move_order,
   draw_bag, draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
   draw_mouse_action_grid, draw_upcast_action_grid, use_mouse, draw_curtain
@@ -89,51 +213,6 @@ draw_sidebar = function(self)
       ui.finish_alignment()
     end
   tk.finish_window()
-end
-
---- NEXT structure: helper functions, state, display functions
-
-action_button = function(displayed_action, hotkey, this_upcasting_group)
-  local player = State.player
-  if this_upcasting_group and not displayed_action:is_available(player) then
-    for _, this_action in ipairs(this_upcasting_group) do
-      if this_action:is_available(player) then
-        displayed_action = this_action
-        break
-      end
-    end
-  end
-
-  local is_available = displayed_action:is_available(player) and State.player:can_act()
-  local codename = is_available and displayed_action.codename or (displayed_action.codename .. "_inactive")
-  local image = gui[codename]
-  if not image then
-    Log.warn_once("Missing image for action %s", codename)
-    image = is_available and gui.unknown or gui.unknown_inactive
-  end
-  local button = ui.key_button(image, hotkey, not is_available)
-  if button.is_clicked then
-    if this_upcasting_group then
-      input_state = {
-        mode = "upcast",
-        group = this_upcasting_group,
-      }
-    elseif displayed_action.parameters == nil or Table.count(displayed_action.parameters) == 0 then
-      player.ai:plan_action(displayed_action)
-      input_state = {mode = "normal"}
-    elseif displayed_action.parameters.entity_target then
-      input_state = {
-        mode = "entity_target",
-        action = displayed_action,
-      }
-    else
-      Error("Unsupported action's .parameter_type %s", displayed_action.parameter_type)
-    end
-  end
-  if button.is_mouse_over then
-    cost = displayed_action.cost
-    hint = displayed_action.get_hint and displayed_action:get_hint(State.player) or displayed_action.name
-  end
 end
 
 local HP_BAR_W = SIDEBAR_INNER_W - 64
@@ -205,44 +284,6 @@ draw_action_grid = function(self)
       State.player.ai:plan_action(actions.move(direction))
     end
   end
-end
-
-local line = function(x1, y1, x2, y2)
-  love.graphics.rectangle("fill", x1, y1, x2 - x1 + 4, y2 - y1 + 4)
-end
-
-local dot = function(x, y)
-  love.graphics.rectangle("fill", x, y, 4, 4)
-end
-
-local draw_bg_grid = function(rows_n)
-  local context = ui.get_context()
-  local start_x = context.cursor_x - 4
-  local start_y = context.cursor_y - 4
-  local finish_x = start_x + 68 * 5
-  local finish_y = start_y + rows_n * 68
-
-  love.graphics.setColor(Vector.hex("2f292c"))
-    line(start_x - 8, start_y, start_x, start_y)
-    line(start_x - 8, finish_y, start_x, finish_y)
-    line(finish_x, start_y, finish_x + 8, start_y)
-    line(finish_x, finish_y, finish_x + 8, finish_y)
-
-    dot(start_x - 16, start_y)
-    dot(start_x - 16, finish_y)
-    dot(finish_x + 16, start_y)
-    dot(finish_x + 16, finish_y)
-
-    for k = 0, 5 do
-      local x = start_x + 68 * k
-      line(x, start_y, x, finish_y)
-    end
-
-    for k = 0, rows_n do
-      local y = start_y + 68 * k
-      line(start_x, y, finish_x, y)
-    end
-  love.graphics.setColor(Vector.white)
 end
 
 draw_keyboard_action_grid = function(self)
@@ -426,28 +467,6 @@ local PRIMITIVE_RESOURCES = {
   "reactions",
 }
 
-local SIDEBAR_BLOCK_PADDING = 10
-
-local start_block = function()
-  ui.stack_push("tk_block_start", ui.get_context().cursor_y)
-  ui.start_frame(
-    4 + SIDEBAR_BLOCK_PADDING, 4 + SIDEBAR_BLOCK_PADDING,
-    68 * 5 + 4  -- to match action grid
-  )
-end
-
-local finish_block = function()
-  local finish = ui.get_context().cursor_y
-  local prev_frame = ui.finish_frame()
-
-  local h = finish - ui.stack_pop("tk_block_start") + SIDEBAR_BLOCK_PADDING + 4
-  local k = sprite.cell_size
-  ui.start_frame(-k, -k, prev_frame.w + 2*k, h + 2*k)
-    ui.tile(gui.sidebar_block_bg)
-  ui.finish_frame()
-  ui.offset(0, h)
-end
-
 draw_resources = function()
   local displayed_resources = {}
   for _, r in ipairs(RESOURCE_DISPLAY_ORDER) do
@@ -599,8 +618,8 @@ end
 local draw_line, draw_options
 
 draw_dialogue = function()
-  local line = State.player.hears
-  if not line then return end
+  local this_line = State.player.hears
+  if not this_line then return end
 
   local H = is_compact and 190 or 280
   local BOTTOM_GAP = is_compact and 0 or 50
@@ -608,10 +627,10 @@ draw_dialogue = function()
 
   tk.start_window("center", love.graphics.getHeight() - H - BOTTOM_GAP, "read_max", H)
   ui.start_font(FONT_SIZE)
-    if line.type == "plain_line" then
-      draw_line(line)
-    elseif line.type == "options" then
-      draw_options(line)
+    if this_line.type == "plain_line" then
+      draw_line(this_line)
+    elseif this_line.type == "options" then
+      draw_options(this_line)
     else
       assert(false)
     end
@@ -624,13 +643,13 @@ local SKIP_SOUNDS = sound.multiple("engine/assets/sounds/skip_line", .05)
 local FAILURE = colors.red_high
 local SUCCESS = colors.green_high
 
-draw_line = function(line)
-  local text = line.text
+draw_line = function(this_line)
+  local text = this_line.text
   ui.start_frame()
   ui.start_line()
-    if line.source then
-      local name = Name.game(line.source)
-      ui.start_color(line.source.sprite.color)
+    if this_line.source then
+      local name = Name.game(this_line.source)
+      ui.start_color(this_line.source.sprite.color)
         ui.text(name)
       ui.finish_color()
       ui.text(": ")
@@ -665,9 +684,9 @@ draw_line = function(line)
   end
 end
 
-draw_options = function(line)
+draw_options = function(this_line)
   local sorted = {}
-  for i, o in pairs(line.options) do  -- can't use luafun: ipairs/pairs detection conflict
+  for i, o in pairs(this_line.options) do  -- can't use luafun: ipairs/pairs detection conflict
     table.insert(sorted, {i, o})
   end
   table.sort(sorted, function(a, b) return a[1] < b[1] end)
@@ -750,20 +769,6 @@ draw_suggestion = function()
   ui.finish_font()
   ui.finish_alignment()
   ui.finish_frame()
-end
-
---- @param task? fun(scene: any, characters: any)
---- @param path? vector[]
-set_mouse_task = function(task, path)
-  State.runner:stop(mouse_task, false, true)
-  if task then
-    local promise
-    promise, mouse_task = State.runner:run_task(task)
-    promise:next(function()
-      mouse_task_path = nil
-    end)
-  end
-  mouse_task_path = path
 end
 
 local PATH_MAX_LENGTH = 50
