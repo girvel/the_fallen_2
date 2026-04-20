@@ -796,7 +796,7 @@ use_mouse = function(self)
         if target and target_action.parameters.entity_target(target_action, State.player, target) then
           ui.cursor("target_active")
           if rmb then
-            State.player.ai:plan_action(target_action, target)
+            State.player.ai:plan_action(target_action, {entity_target = target})
           end
           break
         end

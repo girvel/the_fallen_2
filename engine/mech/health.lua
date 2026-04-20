@@ -157,6 +157,7 @@ end
 --- @param damage integer
 health.attack_enact = function(source, target, did_hit, is_critical, damage)
   if not did_hit then
+    State.hostility:register(source, target)
     State:add(floater.new(is_critical and "!" or "-", target.position, health.COLOR_DAMAGE))
     return
   end

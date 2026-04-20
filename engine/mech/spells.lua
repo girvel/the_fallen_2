@@ -34,20 +34,20 @@ spells.eldritch_blast = {
 
   is_available = action.make_is_available(),
 
-  act = action.make_act(function(self, entity, target)
-    api.rotate(entity, target)
+  act = action.make_act(function(self, entity, params)
+    api.rotate(entity, params.entity_target)
     local attack_roll = D(20)
       + entity:get_modifier("cha")
       + xp.get_proficiency_bonus(entity.level or 1)
-    if api.distance(entity, target) == 1 then
+    if api.distance(entity, params.entity_target) == 1 then
       attack_roll = attack_roll:set("disadvantage")
     end
     local damage_roll = D(10)
-    local did_hit, is_crit, damage = health.attack_precog(entity, target, attack_roll, damage_roll)
+    local did_hit, is_crit, damage = health.attack_precog(entity, params.entity_target, attack_roll, damage_roll)
     entity:animate("fast_gesture"):next(function()
-      health.attack_enact(entity, target, did_hit, is_crit, damage)
+      health.attack_enact(entity, params.entity_target, did_hit, is_crit, damage)
       if did_hit then
-        animated.add_fx("engine/assets/animations/eldritch_blast_target", target.position, "fx_over")
+        animated.add_fx("engine/assets/animations/eldritch_blast_target", params.entity_target.position, "fx_over")
       end
     end)
     return true
@@ -83,11 +83,11 @@ spells.healing_word = Memoize(function(mod, cast_level)
 
     is_available = action.make_is_available(),
 
-    act = action.make_act(function(self, entity, target)
-      api.rotate(entity, target)
+    act = action.make_act(function(self, entity, params)
+      api.rotate(entity, params.entity_target)
       entity:animate("gesture")
-      health.heal(target, (D(4) * cast_level + entity:get_modifier(mod)):roll())
-      animated.add_fx("engine/assets/animations/healing_word_target", target.position)
+      health.heal(params.entity_target, (D(4) * cast_level + entity:get_modifier(mod)):roll())
+      animated.add_fx("engine/assets/animations/healing_word_target", params.entity_target.position)
       animated.add_fx("engine/assets/animations/healing_word_spell", entity.position)
       return true
     end),
@@ -104,11 +104,11 @@ end)
 -- + exiting upcasting
 -- + blinding
 -- + split health.attack into health.attack_precog & health.attack_enact
--- - target argument -> params table
+-- + eldritch blast can be obstructed by melee
+-- + target argument -> params table
 -- - direction
 -- - icons
 -- - fx
--- - eldritch blast can be obstructed by melee
 -- - name formatting?
 -- - level 5, eldritch blast x2
 
@@ -189,11 +189,11 @@ spells.animate_dead = {
     end,
   },
 
-  act = action.make_act(function(self, entity, target)
-    local position = State.grids.solids:find_free_position(target.position)
+  act = action.make_act(function(self, entity, params)
+    local position = State.grids.solids:find_free_position(params.entity_target.position)
     if not position then return false end
 
-    State:remove(target)
+    State:remove(params.entity_target)
     entity:animate("gesture")
     local fx = animated.add_fx("engine/assets/animations/skeleton_raise", position, "solids")
     fx.on_remove = function()
