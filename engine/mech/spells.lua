@@ -3,7 +3,6 @@ local monsters = require("engine.mech.monsters")
 local api = require("engine.tech.api")
 local animated = require("engine.tech.animated")
 local health = require("engine.mech.health")
-local tcod = require("engine.tech.tcod")
 local action = require("engine.tech.action")
 local actions = require("engine.mech.actions")
 local xp = require("engine.mech.xp")
@@ -40,6 +39,9 @@ spells.eldritch_blast = {
     local attack_roll = D(20)
       + entity:get_modifier("cha")
       + xp.get_proficiency_bonus(entity.level or 1)
+    if api.distance(entity, target) == 1 then
+      attack_roll = attack_roll:set("disadvantage")
+    end
     local damage_roll = D(10)
     local did_hit, is_crit, damage = health.attack_precog(entity, target, attack_roll, damage_roll)
     entity:animate("fast_gesture"):next(function()
