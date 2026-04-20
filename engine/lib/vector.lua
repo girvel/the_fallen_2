@@ -335,7 +335,7 @@ vector_methods.normalized2 = function(self)
   elseif self[2] ~= 0 then
     return vector.new(0, sign(self[2]))
   else
-    error("Can not normalize vector.zero")
+    return vector.zero
   end
 end
 

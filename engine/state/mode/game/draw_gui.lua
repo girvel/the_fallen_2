@@ -64,6 +64,11 @@ local action_button = function(displayed_action, hotkey, this_upcasting_group)
         mode = "entity_target",
         action = displayed_action,
       }
+    elseif displayed_action.parameters.direction then
+      input_state = {
+        mode = "direction",
+        action = displayed_action,
+      }
     else
       Error("Unsupported action's .parameter_type %s", displayed_action.parameter_type)
     end
@@ -154,7 +159,8 @@ end
 
 local draw_gui, draw_sidebar, draw_top_bars, draw_action_grid, draw_resources, draw_move_order,
   draw_bag, draw_dialogue, draw_notification, draw_suggestion, draw_keyboard_action_grid,
-  draw_mouse_action_grid, draw_upcast_action_grid, use_mouse, draw_curtain
+  draw_cancel_action_grid, draw_upcast_action_grid,
+  use_mouse, draw_curtain
 
 --- @param self state_mode_game
 --- @param dt number
@@ -269,8 +275,8 @@ draw_action_grid = function(self)
     local mode = input_state.mode
     if mode == "normal" then
       draw_keyboard_action_grid(self)
-    elseif mode == "entity_target" then
-      draw_mouse_action_grid(self)
+    elseif mode == "entity_target" or mode == "direction" then
+      draw_cancel_action_grid(self)
     elseif mode == "upcast" then
       draw_upcast_action_grid(self)
     else
@@ -411,7 +417,7 @@ draw_keyboard_action_grid = function(self)
   ui.finish_line()
 end
 
-draw_mouse_action_grid = function(self)
+draw_cancel_action_grid = function(self)
   draw_bg_grid(1)
   local escape_button = ui.key_button(gui.escape, "escape")
   if escape_button.is_clicked then
@@ -804,12 +810,21 @@ use_mouse = function(self)
           ui.cursor("target_active")
           if rmb then
             State.player.ai:plan_action(input_state.action, {entity_target = target})
+            input_state = {mode = "normal"}
           end
           break
         end
       end
-
+    elseif input_state.mode == "direction" then
+      ui.cursor("target_active")
+      local mouse_direction = (position - State.player.position):normalized2()
+      if mouse_direction ~= Vector.zero and mouse_direction ~= State.player.direction then
+        State.player:rotate(mouse_direction)
+      end
+      -- NEXT visualization for choosing direction
+      -- NEXT reactive
       if rmb then
+        State.player.ai:plan_action(input_state.action, {direction = State.player.direction})
         input_state = {mode = "normal"}
       end
     else

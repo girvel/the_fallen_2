@@ -126,11 +126,15 @@ spells.spray_of_cards = Memoize(function(mod, cast_level)
 
     is_available = action.make_is_available(),
 
-    act = action.make_act(function(self, entity)
+    parameters = {
+      direction = true,
+    },
+
+    act = action.make_act(function(self, entity, params)
       local damage = (D(10) * cast_level):roll()
       local dc = entity:get_spell_dc(mod)
 
-      local d = entity.direction
+      local d = params.direction
       local dr = d:rotate()
       local damages = {}
       for _, delta in ipairs {
@@ -142,6 +146,7 @@ spells.spray_of_cards = Memoize(function(mod, cast_level)
         end
       end
 
+      State.player:rotate(d)
       entity:animate("throw"):next(function()
         local offset
         if d == Vector.up then offset = V(-1, -2)
