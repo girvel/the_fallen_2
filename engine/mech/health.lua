@@ -116,6 +116,10 @@ end
 --- @param attack_roll table
 --- @return boolean did_hit true if attack landed
 health.attack = function(source, target, attack_roll, damage_roll)
+  if target.modify then
+    attack_roll = target:modify("incoming_attack_roll", attack_roll, source)
+  end
+
   local attack = attack_roll:roll()
   local is_nat = attack == attack_roll:max()
   local is_nat_miss = attack == attack_roll:min()

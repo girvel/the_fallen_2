@@ -44,6 +44,7 @@ end
 --- | '"dex_armor_bonus"'
 --- | '"activation"'
 --- | '"hp"'
+--- | '"incoming_attack_roll"'
 --- | '"outgoing_damage"'
 --- | '"saving_throw"'
 --- | '"light"'

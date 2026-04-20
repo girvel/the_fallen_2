@@ -1,0 +1,3 @@
+--- @class condition
+--- @field codename string
+--- @field life_time integer duration in seconds

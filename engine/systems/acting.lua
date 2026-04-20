@@ -240,9 +240,11 @@ return Tiny.processingSystem {
       condition.life_time = condition.life_time - dt
       if condition.life_time <= 0 then
         table.insert(indexes_to_remove, i)
+        Log.trace("Discarded %s", condition)
       end
     end
 
+    -- TODO just remove_in_bulk
     Table.remove_breaking_in_bulk(entity.conditions, indexes_to_remove)
   end,
 }

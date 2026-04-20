@@ -8,6 +8,8 @@ local d = setmetatable({}, module_mt)
 
 --- @alias die_advantage "none"|"advantage"|"disadvantage"
 
+-- TODO instead, advantage should be an integer; + is advantage, - is disadvantage
+
 --- @class die
 --- @field sides_n integer
 --- @field advantage die_advantage

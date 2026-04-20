@@ -36,6 +36,8 @@ init_debug = function()
     class.spell(spells.healing_word, "wis"),
     class.spell(spells.spray_of_cards, "cha"),
   }
+  State.player.level = 20
+  State.player.base_abilities.cha = 20
 end
 
 Ldump.mark(rails, {mt = "const"}, ...)

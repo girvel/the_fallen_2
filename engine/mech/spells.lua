@@ -1,3 +1,4 @@
+local blinded = require("engine.mech.conditions.blinded")
 local monsters = require("engine.mech.monsters")
 local api = require("engine.tech.api")
 local animated = require("engine.tech.animated")
@@ -98,6 +99,7 @@ end)
 -- + saving throw
 -- + exiting upcasting
 -- - blinding
+-- - split health.attack into health.attack_precog & health.attack_enact
 -- - target argument -> params table
 -- - direction
 -- - icons
@@ -126,7 +128,10 @@ spells.spray_of_cards = Memoize(function(mod, cast_level)
       } do
         local target = State.grids.solids:slow_get(delta + entity.position)
         if target and target.hp then
-          health.attack_save(entity, target, "dex", entity:get_spell_dc(mod), damage)
+          if health.attack_save(entity, target, "dex", entity:get_spell_dc(mod), damage) and target.conditions then
+            table.insert(target.conditions, blinded.new())
+            Log.trace("Blinded %s", target)
+          end
         end
       end
       return true
