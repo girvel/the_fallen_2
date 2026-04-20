@@ -1,3 +1,4 @@
+local level = require("engine.tech.level")
 local action = require "engine.tech.action"
 local health = require "engine.mech.health"
 local sound  = require "engine.tech.sound"
@@ -294,16 +295,16 @@ base_attack = function(entity, slot)
   local target = State.grids.solids:slow_get(entity.position + entity.direction)
 
   WHOOSH:play_at(entity.position)
-
-  entity:animate(slot .. "_attack"):next(function()
-    if not State:exists(target) then return end
-
-    if not health.attack(
+  local did_hit, is_crit, damage = health.attack_precog(
       entity,
       target,
       entity:get_attack_roll(slot),
       entity:get_damage_roll(slot)
-    ) then return end
+    )
+
+  entity:animate(slot .. "_attack"):next(function()
+    health.attack_enact(entity, target, did_hit, is_crit, damage)
+    if not did_hit then return end
 
     if target and target.sounds and target.sounds.hit then
       target.sounds.hit:play_at(target.position)
@@ -366,19 +367,15 @@ actions.bow_attack = {
 
       local attack_roll = entity:get_attack_roll("offhand")
       local damage_roll = entity:get_damage_roll("offhand")
+      if d:abs2() == 1 then
+        attack_roll = attack_roll:set("disadvantage")
+      end
+      local did_hit, is_crit, damage = health.attack_precog(entity, target, attack_roll, damage_roll)
 
       self.sounds:play_at(entity.position, "medium")
       projectile.launch(entity, "hand", target, damage_roll:max() * 2):next(function()
         -- SOUND hit?
-        if d:abs2() == 1 then
-          attack_roll = attack_roll:set("disadvantage")
-        end
-        health.attack(
-          entity,
-          target,
-          attack_roll,
-          damage_roll
-        )
+        health.attack_enact(entity, target, did_hit, is_crit, damage)
       end)
     end)
     return true

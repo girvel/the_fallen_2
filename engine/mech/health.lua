@@ -110,34 +110,34 @@ health.set_hp = function(target, value)
   return true
 end
 
---- Attacks with given attack/damage rolls
 --- @param source entity attacking entity
 --- @param target entity attacked entity
---- @param attack_roll table
---- @return boolean did_hit true if attack landed
-health.attack = function(source, target, attack_roll, damage_roll)
+--- @param attack_roll d
+--- @param damage_roll d
+--- @return boolean did_hit
+--- @return boolean is_critical
+--- @return integer damage
+health.attack_precog = function(source, target, attack_roll, damage_roll)
   if target.modify then
     attack_roll = target:modify("incoming_attack_roll", attack_roll, source)
   end
 
   local attack = attack_roll:roll()
-  local is_nat = attack == attack_roll:max()
-  local is_nat_miss = attack == attack_roll:min()
+  local is_nat_20 = attack == attack_roll:max()
+  local is_nat_1 = attack == attack_roll:min()
   local ac = target.get_armor and target:get_armor() or target.armor or 0
 
-  Log.info("%s attacks %s; attack roll: %s, armor: %s", source, target, attack, ac)
+  Log.info("%s / %s | %s attacks %s", attack, ac, source, target)
 
-  if is_nat_miss then
-    State:add(floater.new("!", target.position, health.COLOR_DAMAGE))
-    return false
+  if is_nat_1 then
+    return false, true, 0
   end
 
-  if attack < ac and not is_nat then
-    State:add(floater.new("-", target.position, health.COLOR_DAMAGE))
-    return false
+  if attack < ac and not is_nat_20 then
+    return false, false, 0
   end
 
-  local is_critical = is_nat and attack >= ac
+  local is_critical = is_nat_20 and attack >= ac
   if is_critical then
     damage_roll = damage_roll + D.new(damage_roll.dice, 0)
   end
@@ -146,8 +146,33 @@ health.attack = function(source, target, attack_roll, damage_roll)
   if source.modify then
     damage_amount = source:modify("outgoing_damage", damage_amount, target, is_critical)
   end
-  health.damage(target, damage_amount, source, is_critical)
-  return true
+
+  return true, is_critical, damage_amount
+end
+
+--- @param source entity attacking entity
+--- @param target entity attacked entity
+--- @param did_hit boolean
+--- @param is_critical boolean
+--- @param damage integer
+health.attack_enact = function(source, target, did_hit, is_critical, damage)
+  if not did_hit then
+    State:add(floater.new(is_critical and "!" or "-", target.position, health.COLOR_DAMAGE))
+    return
+  end
+
+  health.damage(target, damage, source, is_critical)
+end
+
+--- Attacks with given attack/damage rolls
+--- @param source entity attacking entity
+--- @param target entity attacked entity
+--- @param attack_roll table
+--- @return boolean did_hit true if attack landed
+health.attack = function(source, target, attack_roll, damage_roll)
+  local did_hit, is_crit, damage = health.attack_precog(source, target, attack_roll, damage_roll)
+  health.attack_enact(source, target, did_hit, is_crit, damage)
+  return did_hit
 end
 
 --- Attacks through making the target roll the saving throw; halves the damage on success

@@ -240,7 +240,6 @@ return Tiny.processingSystem {
       condition.life_time = condition.life_time - dt
       if condition.life_time <= 0 then
         table.insert(indexes_to_remove, i)
-        Log.trace("Discarded %s", condition)
       end
     end
 

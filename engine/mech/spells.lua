@@ -37,12 +37,14 @@ spells.eldritch_blast = {
 
   act = action.make_act(function(self, entity, target)
     api.rotate(entity, target)
+    local attack_roll = D(20)
+      + entity:get_modifier("cha")
+      + xp.get_proficiency_bonus(entity.level or 1)
+    local damage_roll = D(10)
+    local did_hit, is_crit, damage = health.attack_precog(entity, target, attack_roll, damage_roll)
     entity:animate("fast_gesture"):next(function()
-      local attack_roll = D(20)
-        + entity:get_modifier("cha")
-        + xp.get_proficiency_bonus(entity.level or 1)
-      local damage_roll = D(10)
-      if health.attack(entity, target, attack_roll, damage_roll) then
+      health.attack_enact(entity, target, did_hit, is_crit, damage)
+      if did_hit then
         animated.add_fx("engine/assets/animations/eldritch_blast_target", target.position, "fx_over")
       end
     end)
@@ -98,11 +100,12 @@ end)
 -- + sketch
 -- + saving throw
 -- + exiting upcasting
--- - blinding
--- - split health.attack into health.attack_precog & health.attack_enact
+-- + blinding
+-- + split health.attack into health.attack_precog & health.attack_enact
 -- - target argument -> params table
 -- - direction
 -- - icons
+-- - fx
 -- - eldritch blast can be obstructed by melee
 -- - name formatting?
 
@@ -130,7 +133,6 @@ spells.spray_of_cards = Memoize(function(mod, cast_level)
         if target and target.hp then
           if health.attack_save(entity, target, "dex", entity:get_spell_dc(mod), damage) and target.conditions then
             table.insert(target.conditions, blinded.new())
-            Log.trace("Blinded %s", target)
           end
         end
       end
