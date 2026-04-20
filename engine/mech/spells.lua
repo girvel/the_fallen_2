@@ -126,16 +126,32 @@ spells.spray_of_cards = Memoize(function(mod, cast_level)
     act = action.make_act(function(self, entity)
       local damage = (D(10) * cast_level):roll()
       local d = entity.direction
-      for _, delta in ipairs {
-        d, 2 * d, d:rotate() + d, -d:rotate() + d,
-      } do
-        local target = State.grids.solids:slow_get(delta + entity.position)
-        if target and target.hp then
-          if health.attack_save(entity, target, "dex", entity:get_spell_dc(mod), damage) and target.conditions then
-            table.insert(target.conditions, blinded.new())
+      local dr = d:rotate()
+      entity:animate("throw"):next(function()
+        local offset
+        if d == Vector.up then offset = V(-1, -2)
+        elseif d == Vector.right then offset = V(3, -1)
+        elseif d == Vector.down then offset = V(2, 3)
+        elseif d == Vector.left then offset = V(-2, 2)
+        else assert(false) end
+
+        local fx = animated.add_fx(
+          "engine/assets/animations/spray_of_cards", entity.position + offset, "fx_over"
+        )
+        fx.rotation = d:angle()
+
+        for _, delta in ipairs {
+          d, 2 * d, dr + d, -dr + d,
+        } do
+          local target = State.grids.solids:slow_get(delta + entity.position)
+          if target and target.hp then
+            -- NEXT split to two parts
+            if health.attack_save(entity, target, "dex", entity:get_spell_dc(mod), damage) and target.conditions then
+              table.insert(target.conditions, blinded.new())
+            end
           end
         end
-      end
+      end)
       return true
     end),
   }

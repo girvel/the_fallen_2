@@ -365,10 +365,16 @@ vector_methods.rotate_mut = function(self)
   return self
 end
 
---- Rotate vector 90 degrees counterclockwise
+--- Copy & rotate vector 90 degrees counterclockwise
 --- @return vector
 vector_methods.rotate = function(self)
   return self:copy():rotate_mut()
+end
+
+--- Return rotation in radians
+--- @return number
+vector_methods.angle = function(self)
+  return math.atan2(self[2], self[1]) + math.pi/2
 end
 
 local SWIZZLE_BASES = {
