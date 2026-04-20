@@ -575,6 +575,26 @@ ui.image = function(image, scale)
   end
 end
 
+--- @param path string
+--- @return love.ImageData
+local get_atlas = Memoize(function(path)
+  return love.image.newImageData(path)
+end)
+
+--- @param image love.ImageData|string
+--- @param atlas_n integer
+--- @return love.Image
+local get_atlas_image = Memoize(function(image, atlas_n)
+  if type(image) == "string" then
+    image = get_atlas(image)
+  end
+  return love.graphics.newImage(sprite.utility.select(image, atlas_n))
+end)
+
+ui.atlas_image = function(image, atlas_n)
+  ui.image(get_atlas_image(image, atlas_n))
+end
+
 local ACTIVE_FRAME_PERIOD = .1
 
 --- @param image string|love.Image

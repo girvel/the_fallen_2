@@ -40,7 +40,7 @@ end
 methods.game_to_screen = function(self, gx, gy)
   local dx, dy = unpack(self.offset)
   local k = State.camera.SCALE * sprite.cell_size
-  return dx + k * gx, dy + k * gy
+  return k * gx - dx, k * gy - dy
 end
 
 

@@ -821,8 +821,19 @@ use_mouse = function(self)
       if mouse_direction ~= Vector.zero and mouse_direction ~= State.player.direction then
         State.player:rotate(mouse_direction)
       end
-      -- NEXT visualization for choosing direction
-      -- NEXT reactive
+
+      for i, direction in ipairs(Vector.directions) do
+        local x, y = State.camera:game_to_screen(unpack(State.player.position + direction))
+        ui.start_frame(x, y)
+          local mode
+          if State.player.direction ~= direction then
+            mode = "inactive"
+          else
+            mode = "active"
+          end
+          ui.atlas_image("engine/assets/gui/direction_arrow_"..mode..".png", i)
+        ui.finish_frame()
+      end
       if rmb then
         State.player.ai:plan_action(input_state.action, {direction = State.player.direction})
         input_state = {mode = "normal"}
