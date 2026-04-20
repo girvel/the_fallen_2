@@ -168,12 +168,12 @@ draw_gui = function(self, dt)
   is_compact = love.graphics.getHeight() < 900
   hint = nil
 
+  use_mouse(self)
   draw_curtain()
   draw_sidebar(self)
   draw_dialogue()
   draw_notification()
   draw_suggestion()
-  use_mouse(self)
 
   if ui.keyboard("escape") then
     State.mode:open_menu("escape_menu")
@@ -834,9 +834,18 @@ use_mouse = function(self)
           ui.atlas_image("engine/assets/gui/direction_arrow_"..mode..".png", i)
         ui.finish_frame()
       end
+
       if rmb then
         State.player.ai:plan_action(input_state.action, {direction = State.player.direction})
         input_state = {mode = "normal"}
+      end
+
+      for key, d in pairs(Vector.wasd) do
+        if ui.keyboard(key) then
+          State.player.ai:plan_action(input_state.action, {direction = d})
+          input_state = {mode = "normal"}
+          break
+        end
       end
     else
       -- TODO OPT cache with mouse_x, mouse_y and invalidate on tcod map changes

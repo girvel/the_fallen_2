@@ -108,7 +108,7 @@ end)
 -- + target argument -> params table
 -- + fx
 -- + icons
--- - direction
+-- + direction
 -- - name formatting?
 -- - level 5, eldritch blast x2
 
