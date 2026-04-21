@@ -72,7 +72,8 @@ local action_button = function(displayed_action, hotkey, this_upcasting_group)
         action = displayed_action,
       }
     else
-      Error("Unsupported action's .parameter_type %s", displayed_action.parameter_type)
+      local key = next(displayed_action.parameters)
+      Error("Unsupported action's parameter %s", key)
     end
   end
   if button.is_mouse_over then
