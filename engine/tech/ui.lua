@@ -75,11 +75,26 @@ local context
 
 --- @enum (key) ui_cursor_type
 local CURSORS = {
-  normal = love.mouse.newCursor("engine/assets/gui/cursor/normal.png"),
-  target_active = love.mouse.newCursor("engine/assets/gui/cursor/target_active.png", 8, 8),
-  target_inactive = love.mouse.newCursor("engine/assets/gui/cursor/target_inactive.png", 8, 8),
-  walk = love.mouse.newCursor("engine/assets/gui/cursor/walk.png", 8, 8),
-  hand = love.mouse.getSystemCursor("hand"),
+  normal = {
+    image = love.graphics.newImage("engine/assets/gui/cursor/normal.png"),
+    offset = Vector.zero,
+  },
+  target_active = {
+    image = love.graphics.newImage("engine/assets/gui/cursor/target_active.png"),
+    offset = V(8, 8),
+  },
+  target_inactive = {
+    image = love.graphics.newImage("engine/assets/gui/cursor/target_inactive.png"),
+    offset = V(8, 8),
+  },
+  walk = {
+    image = love.graphics.newImage("engine/assets/gui/cursor/walk.png"),
+    offset = V(8, 8),
+  },
+  hand = {
+    image = love.graphics.newImage("engine/assets/gui/cursor/hand.png"),
+    offset = V(5, 0),
+  }
 }
 
 local FRAME = "engine/assets/gui/button_frame.png"
@@ -255,7 +270,8 @@ ui.finish = function()
   input.mouse.button_released = {}
   input.keyboard.pressed = {}
   input.keyboard.input = ""
-  love.mouse.setCursor(CURSORS[state.cursor])
+  local cursor = CURSORS[state.cursor]
+  love.graphics.draw(cursor.image, unpack(V(love.mouse.getPosition()):sub_mut(cursor.offset)))
 end
 
 --- @param x? integer?
