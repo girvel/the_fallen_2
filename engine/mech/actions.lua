@@ -316,6 +316,7 @@ end
 -- TODO reconsider this constant
 actions.BOW_ATTACK_RANGE = 15
 
+--- NEXT redo this action & spells
 actions.bow_attack = {
   name = "выстрелить",
   codename = "bow_attack",
@@ -339,13 +340,16 @@ actions.bow_attack = {
   end),
 
   parameters = {
-    entity_target = function(self, entity, target)
-      local api = require("engine.tech.api")
-      return target
-        and target.hp
-        and State.hostility:get(entity, target) ~= "ally"
-        and api.can_see(entity, target, actions.BOW_ATTACK_RANGE)
-    end,
+    entity_targets = {
+      filter = function(self, entity, target)
+        local api = require("engine.tech.api")
+        return target
+          and target.hp
+          and State.hostility:get(entity, target) ~= "ally"
+          and api.can_see(entity, target, actions.BOW_ATTACK_RANGE)
+      end,
+      max_n = 1,
+    }
   },
 
   act = action.make_act(function(self, entity, params)

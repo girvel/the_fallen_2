@@ -23,30 +23,33 @@ spells.eldritch_blast = action.plain {
   },
 
   parameters = {
-    entity_target = function(self, entity, params)
-      -- NEXT duplicated actions.bow_attack.target_filter, should be action.filters.make_enemy_target(range)
-      local target = params.entity_target
-      return target
-        and target.hp
-        and State.hostility:get(entity, target) ~= "ally"
-        and api.can_see(entity, target, actions.BOW_ATTACK_RANGE)
-    end,
+    entity_targets = {
+      max_n = 1,
+      filter = function(self, entity, target)
+        -- NEXT duplicated actions.bow_attack.target_filter, should be action.filters.make_enemy_target(range)
+        return target
+          and target.hp
+          and State.hostility:get(entity, target) ~= "ally"
+          and api.can_see(entity, target, actions.BOW_ATTACK_RANGE)
+      end,
+    }
   },
 
   _act = function(self, entity, params)
-    api.rotate(entity, params.entity_target)
+    local target = params.entity_targets[1]
+    api.rotate(entity, target)
     local attack_roll = D(20)
       + entity:get_modifier("cha")
       + xp.get_proficiency_bonus(entity.level or 1)
-    if api.distance(entity, params.entity_target) == 1 then
+    if api.distance(entity, target) == 1 then
       attack_roll = attack_roll:set("disadvantage")
     end
     local damage_roll = D(10)
-    local did_hit, is_crit, damage = health.attack_precog(entity, params.entity_target, attack_roll, damage_roll)
+    local did_hit, is_crit, damage = health.attack_precog(entity, target, attack_roll, damage_roll)
     entity:animate("fast_gesture"):next(function()
-      health.attack_enact(entity, params.entity_target, did_hit, is_crit, damage)
+      health.attack_enact(entity, target, did_hit, is_crit, damage)
       if did_hit then
-        animated.add_fx("engine/assets/animations/eldritch_blast_target", params.entity_target.position, "fx_over")
+        animated.add_fx("engine/assets/animations/eldritch_blast_target", target.position, "fx_over")
       end
     end)
     return true
@@ -104,7 +107,7 @@ end)
 -- + fx
 -- + icons
 -- + direction
--- - name formatting?
+-- + name formatting?
 -- - level 5, eldritch blast x2
 
 spells.spray_of_cards = action.leveled_spell(2, function(mod, cast_level)

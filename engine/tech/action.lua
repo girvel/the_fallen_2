@@ -48,11 +48,13 @@ action.mix_in = function(t)
 end
 
 --- @class action_params
---- @field entity_target entity
+--- @field entity_targets entity[] guaranteed # >= 1
 --- @field direction vector
 
+--- @alias filter_f fun(self: action, entity: entity, target: entity): any
+
 --- @class action_params_def
---- @field entity_target? fun(self: action, entity: entity, params: action_params): any
+--- @field entity_targets? {filter: filter_f, max_n: integer}
 --- @field direction? true
 
 --- @alias action table|action_strict
@@ -68,7 +70,7 @@ local action_methods = {
   is_available = function(self, entity) end,
 
   --- @param entity entity
-  --- @param parameter action_params
+  --- @param parameter? action_params
   act = function(self, entity, parameter) end,
 }
 

@@ -59,10 +59,12 @@ local action_button = function(displayed_action, hotkey, this_upcasting_group)
     elseif displayed_action.parameters == nil or Table.count(displayed_action.parameters) == 0 then
       player.ai:plan_action(displayed_action)
       input_state = {mode = "normal"}
-    elseif displayed_action.parameters.entity_target then
+    elseif displayed_action.parameters.entity_targets then
       input_state = {
-        mode = "entity_target",
+        mode = "entity_targets",
         action = displayed_action,
+        targets = {},
+        skips_n = 0,
       }
     elseif displayed_action.parameters.direction then
       input_state = {
@@ -275,7 +277,7 @@ draw_action_grid = function(self)
     local mode = input_state.mode
     if mode == "normal" then
       draw_keyboard_action_grid(self)
-    elseif mode == "entity_target" or mode == "direction" then
+    elseif mode == "entity_targets" or mode == "direction" then
       draw_cancel_action_grid(self)
     elseif mode == "upcast" then
       draw_upcast_action_grid(self)
@@ -791,7 +793,7 @@ use_mouse = function(self)
   end
 
   ui.start_frame(nil, nil, love.graphics.getWidth() - State.camera.sidebar_w)
-    if input_state.mode == "entity_target" then ui.cursor("target_inactive") end
+    if input_state.mode == "entity_targets" then ui.cursor("target_inactive") end
 
     local position = V(love.mouse.getPosition())
       :add_mut(State.camera.offset)
@@ -803,16 +805,22 @@ use_mouse = function(self)
     local lmb = ui.mousedown(1)
     local rmb = ui.mousedown(2)
 
-    if input_state.mode == "entity_target" then
+    if input_state.mode == "entity_targets" then
+      local config = input_state.action.parameters.entity_targets
       for _, grid_layer in ipairs(level.grid_layers) do
         local target = State.grids[grid_layer]:slow_get(position)
-        if target and input_state.action.parameters.entity_target(
-          input_state.action, State.player, {entity_target = target}
+        if target and config.filter(
+          input_state.action, State.player, target
         ) then
           ui.cursor("target_active")
+          -- NEXT skipping
+          -- NEXT visualization
           if rmb then
-            State.player.ai:plan_action(input_state.action, {entity_target = target})
-            input_state = {mode = "normal"}
+            table.insert(input_state.targets, target)
+            if #input_state.targets + input_state.skips_n == config.max_n then
+              State.player.ai:plan_action(input_state.action, {entity_targets = input_state.targets})
+              input_state = {mode = "normal"}
+            end
           end
           break
         end
@@ -890,9 +898,7 @@ use_mouse = function(self)
       end
 
       local is_a_potential_target
-      if not solid then
-        is_a_potential_target = false
-      else
+      if solid then
         local player_hostility = State.hostility:get(State.player, solid)
         is_a_potential_target = (
           player_hostility == "enemy"
@@ -902,8 +908,8 @@ use_mouse = function(self)
 
       if is_a_potential_target
         and actions.bow_attack:is_available(State.player)
-        and actions.bow_attack.parameters.entity_target(
-          actions.bow_attack, State.player, {entity_target = solid}
+        and actions.bow_attack.parameters.entity_targets.filter(
+          actions.bow_attack, State.player, solid
         )
       then
         ui.cursor("target_active")
