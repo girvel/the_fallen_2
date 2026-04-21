@@ -796,7 +796,8 @@ use_mouse = function(self)
   ui.start_frame(nil, nil, love.graphics.getWidth() - State.camera.sidebar_w)
     if input_state.mode == "entity_targets" then ui.cursor("target_inactive") end
 
-    local position = V(love.mouse.getPosition())
+    local mx, my = love.mouse.getPosition()
+    local position = V(mx, my)
       :add_mut(State.camera.offset)
       :div_mut(sprite.cell_size * 4)
       :map_mut(math.floor)
@@ -808,6 +809,13 @@ use_mouse = function(self)
 
     if input_state.mode == "entity_targets" then
       local config = input_state.action.parameters.entity_targets
+      local targets_n = #input_state.targets + input_state.skips_n
+      local max_n = config.max_n(input_state.action, State.player)
+
+      ui.start_frame(mx + 8, my)
+        ui.text("%s/%s", targets_n, max_n)
+      ui.finish_frame()
+
       for _, grid_layer in ipairs(level.grid_layers) do
         local target = State.grids[grid_layer]:slow_get(position)
         if target and config.filter(
@@ -815,10 +823,9 @@ use_mouse = function(self)
         ) then
           ui.cursor("target_active")
           -- NEXT skipping
-          -- NEXT visualization
           if rmb then
             table.insert(input_state.targets, target)
-            if #input_state.targets + input_state.skips_n >= config.max_n(input_state.action, State.player) then
+            if targets_n + 1 >= max_n then
               State.player.ai:plan_action(input_state.action, {entity_targets = input_state.targets})
               input_state = {mode = "normal"}
             end
