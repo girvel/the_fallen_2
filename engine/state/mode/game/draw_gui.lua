@@ -806,7 +806,9 @@ use_mouse = function(self)
     if input_state.mode == "entity_target" then
       for _, grid_layer in ipairs(level.grid_layers) do
         local target = State.grids[grid_layer]:slow_get(position)
-        if target and input_state.action.parameters.entity_target(input_state.action, State.player, target) then
+        if target and input_state.action.parameters.entity_target(
+          input_state.action, State.player, {entity_target = target}
+        ) then
           ui.cursor("target_active")
           if rmb then
             State.player.ai:plan_action(input_state.action, {entity_target = target})
@@ -900,7 +902,9 @@ use_mouse = function(self)
 
       if is_a_potential_target
         and actions.bow_attack:is_available(State.player)
-        and actions.bow_attack.parameters.entity_target(actions.bow_attack, State.player, solid)
+        and actions.bow_attack.parameters.entity_target(
+          actions.bow_attack, State.player, {entity_target = solid}
+        )
       then
         ui.cursor("target_active")
         if rmb then

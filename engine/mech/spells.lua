@@ -15,7 +15,7 @@ local spells = {}
 ----------------------------------------------------------------------------------------------------
 
 --- @type action
-spells.eldritch_blast = {
+spells.eldritch_blast = action.plain {
   name = "мистический заряд",
   codename = "eldritch_blast",
   cost = {
@@ -23,8 +23,9 @@ spells.eldritch_blast = {
   },
 
   parameters = {
-    entity_target = function(self, entity, target)
+    entity_target = function(self, entity, params)
       -- NEXT duplicated actions.bow_attack.target_filter, should be action.filters.make_enemy_target(range)
+      local target = params.entity_target
       return target
         and target.hp
         and State.hostility:get(entity, target) ~= "ally"
@@ -32,9 +33,7 @@ spells.eldritch_blast = {
     end,
   },
 
-  is_available = action.make_is_available(),
-
-  act = action.make_act(function(self, entity, params)
+  _act = function(self, entity, params)
     api.rotate(entity, params.entity_target)
     local attack_roll = D(20)
       + entity:get_modifier("cha")
@@ -51,7 +50,7 @@ spells.eldritch_blast = {
       end
     end)
     return true
-  end),
+  end,
 }
 
 ----------------------------------------------------------------------------------------------------
@@ -73,7 +72,8 @@ spells.healing_word = Memoize(function(mod, cast_level)
     range = 40,
 
     parameters = {
-      entity_target = function(self, entity, target)
+      entity_target = function(self, entity, params)
+        local target = params.entity_target
         return target
           and target.hp
           and target.hp < target:get_max_hp()
@@ -189,7 +189,8 @@ spells.animate_dead = {
   is_available = action.make_is_available(),
 
   parameters = {
-    entity_target = function(self, entity, target)
+    entity_target = function(self, entity, params)
+      local target = params.entity_target
       return State:exists(target) and target.body_flag
     end,
   },

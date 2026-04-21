@@ -47,18 +47,28 @@ action.mix_in = function(t)
   Table.defaults(t, action.base)
 end
 
+--- @class action_params
+--- @field entity_target? entity
+--- @field direction? vector
+
+--- @class action_params_def
+--- @field entity_target? fun(self: action, entity: entity, params: action_params): any
+--- @field direction? true
+
 --- @alias action table|action_strict
 --- @class action_strict
 --- @field codename? string
+--- @field name? string
 --- @field upcast_from? action
 --- @field cost? table<string, number>
---- @field parameters? {entity_target: fun(self: action, entity: entity, target: entity): any}
+--- @field parameters? action_params_def
+--- @field get_hint? fun(self: action, entity: entity): string
 local action_methods = {
   --- @param entity entity
   is_available = function(self, entity) end,
 
   --- @param entity entity
-  --- @param parameter any
+  --- @param parameter action_params
   act = function(self, entity, parameter) end,
 }
 
@@ -106,6 +116,31 @@ action.make_is_available = function(f)
     return true
   end
 end
+
+--- @alias action_prototype action_prototype_strict|table
+--- @class action_prototype_strict: action_strict
+--- @field _act? fun(self: action, entity: entity, params: action_params): boolean
+--- @field _is_available? fun(self: action, entity: entity): any
+
+--- @param prototype action_prototype
+--- @return action
+action.plain = function(prototype)
+  if not prototype.act then
+    prototype.act = action.make_act(prototype._act)
+  end
+
+  if not prototype.is_available then
+    prototype.is_available = action.make_is_available(prototype._is_available)
+  end
+
+  return prototype
+end
+
+--- @alias spell_prototype spell_prototype_strict|table
+--- @class spell_prototype_strict: action_prototype_strict
+--- @field _codename? string
+--- @field _name? string
+--- @field _cost? table<string, number>
 
 Ldump.mark(action, "const", ...)
 return action
