@@ -44,9 +44,13 @@ local function is_callable(f)
   return false
 end
 
+local nil_sub = {}
+
 local function cache_get(cache, params)
   local node = cache
   for i=1, #params do
+    local param = params[i]
+    if param == nil then param = nil_sub end
     node = node.children and node.children[params[i]]
     if not node then return nil end
   end
@@ -58,6 +62,7 @@ local function cache_put(cache, params, results)
   local param
   for i=1, #params do
     param = params[i]
+    if param == nil then param = nil_sub end
     node.children = node.children or {}
     node.children[param] = node.children[param] or {}
     node = node.children[param]
