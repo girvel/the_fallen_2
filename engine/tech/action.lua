@@ -51,10 +51,12 @@ end
 --- @field entity_targets entity[] guaranteed # >= 1
 --- @field direction vector
 
---- @alias filter_f fun(self: action, entity: entity, target: entity): any
+--- @class action_entity_targets_def
+--- @field filter fun(self: action, entity: entity, target: entity): any
+--- @field max_n fun(self: action, entity: entity): integer
 
 --- @class action_params_def
---- @field entity_targets? {filter: filter_f, max_n: integer}
+--- @field entity_targets? action_entity_targets_def
 --- @field direction? true
 
 --- @alias action table|action_strict

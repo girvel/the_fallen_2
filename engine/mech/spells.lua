@@ -24,7 +24,17 @@ spells.eldritch_blast = action.plain {
 
   parameters = {
     entity_targets = {
-      max_n = 1,
+      max_n = function(self, entity)
+        if not entity.level or entity.level < 5 then
+          return 1
+        elseif entity.level < 11 then
+          return 2
+        elseif entity.level < 17 then
+          return 3
+        else
+          return 4
+        end
+      end,
       filter = function(self, entity, target)
         -- NEXT duplicated actions.bow_attack.target_filter, should be action.filters.make_enemy_target(range)
         return target
@@ -36,22 +46,32 @@ spells.eldritch_blast = action.plain {
   },
 
   _act = function(self, entity, params)
-    local target = params.entity_targets[1]
-    api.rotate(entity, target)
-    local attack_roll = D(20)
-      + entity:get_modifier("cha")
-      + xp.get_proficiency_bonus(entity.level or 1)
-    if api.distance(entity, target) == 1 then
-      attack_roll = attack_roll:set("disadvantage")
+    api.rotate(entity, params.entity_targets[1])
+
+    local precogs = {}
+    for _, target in ipairs(params.entity_targets) do
+      local attack_roll = D(20)
+        + entity:get_modifier("cha")
+        + xp.get_proficiency_bonus(entity.level or 1)
+      if api.distance(entity, target) == 1 then
+        attack_roll = attack_roll:set("disadvantage")
+      end
+      local damage_roll = D(10)
+      table.insert(precogs, {
+        target, health.attack_precog(entity, target, attack_roll, damage_roll)
+      })
     end
-    local damage_roll = D(10)
-    local did_hit, is_crit, damage = health.attack_precog(entity, target, attack_roll, damage_roll)
+
     entity:animate("fast_gesture"):next(function()
-      health.attack_enact(entity, target, did_hit, is_crit, damage)
-      if did_hit then
-        animated.add_fx("engine/assets/animations/eldritch_blast_target", target.position, "fx_over")
+      for _, data in ipairs(precogs) do
+        local target, did_hit, is_crit, damage = unpack(data)
+        health.attack_enact(entity, target, did_hit, is_crit, damage)
+        if did_hit then
+          animated.add_fx("engine/assets/animations/eldritch_blast_target", target.position, "fx_over")
+        end
       end
     end)
+
     return true
   end,
 }

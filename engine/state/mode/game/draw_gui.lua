@@ -818,7 +818,7 @@ use_mouse = function(self)
           -- NEXT visualization
           if rmb then
             table.insert(input_state.targets, target)
-            if #input_state.targets + input_state.skips_n == config.max_n then
+            if #input_state.targets + input_state.skips_n >= config.max_n(input_state.action, State.player) then
               State.player.ai:plan_action(input_state.action, {entity_targets = input_state.targets})
               input_state = {mode = "normal"}
             end
