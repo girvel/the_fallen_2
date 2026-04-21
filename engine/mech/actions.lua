@@ -348,12 +348,13 @@ actions.bow_attack = {
           and State.hostility:get(entity, target) ~= "ally"
           and api.can_see(entity, target, actions.BOW_ATTACK_RANGE)
       end,
-      max_n = 1,
+      max_n = function() return 1 end,
     }
   },
 
   act = action.make_act(function(self, entity, params)
-    local d = (params.entity_target.position - entity.position)
+    local target = params.entity_targets
+    local d = (target.position - entity.position)
     if d ~= Vector.zero then
       entity:rotate(d:normalized2())
     end
@@ -364,7 +365,7 @@ actions.bow_attack = {
     entity.inventory.hand = arrow
 
     entity:animate("bow_attack"):next(function()
-      if not State:exists(params.entity_target) then
+      if not State:exists(target) then
         State:remove(entity.inventory.hand)
         entity.inventory.hand = nil
         return
@@ -375,12 +376,12 @@ actions.bow_attack = {
       if d:abs2() == 1 then
         attack_roll = attack_roll:set("disadvantage")
       end
-      local did_hit, is_crit, damage = health.attack_precog(entity, params.entity_target, attack_roll, damage_roll)
+      local did_hit, is_crit, damage = health.attack_precog(entity, target, attack_roll, damage_roll)
 
       self.sounds:play_at(entity.position, "medium")
-      projectile.launch(entity, "hand", params.entity_target, damage_roll:max() * 2):next(function()
+      projectile.launch(entity, "hand", target, damage_roll:max() * 2):next(function()
         -- SOUND hit?
-        health.attack_enact(entity, params.entity_target, did_hit, is_crit, damage)
+        health.attack_enact(entity, target, did_hit, is_crit, damage)
       end)
     end)
     return true

@@ -92,20 +92,23 @@ spells.healing_word = action.leveled_spell(1, function(mod, cast_level)
     range = 40,
 
     parameters = {
-      entity_target = function(self, entity, params)
-        local target = params.entity_target
-        return target
-          and target.hp
-          and target.hp < target:get_max_hp()
-          and api.can_see(entity, target, self.range)
-      end,
+      entity_targets = {
+        filter = function(self, entity, target)
+          return target
+            and target.hp
+            and target.hp < target:get_max_hp()
+            and api.can_see(entity, target, self.range)
+        end,
+        max_n = function() return 1 end,
+      }
     },
 
     _act = function(self, entity, params)
-      api.rotate(entity, params.entity_target)
+      local target = params.entity_targets[1]
+      api.rotate(entity, target)
       entity:animate("gesture")
-      health.heal(params.entity_target, (D(4) * cast_level + entity:get_modifier(mod)):roll())
-      animated.add_fx("engine/assets/animations/healing_word_target", params.entity_target.position)
+      health.heal(target, (D(4) * cast_level + entity:get_modifier(mod)):roll())
+      animated.add_fx("engine/assets/animations/healing_word_target", target.position)
       animated.add_fx("engine/assets/animations/healing_word_spell", entity.position)
       return true
     end,
@@ -190,7 +193,7 @@ end)
 -- [SECTION] Level 3
 ----------------------------------------------------------------------------------------------------
 
--- TODO upcasting
+-- NEXT upcasting
 --- @type action
 spells.animate_dead = {
   codename = "animate_dead",
@@ -203,17 +206,20 @@ spells.animate_dead = {
   is_available = action.make_is_available(),
 
   parameters = {
-    entity_target = function(self, entity, params)
-      local target = params.entity_target
-      return State:exists(target) and target.body_flag
-    end,
+    entity_targets = {
+      filter = function(self, entity, target)
+        return State:exists(target) and target.body_flag
+      end,
+      max_n = function() return 1 end,
+    },
   },
 
   act = action.make_act(function(self, entity, params)
-    local position = State.grids.solids:find_free_position(params.entity_target.position)
+    local target = params.entity_targets[1]
+    local position = State.grids.solids:find_free_position(target.position)
     if not position then return false end
 
-    State:remove(params.entity_target)
+    State:remove(target)
     entity:animate("gesture")
     local fx = animated.add_fx("engine/assets/animations/skeleton_raise", position, "solids")
     fx.on_remove = function()
