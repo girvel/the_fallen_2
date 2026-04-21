@@ -298,6 +298,7 @@ end
 draw_keyboard_action_grid = function(self)
   local additional_actions, upcasts do
     local source = State.player:modify("additional_actions", {}) --[=[@as action[]]=]
+    Log.tracel(source)
     additional_actions = {}
     upcasts = {}
     for _, this_action in ipairs(source) do
@@ -449,7 +450,7 @@ end
 
 local RESOURCE_DISPLAY_ORDER = {
   "actions", "bonus_actions", "reactions", "movement",
-  "spell_slots_1", "spell_slots_2", "spell_slots_3",
+  "spell_slots_1", "spell_slots_2", "spell_slots_3", "spell_slots_4",
   "hit_dice", "action_surge", "second_wind", "fighting_spirit",
 }
 

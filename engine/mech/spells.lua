@@ -119,20 +119,6 @@ end)
 -- [SECTION] Level 2
 ----------------------------------------------------------------------------------------------------
 
--- NEXT PLAN
--- + sketch
--- + saving throw
--- + exiting upcasting
--- + blinding
--- + split health.attack into health.attack_precog & health.attack_enact
--- + eldritch blast can be obstructed by melee
--- + target argument -> params table
--- + fx
--- + icons
--- + direction
--- + name formatting?
--- - level 5, eldritch blast x2
-
 spells.spray_of_cards = action.leveled_spell(2, function(mod, cast_level)
   --- @type spell_prototype
   return {
@@ -194,41 +180,41 @@ end)
 ----------------------------------------------------------------------------------------------------
 
 -- NEXT upcasting
---- @type action
-spells.animate_dead = {
-  codename = "animate_dead",
-
-  cost = {
-    actions = 1,
-    spell_slots_3 = 1,
-  },
-
-  is_available = action.make_is_available(),
-
-  parameters = {
-    entity_targets = {
-      filter = function(self, entity, target)
-        return State:exists(target) and target.body_flag
-      end,
-      max_n = function() return 1 end,
+spells.animate_dead = action.leveled_spell(3, function(mod, cast_level)
+  --- @type spell_prototype
+  return {
+    _codename = "animate_dead",
+    _name = "Поднятие мертвеца",
+    _cost = {
+      actions = 1,
     },
-  },
 
-  act = action.make_act(function(self, entity, params)
-    local target = params.entity_targets[1]
-    local position = State.grids.solids:find_free_position(target.position)
-    if not position then return false end
+    parameters = {
+      entity_targets = {
+        filter = function(self, entity, target)
+          return State:exists(target) and target.body_flag
+        end,
+        max_n = function() return cast_level * 2 - 5 end,
+      },
+    },
 
-    State:remove(target)
-    entity:animate("gesture")
-    local fx = animated.add_fx("engine/assets/animations/skeleton_raise", position, "solids")
-    fx.on_remove = function()
-      local e = State:add_at(monsters.skeleton_heavy(), position, "solids")
-      e.faction = entity.faction
-    end
-    return true
-  end),
-}
+    _act = function(self, entity, params)
+      for _, target in ipairs(params.entity_targets) do
+        local position = State.grids.solids:find_free_position(target.position)
+        if not position then return false end
+
+        State:remove(target)
+        entity:animate("gesture")
+        local fx = animated.add_fx("engine/assets/animations/skeleton_raise", position, "solids")
+        fx.on_remove = function()
+          local e = State:add_at(monsters.skeleton_heavy(), position, "solids")
+          e.faction = entity.faction
+        end
+      end
+      return true
+    end,
+  }
+end)
 
 Ldump.mark(spells, {}, ...)
 return spells
