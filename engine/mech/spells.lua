@@ -57,16 +57,13 @@ spells.eldritch_blast = action.plain {
 -- [SECTION] Level 1
 ----------------------------------------------------------------------------------------------------
 
---- @type action_factory
-spells.healing_word = Memoize(function(mod, cast_level)
-  cast_level = cast_level or 1
+spells.healing_word = action.leveled_spell(1, function(mod, cast_level)
+  --- @type spell_prototype
   return {
-    name = ("Лечащее слово (ур. %s)"):format(cast_level),
-    codename = "healing_word_" .. cast_level,
-
-    cost = {
+    _name = "лечащее слово",
+    _codename = "healing_word",
+    _cost = {
       bonus_actions = 1,
-      ["spell_slots_" .. cast_level] = 1,
     },
 
     range = 40,
@@ -81,16 +78,14 @@ spells.healing_word = Memoize(function(mod, cast_level)
       end,
     },
 
-    is_available = action.make_is_available(),
-
-    act = action.make_act(function(self, entity, params)
+    _act = function(self, entity, params)
       api.rotate(entity, params.entity_target)
       entity:animate("gesture")
       health.heal(params.entity_target, (D(4) * cast_level + entity:get_modifier(mod)):roll())
       animated.add_fx("engine/assets/animations/healing_word_target", params.entity_target.position)
       animated.add_fx("engine/assets/animations/healing_word_spell", entity.position)
       return true
-    end),
+    end,
   }
 end)
 
@@ -112,7 +107,7 @@ end)
 -- - name formatting?
 -- - level 5, eldritch blast x2
 
-spells.spray_of_cards = action.spell(2, function(mod, cast_level)
+spells.spray_of_cards = action.leveled_spell(2, function(mod, cast_level)
   --- @type spell_prototype
   return {
     _name = "веер карт",

@@ -148,7 +148,7 @@ end
 --- @param base_level integer
 --- @param prototype_factory prototype_factory
 --- @return action_factory
-action.spell = function(base_level, prototype_factory)
+action.leveled_spell = function(base_level, prototype_factory)
   return Memoize(function(mod, cast_level)
     if not cast_level then
       cast_level = base_level
