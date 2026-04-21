@@ -112,25 +112,21 @@ end)
 -- - name formatting?
 -- - level 5, eldritch blast x2
 
---- @type action_factory
-spells.spray_of_cards = Memoize(function(mod, cast_level)
-  cast_level = cast_level or 2
+spells.spray_of_cards = action.spell(2, function(mod, cast_level)
+  --- @type spell_prototype
   return {
-    name = ("Веер карт (ур. %s)"):format(cast_level),
-    codename = "spray_of_cards_" .. cast_level,
+    _name = "веер карт",
+    _codename = "spray_of_cards",
 
-    cost = {
+    _cost = {
       actions = 1,
-      ["spell_slots_" .. cast_level] = 1,
     },
-
-    is_available = action.make_is_available(),
 
     parameters = {
       direction = true,
     },
 
-    act = action.make_act(function(self, entity, params)
+    _act = function(self, entity, params)
       local damage = (D(10) * cast_level):roll()
       local dc = entity:get_spell_dc(mod)
 
@@ -168,7 +164,7 @@ spells.spray_of_cards = Memoize(function(mod, cast_level)
         end
       end)
       return true
-    end),
+    end,
   }
 end)
 

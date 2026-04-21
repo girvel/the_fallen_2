@@ -48,8 +48,8 @@ action.mix_in = function(t)
 end
 
 --- @class action_params
---- @field entity_target? entity
---- @field direction? vector
+--- @field entity_target entity
+--- @field direction vector
 
 --- @class action_params_def
 --- @field entity_target? fun(self: action, entity: entity, params: action_params): any
@@ -141,6 +141,44 @@ end
 --- @field _codename? string
 --- @field _name? string
 --- @field _cost? table<string, number>
+
+--- @alias action_factory fun(mod?: ability, upcast_level?: integer): action
+--- @alias prototype_factory fun(mod?: ability, cast_level: integer): spell_prototype
+
+--- @param base_level integer
+--- @param prototype_factory prototype_factory
+--- @return action_factory
+action.spell = function(base_level, prototype_factory)
+  return Memoize(function(mod, cast_level)
+    if not cast_level then
+      cast_level = base_level
+    elseif cast_level < base_level then
+      Error("Upcast %s is lower than the base level %s", cast_level, base_level)
+    end
+
+    local t = prototype_factory(mod, cast_level)
+    action.plain(t)
+
+    if not t.name and t._name then
+      if cast_level == base_level then
+        t.name = t._name
+      else
+        t.name = ("%s (ур. %s)"):format(t._name, cast_level)
+      end
+    end
+
+    if not t.codename and t._codename then
+      t.codename = t._codename.."_"..cast_level
+    end
+
+    if not t.cost and t._cost then
+      t.cost = t._cost
+      t.cost["spell_slots_"..cast_level] = 1
+    end
+
+    return t
+  end)
+end
 
 Ldump.mark(action, "const", ...)
 return action

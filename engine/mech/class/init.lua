@@ -90,8 +90,6 @@ local parse_slot_level = function(str)
   return nil
 end
 
---- @alias action_factory fun(mod?: ability, upcast_level?: integer): action
-
 --- Perk providing a spell, including upcasting if the cost contains spell slots
 --- @param spell action|action_factory
 --- @param mod? ability
