@@ -153,9 +153,11 @@ end
 --- @param prototype_factory prototype_factory
 --- @return action_factory
 action.leveled_spell = function(base_level, prototype_factory)
-  return Memoize(function(mod, cast_level)
+  local result_factory
+  result_factory = Memoize(function(mod, cast_level)
     if not cast_level then
-      cast_level = base_level
+      -- recursion for memoization equivalence
+      return result_factory(mod, base_level)
     elseif cast_level < base_level then
       Error("Upcast %s is lower than the base level %s", cast_level, base_level)
     end
@@ -180,8 +182,13 @@ action.leveled_spell = function(base_level, prototype_factory)
       t.cost["spell_slots_"..cast_level] = 1
     end
 
+    if not t.upcast_from and cast_level ~= base_level then
+      t.upcast_from = result_factory(mod, base_level)
+    end
+
     return t
   end)
+  return result_factory
 end
 
 Ldump.mark(action, "const", ...)

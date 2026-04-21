@@ -109,13 +109,16 @@ class.spell = Memoize(function(spell, mod)
     modify_additional_actions = function(self, entity, list)
       table.insert(list, base_spell)
       if not base_slot_n then return list end
+
+      local max_slot_level = base_slot_n
       for resource_name in pairs(entity.resources) do
         local spell_slot_n = parse_slot_level(resource_name)
-        if spell_slot_n and spell_slot_n > base_slot_n then
-          local this_spell = spell(mod, spell_slot_n)
-          this_spell.upcast_from = base_spell
-          table.insert(list, this_spell)
+        if spell_slot_n and spell_slot_n > max_slot_level then
+          max_slot_level = spell_slot_n
         end
+      end
+      for level = base_slot_n + 1, max_slot_level do
+        table.insert(list, spell(mod, level))
       end
       return list
     end,
