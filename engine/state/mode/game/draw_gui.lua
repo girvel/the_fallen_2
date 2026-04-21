@@ -822,15 +822,26 @@ use_mouse = function(self)
           input_state.action, State.player, target
         ) then
           ui.cursor("target_active")
-          -- NEXT skipping
           if rmb then
             table.insert(input_state.targets, target)
-            if targets_n + 1 >= max_n then
-              State.player.ai:plan_action(input_state.action, {entity_targets = input_state.targets})
-              input_state = {mode = "normal"}
-            end
           end
-          break
+          goto target_search_end
+        end
+      end
+
+      if rmb then
+        if targets_n == 0 then
+          input_state = {mode = "normal"}
+        else
+          input_state.skips_n = input_state.skips_n + 1
+        end
+      end
+      ::target_search_end::
+
+      if rmb then
+        if targets_n + 1 >= max_n then
+          State.player.ai:plan_action(input_state.action, {entity_targets = input_state.targets})
+          input_state = {mode = "normal"}
         end
       end
     elseif input_state.mode == "direction" then
