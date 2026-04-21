@@ -51,7 +51,7 @@ local function cache_get(cache, params)
   for i=1, #params do
     local param = params[i]
     if param == nil then param = nil_sub end
-    node = node.children and node.children[params[i]]
+    node = node.children and node.children[param]
     if not node then return nil end
   end
   return node.results
