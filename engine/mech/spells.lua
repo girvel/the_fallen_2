@@ -1,3 +1,4 @@
+local paralyzed = require("engine.mech.conditions.paralyzed")
 local blinded = require("engine.mech.conditions.blinded")
 local monsters = require("engine.mech.monsters")
 local api = require("engine.tech.api")
@@ -112,6 +113,46 @@ end)
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Level 2
 ----------------------------------------------------------------------------------------------------
+
+local _enemy_filter_20 = action.filters.enemy(20)
+
+--- TODO concentration
+--- NEXT FX
+--- NEXT animation
+--- NEXT icon
+spells.hold_person = action.leveled_spell(2, function(mod, cast_level)
+  --- @type spell_prototype
+  return {
+    _name = "Удержание личности",
+    _codename = "hold_person",
+    _cost = {actions = 1},
+
+    parameters = {
+      entity_targets = {
+        filter = function(self, entity, target)
+          return _enemy_filter_20(self, entity, target)
+            and entity.creature_type == "humanoid"
+        end,
+        max_n = function(self, entity)
+          return cast_level - 1
+        end,
+      },
+    },
+
+    _act = function(self, entity, params)
+      for _, target in ipairs(params.entity_targets) do
+        State.hostility:register(entity, target)
+        if target.conditions
+          and target.saving_throw
+          and not target:saving_throw("wis", entity:get_spell_dc(mod))
+        then
+          table.insert(target.conditions, paralyzed.new(60))
+        end
+      end
+      return true
+    end,
+  }
+end)
 
 spells.spray_of_cards = action.leveled_spell(2, function(mod, cast_level)
   --- @type spell_prototype

@@ -20,6 +20,7 @@
 --- @field faction string determines hostility through State.hostility
 --- @field sounds table<sound_event, sound_multiple> [CONST]
 --- @field cues table<cue_slot, fun(): item> [CONST] Cue overrides (see item.set_cue)
+--- @field creature_type "beast"|"humanoid"|"undead"
 ---
 --- @field base_abilities abilities ability scores before perks/level-ups
 --- @field level integer character level

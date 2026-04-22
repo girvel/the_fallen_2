@@ -7,8 +7,8 @@ local perks = {}
 --- Does not use opportunity attacks
 perks.passive = {
   -- TODO should probably accept action itself instead of codename
-  modify_activation = function(self, entity, value, codename)
-    if codename == "opportunity_attack" then
+  modify_activation = function(self, entity, value, action)
+    if action.codename == "opportunity_attack" then
       return false
     end
     return value

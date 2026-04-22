@@ -436,7 +436,7 @@ draw_upcast_action_grid = function(self)
   ui.start_line()
     for i, this_action in ipairs(input_state.group) do
       action_button(this_action, tostring(i))
-      ui.offset(4)  -- NEXT do grid utility functions, like :start_grid, :finish_grid, :grid_item, :grid_line_break
+      ui.offset(4)  -- TODO do grid utility functions, like :start_grid, :finish_grid, :grid_item, :grid_line_break
     end
   ui.finish_line()
   ui.offset(0, 4)

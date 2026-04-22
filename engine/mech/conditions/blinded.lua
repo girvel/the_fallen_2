@@ -4,7 +4,7 @@ local blinded = {}
 local methods = {}
 blinded.mt = {__index = methods}
 
---- @return condition_blinded: condition
+--- @return condition_blinded
 blinded.new = function()
   return setmetatable({
     life_time = 6,

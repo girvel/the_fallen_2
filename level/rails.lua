@@ -37,6 +37,7 @@ init_debug = function()
     class.spell(spells.animate_dead),
     class.spell(spells.healing_word, "wis"),
     class.spell(spells.spray_of_cards, "cha"),
+    class.spell(spells.hold_person, "cha"),
   }
   State.player.level = 20
   State.player.base_abilities.cha = 20

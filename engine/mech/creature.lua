@@ -45,6 +45,7 @@ end
 --- | '"activation"'
 --- | '"hp"'
 --- | '"incoming_attack_roll"'
+--- | '"incoming_is_critical"'
 --- | '"outgoing_damage"'
 --- | '"saving_throw"'
 --- | '"light"'

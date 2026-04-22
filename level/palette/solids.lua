@@ -350,6 +350,7 @@ solids.pig = function()
   local e = {
     name = "Свинья",
     codename = "pig",
+    creature_type = "beast",
     base_abilities = abilities.new(10, 14, 10, 4, 10, 6),
     level = 1,
     ai = wandering.new(),
@@ -384,6 +385,7 @@ solids.boar = function()
   local e = {
     name = "Кабан",
     codename = "boar",
+    creature_type = "beast",
     base_abilities = abilities.new(13, 12, 12, 2, 9, 5),
     level = 1,
     ai = combat_ai.new({scan_range = 5}),
@@ -402,6 +404,24 @@ solids.boar = function()
   }
   creature.mix_in(e)
   animated.mix_in(e, "assets/animations/pig")
+  return e
+end
+
+solids.ai_tester = function(faction)
+  local e = {
+    codename = faction and ("ai_tester_" .. faction) or "ai_tester",
+    base_abilities = abilities.new(10, 14, 10, 10, 10, 10),
+    armor = 10,
+    level = 1,
+    ai = combat_ai.new(),
+    inventory = {
+      -- offhand = items.short_bow(),
+    },
+    max_hp = 30,
+    faction = faction or State.uid:next(),
+  }
+  humanoid.mix_in(e)
+  creature.mix_in(e)
   return e
 end
 

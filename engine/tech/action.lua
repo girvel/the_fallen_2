@@ -26,7 +26,7 @@ action.base = {
   end,
 
   act = function(self, entity)
-    if entity.modify and not entity:modify("activation", true, self.codename) then return false end
+    if entity.modify and not entity:modify("activation", true, self) then return false end
     if not safety.call(self.is_available, self, entity) then return false end
     if self._act then
       local result = safety.call(self._act, self, entity)
@@ -86,7 +86,7 @@ end
 --- @return act_function
 action.make_act = function(f)
   return function(self, entity, parameter)
-    if entity.modify and not entity:modify("activation", true, self.codename) then return false end
+    if entity.modify and not entity:modify("activation", true, self) then return false end
     if not safety.call(self.is_available, self, entity) then return false end
     if f then
       local result = safety.call(f, self, entity, parameter)

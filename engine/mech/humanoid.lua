@@ -37,14 +37,19 @@ humanoid.add_body = function(self)
   return e
 end
 
+local humanoid_defaults = {
+  transparent_flag = true,
+  seethrough_flag = true,
+  creature_type = "humanoid",
+  cues = humanoid.cues,
+  on_half_hp = humanoid.add_blood_mark,
+  on_death = humanoid.add_body,
+}
+
 --- @param entity entity
 humanoid.mix_in = function(entity)
   animated.mix_in(entity, "engine/assets/animations/humanoid")
-  entity.transparent_flag = true
-  entity.seethrough_flag = true
-  entity.cues = humanoid.cues
-  entity.on_half_hp = humanoid.add_blood_mark
-  entity.on_death = humanoid.add_body
+  Table.defaults(entity, humanoid_defaults)
 end
 
 Ldump.mark(humanoid, {}, ...)
