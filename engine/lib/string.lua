@@ -15,6 +15,7 @@ string.utf_sub = function(str, a, b)
     b = utf_len
   elseif b < 0 then
     b = b + utf_len + 1
+    if b <= 0 then return "" end
   end
   return str:sub(utf8.offset(str, a), utf8.offset(str, b + 1) - 1)
 end
