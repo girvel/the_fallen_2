@@ -187,6 +187,16 @@ return Tiny.processingSystem {
     current = State.combat:get_current()
     Log.info("--- %s's turn ---", Name.code(current))
     State:add(animated.fx("engine/assets/animations/underfoot_circle", current.position))
+
+    if current.conditions then
+      local to_remove = {}
+      for i, condition in ipairs(current.conditions) do
+        if condition.move_start and condition:move_start(current) then
+          table.insert(to_remove, i)
+        end
+      end
+      Table.remove_breaking_in_bulk(current.conditions, to_remove)
+    end
   end,
 
   _finish_combat = function(self)

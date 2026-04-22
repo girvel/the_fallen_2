@@ -137,15 +137,19 @@ spells.hold_person = action.leveled_spell(2, function(mod, cast_level)
     },
 
     _act = function(self, entity, params)
+      local dc = entity:get_spell_dc(mod)
+      local targets = {}
+      for _, target in ipairs(params.entity_targets) do
+        targets[target] = target.conditions
+          and target.saving_throw
+          and not target:saving_throw("wis", dc)
+      end
       entity:animate("gesture"):next(function()
-        for _, target in ipairs(params.entity_targets) do
+        for target, failed in pairs(targets) do
           State.hostility:register(entity, target)
-          if target.conditions
-            and target.saving_throw
-            and not target:saving_throw("wis", entity:get_spell_dc(mod))
-          then
+          if failed then
             animated.add_fx("engine/assets/animations/hold_person", target.position, "fx_over")
-            table.insert(target.conditions, paralyzed.new(60))
+            table.insert(target.conditions, paralyzed.new(60, "wis", dc))
           end
         end
       end)
