@@ -9,3 +9,6 @@
 local a   = 1
 local bcd = 2
 ```
+
+3. Function calls always use braces (`()`) except if it's something like `action.plain {...}`, where action.plain is kind of a type
+4. Private fields start with _
