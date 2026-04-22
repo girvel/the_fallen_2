@@ -340,19 +340,13 @@ actions.bow_attack = {
 
   parameters = {
     entity_targets = {
-      filter = function(self, entity, target)
-        local api = require("engine.tech.api")
-        return target
-          and target.hp
-          and State.hostility:get(entity, target) ~= "ally"
-          and api.can_see(entity, target, actions.BOW_ATTACK_RANGE)
-      end,
+      filter = action.filters.enemy(actions.BOW_ATTACK_RANGE),
       max_n = function() return 1 end,
     }
   },
 
   act = action.make_act(function(self, entity, params)
-    local target = params.entity_targets
+    local target = params.entity_targets[1]
     local d = (target.position - entity.position)
     if d ~= Vector.zero then
       entity:rotate(d:normalized2())

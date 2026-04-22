@@ -1,8 +1,9 @@
+local api = require("engine.tech.api")
 local safety = require "engine.tech.safety"
 
 
 local action = {
-  default = {}
+  filters = {},
 }
 
 --- @deprecated
@@ -42,17 +43,14 @@ action.base = {
   end,
 }
 
---- @deprecated
-action.mix_in = function(t)
-  Table.defaults(t, action.base)
-end
-
 --- @class action_params
 --- @field entity_targets entity[] guaranteed # >= 1
 --- @field direction vector
 
+--- @alias target_filter fun(self: action, entity: entity, target: entity): any
+
 --- @class action_entity_targets_def
---- @field filter fun(self: action, entity: entity, target: entity): any
+--- @field filter target_filter
 --- @field max_n fun(self: action, entity: entity): integer
 
 --- @class action_params_def
@@ -189,6 +187,17 @@ action.leveled_spell = function(base_level, prototype_factory)
     return t
   end)
   return result_factory
+end
+
+--- @param range integer
+--- @return target_filter
+action.filters.enemy = function(range)
+  return function(self, entity, target)
+    return target
+      and target.hp
+      and State.hostility:get(entity, target) ~= "ally"
+      and api.can_see(entity, target, range)
+  end
 end
 
 Ldump.mark(action, "const", ...)

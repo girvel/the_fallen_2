@@ -3,9 +3,7 @@ local ui = require("engine.tech.ui")
 local animated = require("engine.tech.animated")
 local level = require("engine.tech.level")
 local async = require("engine.tech.async")
-local actions = require("engine.mech.actions")
 local sound = require("engine.tech.sound")
-local fighter = require("engine.mech.class.fighter")
 
 
 --- API for asynchronous scripting, both AI and rails
@@ -223,6 +221,8 @@ end
 --- @param speed? number
 --- @return boolean
 api.follow_path = function(entity, path, uses_dash, speed)
+  local actions = require("engine.mech.actions")
+
   speed = speed or entity.speed or 5
   if uses_dash and #path > 6 then
     speed = speed * 1.5
@@ -246,6 +246,9 @@ end
 --- @param entity entity
 --- @param target entity
 api.attack = function(entity, target)
+  local actions = require("engine.mech.actions")
+  local fighter = require("engine.mech.class.fighter")
+
   local direction = target.position - entity.position
   if direction:abs2() ~= 1 then return end
 

@@ -35,13 +35,7 @@ spells.eldritch_blast = action.plain {
           return 4
         end
       end,
-      filter = function(self, entity, target)
-        -- NEXT duplicated actions.bow_attack.target_filter, should be action.filters.make_enemy_target(range)
-        return target
-          and target.hp
-          and State.hostility:get(entity, target) ~= "ally"
-          and api.can_see(entity, target, actions.BOW_ATTACK_RANGE)
-      end,
+      filter = action.filters.enemy(actions.BOW_ATTACK_RANGE),
     }
   },
 
@@ -88,8 +82,6 @@ spells.healing_word = action.leveled_spell(1, function(mod, cast_level)
     _cost = {
       bonus_actions = 1,
     },
-
-    range = 40,
 
     parameters = {
       entity_targets = {
@@ -198,6 +190,7 @@ spells.animate_dead = action.leveled_spell(3, function(mod, cast_level)
     },
 
     _act = function(self, entity, params)
+      -- NEXT spawn next to their bodies
       local get_position = State.grids.solids:find_free_positions(params.entity_targets[1].position)
       local final_positions = {}
       for _, target in ipairs(params.entity_targets) do
