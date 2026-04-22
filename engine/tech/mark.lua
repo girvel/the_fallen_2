@@ -6,6 +6,7 @@ return function(factory, grid_layer)
   grid_layer = grid_layer or "marks"
   return function(self)
     local entity = factory()
+    entity.bouncy_spawn_flag = true
 
     local final_position
     for d in Iteration.rhombus(3) do
@@ -24,7 +25,6 @@ return function(factory, grid_layer)
     end
 
     if not final_position then return end
-
-    return State:add(entity, {position = final_position, grid_layer = grid_layer})
+    return State:add_at(entity, final_position, grid_layer)
   end
 end

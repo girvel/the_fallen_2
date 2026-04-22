@@ -27,10 +27,8 @@ level.layers = {
   "fx_over_shadows",
 }
 
---- @alias grid_positioned {position: vector, grid_layer: string}
-
 --- Forcefully move entity to a new position
---- @param entity grid_positioned
+--- @param entity entity
 --- @param position vector
 --- @return boolean
 level.unsafe_move = function(entity, position)
@@ -48,7 +46,7 @@ level.unsafe_move = function(entity, position)
 end
 
 --- Safely move entity to a new position
---- @param entity grid_positioned
+--- @param entity entity
 --- @param position vector
 --- @return boolean # false if position is out of grid's bounds or the new position is occupied
 level.slow_move = function(entity, position)
@@ -69,7 +67,7 @@ level.switch_places = function(entity, target)
 end
 
 --- Forcefully change entity's grid_layer
---- @param entity grid_positioned
+--- @param entity entity
 --- @param new_grid_layer string
 --- @return nil
 level.change_grid_layer = function(entity, new_grid_layer)
@@ -80,7 +78,7 @@ level.change_grid_layer = function(entity, new_grid_layer)
 end
 
 --- Put entity in its .position
---- @param entity grid_positioned
+--- @param entity entity
 --- @return nil
 level.put = function(entity)
   local grid = State.grids[entity.grid_layer]
@@ -90,6 +88,10 @@ level.put = function(entity)
 
   local prev = grid[entity.position]
   if prev == entity then return end
+  if prev and entity.bouncy_spawn_flag then
+    entity.position = grid:find_free_position(entity.position) or entity.position
+    prev = grid[entity.position]
+  end
 
   if State.is_loaded and prev then
     Log.warn("Grid collision at %s[%s]: %s replaces %s",
@@ -101,7 +103,7 @@ level.put = function(entity)
 end
 
 --- Remove entity from its .position
---- @param entity grid_positioned
+--- @param entity entity
 --- @return nil
 level.remove = function(entity)
   State.grids[entity.grid_layer][entity.position] = nil

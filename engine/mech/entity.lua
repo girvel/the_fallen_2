@@ -53,3 +53,4 @@
 --- @field body_flag true? is true for entities representing resurrectable bodies
 --- @field blind_sight_flag true? doesn't need FOV for searching targets
 --- @field sokoban_flag true? turns on sokoban mechanics for shove
+--- @field bouncy_spawn_flag true? places entity into a nearest free position on spawn
