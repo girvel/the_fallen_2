@@ -19,6 +19,10 @@ methods.modify_activation = function(self, entity, value, action)
   return false
 end
 
+methods.modify_incoming_attack_roll = function(self, entity, roll)
+  return roll:set("advantage")
+end
+
 methods.modify_incoming_is_critical = function(self, entity, value, source)
   if api.distance(entity, source) == 1 then
     return true

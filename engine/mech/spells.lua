@@ -117,9 +117,6 @@ end)
 local _enemy_filter_20 = action.filters.enemy(20)
 
 --- TODO concentration
---- NEXT FX
---- NEXT animation
---- NEXT icon
 spells.hold_person = action.leveled_spell(2, function(mod, cast_level)
   --- @type spell_prototype
   return {
@@ -140,15 +137,18 @@ spells.hold_person = action.leveled_spell(2, function(mod, cast_level)
     },
 
     _act = function(self, entity, params)
-      for _, target in ipairs(params.entity_targets) do
-        State.hostility:register(entity, target)
-        if target.conditions
-          and target.saving_throw
-          and not target:saving_throw("wis", entity:get_spell_dc(mod))
-        then
-          table.insert(target.conditions, paralyzed.new(60))
+      entity:animate("gesture"):next(function()
+        for _, target in ipairs(params.entity_targets) do
+          State.hostility:register(entity, target)
+          if target.conditions
+            and target.saving_throw
+            and not target:saving_throw("wis", entity:get_spell_dc(mod))
+          then
+            animated.add_fx("engine/assets/animations/hold_person", target.position, "fx_over")
+            table.insert(target.conditions, paralyzed.new(60))
+          end
         end
-      end
+      end)
       return true
     end,
   }

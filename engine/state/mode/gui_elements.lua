@@ -58,6 +58,8 @@ local gui_elements = {
   healing_word_3 = nth(69),
   spray_of_cards_2 = nth(70),
   spray_of_cards_3 = nth(71),
+  hold_person_2 = nth(72),
+  hold_person_3 = nth(72),
   eldritch_blast_inactive = nth(73),
   animate_dead_3_inactive = nth(74),
   healing_word_1_inactive = nth(75),
@@ -65,6 +67,8 @@ local gui_elements = {
   healing_word_3_inactive = nth(77),
   spray_of_cards_2_inactive = nth(78),
   spray_of_cards_3_inactive = nth(79),
+  hold_person_2_inactive = nth(80),
+  hold_person_3_inactive = nth(80),
 
   window_bg = "engine/assets/gui/window_bg.png",
   bar_bg = "engine/assets/gui/bar_bg.png",
