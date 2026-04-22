@@ -298,7 +298,6 @@ end
 draw_keyboard_action_grid = function(self)
   local additional_actions, upcasts do
     local source = State.player:modify("additional_actions", {}) --[=[@as action[]]=]
-    Log.tracel(source)
     additional_actions = {}
     upcasts = {}
     for _, this_action in ipairs(source) do

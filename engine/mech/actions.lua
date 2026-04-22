@@ -316,7 +316,6 @@ end
 -- TODO reconsider this constant
 actions.BOW_ATTACK_RANGE = 15
 
---- NEXT redo this action & spells
 actions.bow_attack = {
   name = "выстрелить",
   codename = "bow_attack",

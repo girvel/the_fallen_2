@@ -179,7 +179,6 @@ end)
 -- [SECTION] Level 3
 ----------------------------------------------------------------------------------------------------
 
--- NEXT upcasting
 spells.animate_dead = action.leveled_spell(3, function(mod, cast_level)
   --- @type spell_prototype
   return {
@@ -199,10 +198,15 @@ spells.animate_dead = action.leveled_spell(3, function(mod, cast_level)
     },
 
     _act = function(self, entity, params)
+      local get_position = State.grids.solids:find_free_positions(params.entity_targets[1].position)
+      local final_positions = {}
       for _, target in ipairs(params.entity_targets) do
-        local position = State.grids.solids:find_free_position(target.position)
+        local position = get_position()
         if not position then return false end
+        final_positions[target] = position
+      end
 
+      for target, position in pairs(final_positions) do
         State:remove(target)
         entity:animate("gesture")
         local fx = animated.add_fx("engine/assets/animations/skeleton_raise", position, "solids")
