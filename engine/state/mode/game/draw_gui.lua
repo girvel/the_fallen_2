@@ -812,7 +812,7 @@ use_mouse = function(self)
       local targets_n = #input_state.targets + input_state.skips_n
       local max_n = config.max_n(input_state.action, State.player)
 
-      ui.start_frame(mx + 8, my)
+      ui.start_frame(mx + 8, my, 100)
         ui.text("%s/%s", targets_n, max_n)
       ui.finish_frame()
 

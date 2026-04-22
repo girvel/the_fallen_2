@@ -401,6 +401,7 @@ local wrap = Memoize(function(text, font, initial_offset, width)
   local i = 1
   while true do
     local line = text:utf_sub(i, i + (i == 1 and first_max_w or max_w) - 1)
+    if line == "" then return {} end
     local not_last = i - 1 + line:utf_len() < text:utf_len()
 
     if not_last then
