@@ -16,7 +16,7 @@ return function(factory, grid_layer)
       if State.grids[grid_layer][p] then goto continue end
 
       local solid = State.grids.solids[p]
-      if solid and solid ~= self and not solid.transparent_flag then goto continue end
+      if solid and solid ~= self and not solid.seethrough_flag then goto continue end
 
       final_position = p
       do break end

@@ -42,6 +42,7 @@
 ---
 --- @field player_flag true? marks player character for level loading
 --- @field transparent_flag true? marks entities that block path, but not vision
+--- @field seethrough_flag true? entity does not take all the space, the background is visible
 --- @field perspective_flag true? marks entities that could be seen only from below
 --- @field low_flag true? entity is low: disable reflections, shove may go over
 --- @field boring_flag true? disable log messages about the entity because it's dull

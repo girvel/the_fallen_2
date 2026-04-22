@@ -37,10 +37,11 @@ humanoid.add_body = function(self)
   return e
 end
 
---- @param entity table
+--- @param entity entity
 humanoid.mix_in = function(entity)
   animated.mix_in(entity, "engine/assets/animations/humanoid")
   entity.transparent_flag = true
+  entity.seethrough_flag = true
   entity.cues = humanoid.cues
   entity.on_half_hp = humanoid.add_blood_mark
   entity.on_death = humanoid.add_body
