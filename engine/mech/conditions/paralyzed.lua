@@ -7,7 +7,6 @@ local paralyzed = {}
 local methods = {}
 paralyzed.mt = {__index = methods}
 
---- NEXT recheck saving throw
 --- @param mod? ability
 --- @param dc? integer
 --- @return condition_paralyzed
