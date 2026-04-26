@@ -23,6 +23,23 @@ local run = function(command, ...)
   end
 end
 
+--- @param path string
+--- @return string
+local read_file = function(path)
+  local f = assert(io.open(path, "r"))
+  local result = f:read("*a")
+  f:close()
+  return result
+end
+
+--- @param path string
+--- @param content string
+local write_file = function(path, content)
+  local f = assert(io.open(path, "w"))
+  f:write(content)
+  f:close()
+end
+
 local parse_cli = function()
   local parser = argparse()
     :description("Fallen engine's build tool")
@@ -169,6 +186,10 @@ cli.exe = function(args)
   run("mkdir -p .build/%s_linux", versioned_name)
   run("cp .build/%s.love .build/%s_linux", name, versioned_name)
   run("cp engine/lib/*.so .build/%s_linux", versioned_name)
+  write_file(
+    (".build/%s_linux/README.txt"):format(versioned_name),
+    read_file("engine/assets/build/README-linux.txt"):gsub("%%NAME%%", name)
+  )
   run("cd .build; zip -9 -r %s_linux.zip %s_linux", versioned_name, versioned_name)
 
   -- pack win64
@@ -179,6 +200,10 @@ cli.exe = function(args)
   run("mv .build/%s.exe .build/%s_win64/%s.exe", name, versioned_name, name)
   run("cp '%s'/*.dll .build/%s_win64/", include, versioned_name)
   run("cp engine/lib/*.dll .build/%s_win64/", versioned_name)
+  write_file(
+    (".build/%s_win64/README.txt"):format(versioned_name),
+    read_file("engine/assets/build/README-windows.txt"):gsub("%%NAME%%", name)
+  )
   run("cd .build; zip -9 -r %s_win64.zip %s_win64", versioned_name, versioned_name)
 
   -- cleanup
