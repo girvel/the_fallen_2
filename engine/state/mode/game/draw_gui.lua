@@ -901,6 +901,7 @@ use_mouse = function(self)
         if mouse_task_path then
           render_path(mouse_task_path)
         elseif path then
+          -- TODO show only after moving a mouse, hide on WASD
           render_path(path, max_length)
         end
       end

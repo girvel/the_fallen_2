@@ -26,6 +26,8 @@ methods.move_start = function(self, entity)
   end
 end
 
+-- TODO autofail dex/str saves
+
 methods.modify_activation = function(self, entity, value, action)
   return false
 end
