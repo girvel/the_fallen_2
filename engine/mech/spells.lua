@@ -128,7 +128,7 @@ spells.hold_person = action.leveled_spell(2, function(mod, cast_level)
       entity_targets = {
         filter = function(self, entity, target)
           return _enemy_filter_20(self, entity, target)
-            and entity.creature_type == "humanoid"
+            and target.creature_type == "humanoid"
         end,
         max_n = function(self, entity)
           return cast_level - 1
