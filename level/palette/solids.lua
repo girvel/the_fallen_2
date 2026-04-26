@@ -1,4 +1,3 @@
-local spells = require("engine.mech.spells")
 local item = require("engine.tech.item")
 local perks = require("engine.mech.perks")
 local animated = require("engine.tech.animated")
@@ -361,7 +360,7 @@ solids.pig = function()
       perks.passive,
     },
     on_half_hp = humanoid.add_blood_mark,
-    on_death = humanoid.add_body,
+    on_death = humanoid.add_blood_mark,
   }
   creature.mix_in(e)
   animated.mix_in(e, "assets/animations/pig")
@@ -400,7 +399,7 @@ solids.boar = function()
       perks.relentless,
     },
     on_half_hp = humanoid.add_blood_mark,
-    on_death = humanoid.add_body,
+    on_death = humanoid.add_blood_mark,
   }
   creature.mix_in(e)
   animated.mix_in(e, "assets/animations/pig")

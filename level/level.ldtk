@@ -2890,6 +2890,22 @@
 							"fieldInstances": [],
 							"__worldX": 1440,
 							"__worldY": 1376
+						},
+						{
+							"__identifier": "boar",
+							"__grid": [92,85],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 61, "x": 0, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#D77643",
+							"iid": "6cf23660-21a0-11f1-8379-2ba8963a58c0",
+							"width": 16,
+							"height": 16,
+							"defUid": 62,
+							"px": [1472,1360],
+							"fieldInstances": [],
+							"__worldX": 1472,
+							"__worldY": 1360
 						}
 					]
 				},
