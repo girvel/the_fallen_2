@@ -135,7 +135,7 @@ cli.exe = function(args)
 
   local name do
     love = {}
-    local ok, msg = pcall(require, "conf")
+    local ok, msg = pcall(require, "conf")  ---@diagnostic disable-line:undefined-global
     if ok then
       local config = {window = {}}
       love.conf(config)
@@ -161,17 +161,18 @@ cli.exe = function(args)
   run("echo '*' > .build/.gitignore")
 
   -- build .love
-  run("zip -9 -r%s .build/%s.love assets engine levels conf.lua main.lua",
-    args.verbose and "" or " -q", versioned_name)
+  -- TODO do not include engine/docs and assets/build
+  run("zip -9 -r%s .build/%s.love assets engine level conf.lua main.lua",
+    args.verbose and "" or " -q", name)
 
   -- pack linux
   run("mkdir -p .build/%s_linux", versioned_name)
-  run("cp .build/%s.love .build/%s_linux", versioned_name, versioned_name)
+  run("cp .build/%s.love .build/%s_linux", name, versioned_name)
   run("cp engine/lib/*.so .build/%s_linux", versioned_name)
   run("cd .build; zip -9 -r %s_linux.zip %s_linux", versioned_name, versioned_name)
 
   -- pack win64
-  run("cat '%s/love.exe' .build/%s.love > .build/%s.exe", include, versioned_name, name)
+  run("cat '%s/love.exe' .build/%s.love > .build/%s.exe", include, name, name)
   run("convert engine/assets/sprites/icon.png +clone -sample 256x256 +clone -sample 48x48 +clone -sample 32x32 -colorspace sRGB .build/dot.ico")
   run("wine '%s/rcedit-x64.exe' .build/%s.exe --set-icon .build/dot.ico", include, name)
   run("mkdir -p .build/%s_win64", versioned_name)
@@ -181,7 +182,7 @@ cli.exe = function(args)
   run("cd .build; zip -9 -r %s_win64.zip %s_win64", versioned_name, versioned_name)
 
   -- cleanup
-  run("rm .build/%s.love", versioned_name)
+  run("rm .build/%s.love", name)
 
   log.info("Build finished.")
 end
