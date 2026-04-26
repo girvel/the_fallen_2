@@ -21,7 +21,9 @@ end
 
 --- @param checkpoint string
 methods.init = function(self, checkpoint)
-  if Kernel.debug then init_debug() end
+  -- TODO replace
+  -- if Kernel.debug then init_debug() end
+  init_debug()
 end
 
 init_debug = function()
