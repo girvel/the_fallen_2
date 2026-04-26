@@ -18,14 +18,7 @@ humanoid.cues = {
   end,
 }
 
-local blood_mark_sprites do
-  local atlas = love.image.newImageData("engine/assets/sprites/blood_mark.png")
-  blood_mark_sprites = {}
-  for i = 1, 2 do
-    blood_mark_sprites[i] = sprite.image(sprite.utility.select(atlas, i))
-  end
-end
-
+local blood_mark_sprites = sprite.collection("engine/assets/sprites/blood_mark.png")
 humanoid.add_blood_mark = mark(function()
   return {
     codename = "blood_mark",
@@ -34,14 +27,7 @@ humanoid.add_blood_mark = mark(function()
   }
 end)
 
-local body_sprites do
-  local atlas = love.image.newImageData("engine/assets/sprites/body.png")
-  body_sprites = {}
-  for i = 1, 1 do
-    body_sprites[i] = sprite.image(sprite.utility.select(atlas, i))
-  end
-end
-
+local body_sprites = sprite.collection("engine/assets/sprites/body.png")
 humanoid.add_body = mark(function()
   return {
     codename = "body",
