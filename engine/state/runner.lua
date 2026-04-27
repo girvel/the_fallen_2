@@ -9,23 +9,11 @@ local runner = {}
 --- @alias runner_scenes table<string, scene>
 
 --- @alias scene scene_strict|table
-
---- @class character_options
---- @field dynamic? boolean Does not trigger error if the character is missing (nil)
---- @field optional? boolean Allows the scene to run without this character
-
 --- @class scene_strict
---- @field characters? table<string, character_options>
---- @field start_predicate fun(self: scene, dt: number, ch: runner_characters, ps: runner_positions): boolean|any, ...
---- @field run fun(self: scene, ch: runner_characters, ps: runner_positions, ...): any
---- @field enabled? boolean
---- @field mode? "sequential"|"parallel"|"once"|"disable"
---- @field boring_flag? true don't log scene beginning and ending
---- @field save_flag? true don't warn about making a save during this scene
---- @field in_combat_flag? true allows scene to start in combat
---- @field lag_flag? true hides coroutine lag warnings
---- @field on_add? fun(self: scene, ch: runner_characters, ps: runner_positions) runs when the scene is added
---- @field on_cancel? fun(self: scene, ch: runner_characters, ps: runner_positions) runs when the scene run is cancelled (either through runner:stop or loading a save)
+--- @field condition fun(self: scene, name: string, dt: number): boolean|any, ...
+--- @field run fun(self: scene, name: string, ...): any
+--- @field on_add? fun(self: scene, name: string) runs when the scene is added
+--- @field on_cancel? fun(self: scene, name: string) runs when the scene run is cancelled (either through runner:stop or loading a save)
 
 --- @class scene_run
 --- @field coroutine thread
@@ -61,107 +49,27 @@ end
 
 local scene_run_mt = {}
 
---- @param self state_runner
---- @param scene scene
---- @param scene_name string
---- @return boolean, runner_characters
-local select_characters = function(self, scene, scene_name)
-  local ok = true
-  local characters = {}
-
-  if scene.characters then
-    for name, opts in pairs(scene.characters) do
-      local e
-      if opts.dynamic then
-        e = rawget(self.entities, name)
-      else
-        e = self.entities[name]
-      end
-
-      if not opts.optional and not State:exists(e)
-        or self.locked_entities[e]
-      then
-        ok = false
-      end
-
-      characters[name] = e
-    end
-  end
-
-  return ok, Table.strict(characters, ("scene %q's character"):format(scene_name))
-end
-
---- @param self state_runner
---- @param scene scene
---- @param key string
---- @param ch runner_characters
-local finish = function(self, scene, key, ch)
-  for _, character in pairs(ch) do
-    self.locked_entities[character] = nil
-  end
-
-  if Table.key_of(ch, State.player) then
-    State.camera.target_override = nil
-    State.camera.is_camera_following = true
-    State.player.curtain_color = Vector.transparent
-  end
-end
-
 --- @param dt number
 methods.update = function(self, dt)
   for scene_name, scene in pairs(self.scenes) do
-    if not (scene.enabled
-      and (not self.save_lock or self.save_lock == scene or scene.on_cancel)
-      and (scene.mode == "parallel" or not self:is_running(scene))
-      and (scene.in_combat_flag
-        or not State.combat
-        or not scene.characters
-        or Table.count(scene.characters) == 0))
-    then
-      goto continue
+    local condition_return = {scene:condition(scene_name, dt)}
+    local ok = table.remove(condition_return, 1)
+    if ok then
+      local run = {
+        coroutine = coroutine.create(function()
+          safety.call(scene.run, scene, scene_name, unpack(condition_return))
+        end),
+        base_scene = scene,
+        name = scene_name,
+      }
+      setmetatable(run, scene_run_mt)
+      table.insert(self._scene_runs, run)
     end
-
-    local ok, ch = select_characters(self, scene, scene_name)
-    if not ok then goto continue end
-
-    local args = {scene:start_predicate(dt, ch, self.positions)}
-    local ok = table.remove(args, 1)
-    if not ok then goto continue end
-
-    -- outside coroutine to avoid two scenes with the same character starting in the same frame
-    for _, character in pairs(ch) do
-      self.locked_entities[character] = true
-    end
-
-    table.insert(self._scene_runs, setmetatable({
-      coroutine = coroutine.create(function()
-        if not scene.mode or scene.mode == "once" then
-          State.runner:remove(scene)
-        elseif scene.mode == "disable" then
-          scene.enabled = nil
-        end
-
-        if not scene.boring_flag then
-          Log.info("Scene %q starts", scene_name)
-        end
-
-        safety.call(scene.run, scene, ch, self.positions, unpack(args))
-        finish(self, scene, scene_name, ch)
-
-        if not scene.boring_flag then
-          Log.info("Scene %q ends", scene_name)
-        end
-      end),
-      base_scene = scene,
-      name = scene_name,
-    }, scene_run_mt))
-
-    ::continue::
   end
 
   local to_remove = {}
+  -- State.runner:stop may change _scene_runs
   local runs_copy = Table.shallow_copy(self._scene_runs)
-  -- State.runner:stop may change this collection
 
   for _, run in ipairs(runs_copy) do
     async.resume(run.coroutine)
@@ -171,7 +79,7 @@ methods.update = function(self, dt)
     end
   end
 
-  -- can't use runs_copy anymore -- could be changed
+  -- can't use runs_copy anymore -- _scene_runs could be changed
   self._scene_runs = Fun.iter(self._scene_runs)
     :filter(function(run) return not to_remove[run] end)
     :totable()
@@ -190,79 +98,42 @@ end
 --- @param scene string|scene
 --- @param hard? boolean prevent :on_cancel
 --- @param silent? boolean
-methods.stop = function(self, scene, hard, silent)
-  local key
+methods.cancel = function(self, scene, hard, silent)
+  local name
   if type(scene) ~= "table" then
-    key = scene
+    name = scene
     scene = self.scenes[scene]
-  else
-    key = Table.key_of(self.scenes, scene)
   end
 
-  local old_length = #self._scene_runs
-
-  self._scene_runs = Fun.iter(self._scene_runs)
-    :filter(function(r)
-      if r.base_scene ~= scene then
-        return true
+  local next_runs = {}
+  local cancelled_n = 0
+  for _, run in ipairs(self._scene_runs) do
+    if run.base_scene ~= scene then
+      table.insert(next_runs, run)
+    else
+      cancelled_n = cancelled_n + 1
+      name = name or run.name
+      if not hard and run.base_scene.on_cancel then
+        -- TODO enforce that :on_cancel should not be async?
+        run.coroutine = coroutine.create(function()
+          run.base_scene:on_cancel(run.name)
+        end)
       end
-      key = key or r.name
-      return false
-    end)
-    :totable()
-
-  local new_length = #self._scene_runs
-
-  local did_on_cancel_run = false
-  if new_length ~= old_length then
-    self:run_task_sync(function()
-      local _, ch = select_characters(self, scene, key)
-      finish(self, scene, key, ch)
-
-      if scene.on_cancel then
-        did_on_cancel_run = true
-        if not hard then
-          local _, characters = select_characters(self, scene, key)
-          scene:on_cancel(characters, State.runner.positions)
-        end
-      end
-
-      local postfix = ""
-      if did_on_cancel_run then
-        if hard then
-          postfix = "; prevented :on_cancel"
-        else
-          postfix = "; used :on_cancel"
-        end
-      end
-
-      if not silent then
-        Log.info("Stopping scene %s; interrupted %s runs%s", key or Inspect(scene), old_length - new_length, postfix)
-      end
-    end)
-  else
-    if not silent then
-      Log.info("Stopping scene %s; no runs found", key)
     end
   end
+
+  Log.info("%s runs | Cancelling %s", cancelled_n, name or "<non-existing scene>")
 end
 
 --- @param scenes runner_scenes
-methods.add = function(self, scenes)
+methods.extend = function(self, scenes)
   Table.extend_strict(self.scenes, scenes)
   local on_adds_repr = ""
   for name, scene in pairs(scenes) do
     if scene.on_add then
-      scene:on_add(self.entities, self.positions)
+      -- TODO maybe run on_add during update?
+      scene:on_add(name)
       on_adds_repr = on_adds_repr .. "\n  " .. name .. ":on_add()"
-    end
-
-    if Table.contains(Kernel.args.enable_scenes, name) then
-      scene.enabled = true
-    end
-
-    if Table.contains(Kernel.args.disable_scenes, name) then
-      scene.enabled = nil
     end
   end
 

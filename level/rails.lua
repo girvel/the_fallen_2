@@ -45,12 +45,13 @@ init_debug = function()
   State.player.level = 20
   State.player.base_abilities.cha = 20
 
-  State.runner:add {
+  State.runner:extend {
     --- @type scene
-    demo_scene = {
+    demo_scene = cutscene.make {
       enabled = true,
       characters = {
         player = {},
+        ai_tester = {},
       },
       start_predicate = function(self, dt, ch, ps)
         return true
