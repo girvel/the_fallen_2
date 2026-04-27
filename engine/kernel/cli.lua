@@ -17,6 +17,11 @@ cli.parse = function(args)
     "Show FPS; no confirmation on exit, exit through Ctrl+D enabled;"
   )
 
+  parser:flag(
+    "-y --youtube",
+    "Set window to appear in constant position, raise scale -- to make YT videos"
+  )
+
   parser:option(
     "-s --enable-scenes"
   ):args("+"):default({})

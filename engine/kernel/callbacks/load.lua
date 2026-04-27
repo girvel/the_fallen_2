@@ -44,9 +44,16 @@ return function(args)
     love.window.updateMode(0, 0, {fullscreen = true, minheight = 200, minwidth = 200})
   end
 
-  State = state.new(assert(love.filesystem.load("engine/systems/init.lua"))(), args)
+  State = state.new(assert(love.filesystem.load("engine/systems/init.lua"))())
   assert = safety.assert
   Error = safety.error
+
+  if args.youtube then
+    if args.resulution then
+      love.window.setPosition(200, 200)
+    end
+    State.camera.SCALE = 8
+  end
 
   Log.info("Finished love.load")
 end

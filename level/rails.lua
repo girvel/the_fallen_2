@@ -45,24 +45,24 @@ init_debug = function()
   State.player.level = 20
   State.player.base_abilities.cha = 20
 
-  State.runner:extend {
-    --- @type scene
-    demo_scene = cutscene.make {
-      enabled = true,
-      characters = {
-        player = {},
-        ai_tester = {},
-      },
-      start_predicate = function(self, dt, ch, ps)
-        return true
-      end,
-      run = function(self, ch, ps)
-        local sp = screenplay.new("assets/screenplay/00_test.ms", ch)
-          sp:lines()
-        sp:finish()
-      end,
-    },
-  }
+  -- State.runner:extend {
+  --   --- @type scene
+  --   demo_scene = cutscene.make {
+  --     enabled = true,
+  --     characters = {
+  --       player = {},
+  --       ai_tester = {},
+  --     },
+  --     start_predicate = function(self, dt, ch, ps)
+  --       return true
+  --     end,
+  --     run = function(self, ch, ps)
+  --       local sp = screenplay.new("assets/screenplay/00_test.ms", ch)
+  --         sp:lines()
+  --       sp:finish()
+  --     end,
+  --   },
+  -- }
 end
 
 Ldump.mark(rails, {mt = "const"}, ...)
