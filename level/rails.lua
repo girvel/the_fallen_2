@@ -1,3 +1,4 @@
+local screenplay = require("engine.tech.screenplay")
 local spells = require("engine.mech.spells")
 local class = require("engine.mech.class")
 local items = require("level.palette.items")
@@ -43,6 +44,24 @@ init_debug = function()
   }
   State.player.level = 20
   State.player.base_abilities.cha = 20
+
+  State.runner:add {
+    --- @type scene
+    demo_scene = {
+      enabled = true,
+      characters = {
+        player = {},
+      },
+      start_predicate = function(self, dt, ch, ps)
+        return true
+      end,
+      run = function(self, ch, ps)
+        local sp = screenplay.new("assets/screenplay/00_test.ms", ch)
+          sp:lines()
+        sp:finish()
+      end,
+    },
+  }
 end
 
 Ldump.mark(rails, {mt = "const"}, ...)
