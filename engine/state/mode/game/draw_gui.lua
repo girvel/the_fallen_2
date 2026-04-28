@@ -797,10 +797,7 @@ use_mouse = function(self)
     if input_state.mode == "entity_targets" then ui.cursor("target_inactive") end
 
     local mx, my = love.mouse.getPosition()
-    local position = V(mx, my)
-      :add_mut(State.camera.offset)
-      :div_mut(sprite.cell_size * 4)
-      :map_mut(math.floor)
+    local position = V(State.camera:screen_to_game(mx, my))
     local solid = State.grids.solids:slow_get(position)
     local interaction_target = interactive.get_at(position)
 

@@ -36,13 +36,23 @@ end
 
 --- @param gx number
 --- @param gy number
---- @return number sx, number sy
+--- @return number sx
+--- @return number sy
 methods.game_to_screen = function(self, gx, gy)
   local dx, dy = unpack(self.offset)
   local k = State.camera.SCALE * sprite.cell_size
   return k * gx - dx, k * gy - dy
 end
 
+--- @param sx number
+--- @param sy number
+--- @return number gx
+--- @return number gy
+methods.screen_to_game = function(self, sx, sy)
+  local dx, dy = unpack(self.offset)
+  local k = State.camera.SCALE * sprite.cell_size
+  return math.floor((sx + dx) / k), math.floor((sy + dy) / k)
+end
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Implementation
