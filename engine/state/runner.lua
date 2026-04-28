@@ -35,7 +35,6 @@ local runner = {}
 local methods = {}
 runner.mt = {__index = methods}
 
-
 --- @return state_runner
 runner.new = function()
   return setmetatable({
@@ -159,19 +158,24 @@ methods.remove = function(self, scene)
   end
 end
 
+--- @class task
+--- @field promise promise
+--- @field scene scene
+
+local return_true = function() return true end
+
 --- @param f fun(scene, characters)
 --- @param name? string
---- @return promise, scene
+--- @return promise
+--- @return scene
 methods.run_task = function(self, f, name)
   local key = ("%s_%s"):format(name or "task", State.uid:next())
 
   local end_promise = Promise.new()
   local scene = {
-    boring_flag = true,
-    mode = "once",
-    enabled = true,
-    start_predicate = function() return true end,
+    condition = return_true,
     run = function(self_scene)
+      State.runner:remove(self_scene)
       f(self_scene)
       end_promise:resolve()
     end,
@@ -182,7 +186,8 @@ end
 
 --- @param f fun(scene, characters)
 --- @param name? string
---- @return promise, scene
+--- @return promise
+--- @return scene
 methods.run_task_sync = function(self, f, name)
   local promise, scene = self:run_task(f, name)
   scene.on_cancel = f
