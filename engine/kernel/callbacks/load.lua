@@ -49,7 +49,7 @@ return function(args)
   Error = safety.error
 
   if args.youtube then
-    if args.resulution then
+    if args.resolution then
       love.window.setPosition(200, 200)
     end
     State.camera.SCALE = 8
