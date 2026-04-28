@@ -1,3 +1,4 @@
+local screenplay = require("engine.tech.screenplay")
 local cutscene = {}
 
 --- @class cutscene.characters_def
@@ -6,14 +7,14 @@ local cutscene = {}
 
 --- @alias cutscene cutscene_strict|table
 --- @class cutscene_strict: scene_strict
---- @field _run fun(self: scene, ch: runner_characters, ps: runner_positions, ...): any
+--- @field _run fun(self: scene, ch: runner_characters, ps: runner_positions, sp?: screenplay, ...): any
 --- @field _condition? fun(self: scene, name: string, dt: number, ch: runner_characters, ps: runner_positions): boolean|any, ...
 --- @field _on_add? fun(self: scene, ch: runner_characters, ps: runner_positions) runs when the scene is added
 --- @field _on_cancel? fun(self: scene, ch: runner_characters, ps: runner_positions) runs when the scene run is cancelled (either through runner:stop or loading a save)
 --- @field enabled? boolean
 --- @field mode? "sequential"|"parallel"|"once"|"disable"
 --- @field characters? table<string, cutscene.characters_def>
---- @field screenplay? string
+--- @field screenplay? string a path to screenplay
 --- @field boring_flag? true don't log scene beginning and ending
 --- @field save_flag? true don't warn about making a save during this scene
 --- @field in_combat_flag? true allows scene to start in combat
@@ -24,6 +25,9 @@ cutscene.mt = {__index = methods}
 --- @param t cutscene
 --- @return cutscene
 cutscene.make = function(t)
+  if t.screenplay and not love.filesystem.getInfo(t.screenplay) then
+    Error("Missing screenplay file at %s", t.screenplay)
+  end
   return setmetatable(t, cutscene.mt)
 end
 
@@ -114,16 +118,23 @@ end
 --- @param ch runner_characters
 --- @param ps runner_positions
 methods.run = function(self, name, ch, ps, ...)
+  if not self.boring_flag then
+    Log.info("Scene %q starts", name)
+  end
+
   if not self.mode or self.mode == "once" then
     State.runner:remove(self)
   elseif self.mode == "disable" then
     self.enabled = nil
   end
-  if not self.boring_flag then
-    Log.info("Scene %q starts", name)
+
+  local sp
+  if self.screenplay then
+    sp = screenplay.new(self.screenplay, ch)
   end
-  self:_run(ch, ps, ...)
+  self:_run(ch, ps, sp, ...)
   finish(self, name, ch)
+
   if not self.boring_flag then
     Log.info("Scene %q ends", name)
   end

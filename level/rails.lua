@@ -52,15 +52,14 @@ init_debug = function()
     --- @type scene
     demo_scene = cutscene.make {
       enabled = true,
+      screenplay = "assets/screenplay/00_test.ms",
       characters = {
         player = {},
         ai_tester = {},
       },
 
-      _run = function(self, ch, ps)
-        local sp = screenplay.new("assets/screenplay/00_test.ms", ch)
-          sp:lines()
-        sp:finish()
+      _run = function(self, ch, ps, sp)
+        sp:lines()
 
         local promise, scene = State.runner:run_task(function()
           api.travel_scripted(ch.ai_tester, ps.travel_to):wait()
