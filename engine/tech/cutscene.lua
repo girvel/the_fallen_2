@@ -89,8 +89,15 @@ methods.condition = function(self, name, dt)
   local ok, ch = select_characters(self, name)
   if not ok then return false end
 
-  local condition_return = {self:_condition(name, dt, ch, State.runner.positions)}
-  ok = table.remove(condition_return, 1)
+  local condition_return
+  if self._condition then
+    condition_return = {self:_condition(name, dt, ch, State.runner.positions)}
+    ok = table.remove(condition_return, 1)
+  else
+    condition_return = {}
+    ok = true
+  end
+
   if ok then
     -- done in condition to prevent the next condition possibly triggering
     for _, character in pairs(ch) do
