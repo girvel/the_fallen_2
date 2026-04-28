@@ -76,13 +76,16 @@ end
 --- @return boolean
 --- @return ...
 methods.condition = function(self, name, dt)
-  if not (self.enabled
+  local main_condition = (
+    self.enabled
+    -- NEXT move save_lock logic back into the runner
     and (not State.runner.save_lock or State.runner.save_lock == self or self.on_cancel)
     and (self.mode == "parallel" or not State.runner:is_running(self))
     and (self.in_combat_flag
       or not State.combat
       or not self.characters)
-  ) then
+  )
+  if not main_condition then
     return false
   end
 
@@ -146,6 +149,13 @@ methods.on_add = function(self, name)
 
   if Table.contains(Kernel.args.disable_scenes, name) then
     self.enabled = nil
+  end
+end
+
+--- @param name string
+methods.on_remove = function(self, name)
+  if not self.boring_flag then
+    Log.info("Removed scene %s", name)
   end
 end
 

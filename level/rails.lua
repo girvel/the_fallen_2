@@ -1,3 +1,5 @@
+local async = require("engine.tech.async")
+local api = require("engine.tech.api")
 local cutscene = require("engine.tech.cutscene")
 local screenplay = require("engine.tech.screenplay")
 local spells = require("engine.mech.spells")
@@ -59,6 +61,13 @@ init_debug = function()
         local sp = screenplay.new("assets/screenplay/00_test.ms", ch)
           sp:lines()
         sp:finish()
+
+        local promise, scene = State.runner:run_task(function()
+          api.travel_scripted(ch.ai_tester, ps.travel_to):wait()
+        end, "parent")
+
+        async.sleep(.5)
+        State.runner:cancel(scene)
       end,
     },
   }

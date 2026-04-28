@@ -91,7 +91,7 @@ local set_mouse_task = function(task, path)
 
   if task then
     local promise
-    promise, mouse_task = State.runner:run_task(task)
+    promise, mouse_task = State.runner:run_task(task, "mouse_task")
     promise:next(function()
       mouse_task_path = nil
     end)

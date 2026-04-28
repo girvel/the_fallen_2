@@ -13,12 +13,15 @@ local runner = {}
 --- @field condition fun(self: scene, name: string, dt: number): boolean|any, ...
 --- @field run fun(self: scene, name: string, ...): any
 --- @field on_add? fun(self: scene, name: string) runs when the scene is added
---- @field on_cancel? fun(self: scene, name: string) runs when the scene run is cancelled (either through runner:stop or loading a save)
+--- @field on_remove? fun(self: scene, name: string) runs when the scene is removed
+--- @field on_cancel? fun(self: scene, name: string) runs when the scene run is cancelled (either through runner:cancel or loading a save)
 
 --- @class scene_run
 --- @field coroutine thread
 --- @field name string
 --- @field base_scene scene
+--- @field children scene_run[]
+--- @field is_cancelled boolean
 
 --- @class scene_cancellation
 --- @field name string
@@ -30,6 +33,7 @@ local runner = {}
 --- @field entities table<string, entity>
 --- @field locked_entities table<entity, true>
 --- @field save_lock scene?
+--- @field active_run scene_run?
 --- @field _scene_runs scene_run[]
 --- @field _loading_cancellations? scene_cancellation[]
 local methods = {}
@@ -60,6 +64,7 @@ methods.update = function(self, dt)
         end),
         base_scene = scene,
         name = scene_name,
+        children = {},
       }
       setmetatable(run, scene_run_mt)
       table.insert(self._scene_runs, run)
@@ -67,11 +72,13 @@ methods.update = function(self, dt)
   end
 
   local to_remove = {}
-  -- State.runner:stop may change _scene_runs
+  -- State.runner:cancel may change _scene_runs
   local runs_copy = Table.shallow_copy(self._scene_runs)
 
   for _, run in ipairs(runs_copy) do
+    self.active_run = run
     async.resume(run.coroutine)
+    self.active_run = nil
 
     if coroutine.status(run.coroutine) == "dead" then
       to_remove[run] = true
@@ -104,12 +111,20 @@ methods.cancel = function(self, scene, hard, silent)
     scene = self.scenes[scene]
   end
 
-  local next_runs = {}
-  local cancelled_n = 0
+  local cancelled = {}
   for _, run in ipairs(self._scene_runs) do
-    if run.base_scene ~= scene then
-      table.insert(next_runs, run)
-    else
+    if run.base_scene == scene then
+      cancelled[run] = true
+      for _, child in ipairs(run.children) do
+        cancelled[child] = true
+      end
+    end
+  end
+
+  local cancelled_n = 0
+  local next_runs = {}
+  for _, run in ipairs(self._scene_runs) do
+    if cancelled[run] then
       cancelled_n = cancelled_n + 1
       name = name or run.name
       if not hard and run.base_scene.on_cancel then
@@ -117,11 +132,15 @@ methods.cancel = function(self, scene, hard, silent)
         run.coroutine = coroutine.create(function()
           run.base_scene:on_cancel(run.name)
         end)
+        table.insert(next_runs, run)
       end
+    else
+      table.insert(next_runs, run)
     end
   end
+  self._scene_runs = next_runs
 
-  Log.info("%s runs | Cancelling %s", cancelled_n, name or "<non-existing scene>")
+  Log.debug("%s runs stopped | Cancelling %s", cancelled_n, name or "<non-existing scene>")
 end
 
 --- @param scenes runner_scenes
@@ -130,7 +149,6 @@ methods.extend = function(self, scenes)
   local on_adds_repr = ""
   for name, scene in pairs(scenes) do
     if scene.on_add then
-      -- TODO maybe run on_add during update?
       scene:on_add(name)
       on_adds_repr = on_adds_repr .. "\n  " .. name .. ":on_add()"
     end
@@ -153,28 +171,30 @@ methods.remove = function(self, scene)
   if not key then return end
   self.scenes[key] = nil
 
-  if not scene_itself.boring_flag then
-    Log.info("Removed scene %s", key)
+  if scene_itself.on_remove then
+    scene_itself:on_remove(key)
   end
 end
-
---- @class task
---- @field promise promise
---- @field scene scene
 
 local return_true = function() return true end
 
 --- @param f fun(scene, characters)
 --- @param name? string
+--- @param detach? boolean
 --- @return promise
 --- @return scene
-methods.run_task = function(self, f, name)
+methods.run_task = function(self, f, name, detach)
   local key = ("%s_%s"):format(name or "task", State.uid:next())
 
   local end_promise = Promise.new()
+  local parent = self.active_run
   local scene = {
     condition = return_true,
     run = function(self_scene)
+      if not detach and parent then
+        if parent.is_cancelled then return end
+        table.insert(parent.children, State.runner.active_run)
+      end
       State.runner:remove(self_scene)
       f(self_scene)
       end_promise:resolve()
