@@ -85,13 +85,18 @@ end
 --- @param task? fun(scene: any, characters: any)
 --- @param path? vector[]
 local set_mouse_task = function(task, path)
-  State.runner:cancel(mouse_task, false, true)
+  if mouse_task then
+    State.runner:cancel(mouse_task, false, true)
+  end
+
   if task then
     local promise
     promise, mouse_task = State.runner:run_task(task)
     promise:next(function()
       mouse_task_path = nil
     end)
+  else
+    mouse_task = nil
   end
   mouse_task_path = path
 end
@@ -785,11 +790,11 @@ local render_path
 
 use_mouse = function(self)
   if ui.mousedown(1) then
-    set_mouse_task()
+    set_mouse_task(nil)
   end
 
   if not State.player:can_act() then
-    State.runner:cancel(mouse_task, false, true)
+    set_mouse_task(nil)
     return
   end
 

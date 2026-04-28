@@ -191,11 +191,8 @@ end
 
 methods.handle_loading = function(self)
   -- NOTICE: is done only when the whole state is deserialized
-
   for _, c in ipairs(self._loading_cancellations) do
-    local _, ch = select_characters(self, c.base_scene, c.name)
-    c.base_scene:on_cancel(ch, self.positions)
-    finish(self, c.base_scene, c.name, ch)
+    c.base_scene:on_cancel(c.name)
   end
 
   if #self._loading_cancellations > 0 then
@@ -209,6 +206,7 @@ methods.handle_loading = function(self)
   self._loading_cancellations = nil
 end
 
+-- NEXT move to level
 --- @param prefix string
 --- @return string[]
 methods.position_sequence = function(self, prefix)
