@@ -8,7 +8,7 @@ local cutscene = {}
 --- @alias cutscene cutscene_strict|table
 --- @class cutscene_strict: scene_strict
 --- @field _run fun(self: scene, ch: ch, ps: ps, sp?: screenplay, ...): any
---- @field _condition? fun(self: scene, name: string, dt: number, ch: ch, ps: ps): boolean|any, ...
+--- @field _condition? fun(self: scene, dt: number, ch: ch, ps: ps): boolean|any, ...
 --- @field _on_add? fun(self: scene, ch: ch, ps: ps) runs when the scene is added
 --- @field _on_cancel? fun(self: scene, ch: ch, ps: ps) runs when the scene run is cancelled (either through runner:stop or loading a save)
 --- @field enabled? boolean
@@ -95,7 +95,7 @@ methods.condition = function(self, name, dt)
 
   local condition_return
   if self._condition then
-    condition_return = {self:_condition(name, dt, ch, State.level.positions)}
+    condition_return = {self:_condition(dt, ch, State.level.positions)}
     ok = table.remove(condition_return, 1)
   else
     condition_return = {}
