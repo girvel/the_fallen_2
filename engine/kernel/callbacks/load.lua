@@ -55,5 +55,9 @@ return function(args)
     State.camera.SCALE = 8
   end
 
+  if args.playground then
+    love.filesystem.load("engine/kernel/playground.lua")()
+  end
+
   Log.info("Finished love.load")
 end

@@ -22,6 +22,11 @@ cli.parse = function(args)
     "Set window to appear in constant position, raise scale -- to make YT videos"
   )
 
+  parser:flag(
+    "-P --playground",
+    "Run the playground script"
+  )
+
   parser:option(
     "-s --enable-scenes"
   ):args("+"):default({})
