@@ -1,7 +1,6 @@
 local async = require("engine.tech.async")
 local api = require("engine.tech.api")
 local cutscene = require("engine.tech.cutscene")
-local screenplay = require("engine.tech.screenplay")
 local spells = require("engine.mech.spells")
 local class = require("engine.mech.class")
 local items = require("level.palette.items")
@@ -17,17 +16,15 @@ rails.mt = {__index = methods}
 local init_debug
 
 --- @return rails
-rails.new = function()
-  return setmetatable({
-    
-  }, rails.mt)
+rails.new = function(checkpoint)
+  -- TODO replace
+  -- if Kernel.debug then init_debug() end
+  init_debug()
+  return setmetatable({}, rails.mt)
 end
 
 --- @param checkpoint string
 methods.init = function(self, checkpoint)
-  -- TODO replace
-  -- if Kernel.debug then init_debug() end
-  init_debug()
 end
 
 init_debug = function()
@@ -49,7 +46,6 @@ init_debug = function()
   State.player.base_abilities.cha = 20
 
   State.runner:extend {
-    --- @type scene
     demo_scene = cutscene.make {
       enabled = true,
       screenplay = "assets/screenplay/00_test.ms",

@@ -22,7 +22,7 @@ tk.find_target = function(entity, r, vision_map, sane_traveling_distance)
     if State.hostility:get(entity, e) == "enemy"
       and e.hp and e.hp > 0
       and (entity.blind_sight_flag or vision_map:is_visible_unsafe(unpack(e.position)))
-      and (not State.runner.locked_entities[e])
+      and (not State.level.locked_entities[e])
       and api.traveling_distance(entity, e) < (sane_traveling_distance or 100)
     then
       return e
@@ -44,7 +44,7 @@ tk.sees_enemies = function(entity, r, vision_map, sane_traveling_distance)
       and State.hostility:get(entity, e) == "enemy"
       and e.hp and e.hp > 0
       and (entity.blind_sight_flag or vision_map:is_visible_unsafe(unpack(e.position)))
-      and (not State.runner.locked_entities[e])
+      and (not State.level.locked_entities[e])
     then
       return true
     end

@@ -11,7 +11,7 @@ local sprite = require("engine.tech.sprite")
 --- @class preload_entity
 --- @field position vector
 --- @field identifier string
---- @field runner_name? string
+--- @field capture_name? string
 --- @field args? string
 
 local put_positions, put_entities, put_tiles
@@ -65,7 +65,7 @@ local preload = function(root)
       local missed_captures = Fun.pairs(captures._inner_array)
         :map(function(i, capture)
           return ("%s %s@%s"):format(
-            capture.runner_name, capture.layer, V(captures:_get_outer_index(i))
+            capture.capture_name, capture.layer, V(captures:_get_outer_index(i))
           )
         end)
         :totable()
@@ -82,7 +82,7 @@ end
 ----------------------------------------------------------------------------------------------------
 
 --- @class preload_capture
---- @field runner_name string
+--- @field capture_name string
 --- @field layer string
 
 local fields = function(instance, ...)
@@ -118,15 +118,15 @@ local tile_relative_position = function(instance)
   return Vector.own(instance.px):div_mut(sprite.cell_size):add_mut(Vector.one)
 end
 
-local insert_position = function(collection, runner_name, position)
-  if collection[runner_name] then
+local insert_position = function(collection, capture_name, position)
+  if collection[capture_name] then
     Error(
-      "Name collision: positions %s and %s both have a runner_name %s",
-      collection[runner_name], position, runner_name
+      "Name collision: positions %s and %s both have a capture_name %s",
+      collection[capture_name], position, capture_name
     )
   end
 
-  collection[runner_name] = position
+  collection[capture_name] = position
 end
 
 --- @param layer table
@@ -140,25 +140,25 @@ put_positions = function(layer, offset, positions, captures)
     if instance.__identifier == "position" then
       local position = absolute_position(instance)
 
-      local runner_name = fields(instance, "runner_name")
-      if runner_name == nil or runner_name == "" then
-        Error("No runner_name for position %s", position)
+      local capture_name = fields(instance, "capture_name")
+      if capture_name == nil or capture_name == "" then
+        Error("No capture_name for position %s", position)
       end
 
-      insert_position(positions, runner_name, position)
+      insert_position(positions, capture_name, position)
     elseif instance.__identifier == "entity_capture" then
       local position = relative_position(instance)
 
-      local runner_name, this_layer = fields(instance, "runner_name", "layer")
-      if runner_name == nil or runner_name == "" then
-        Error("No runner_name for entity_capture @local:%s", position)
+      local capture_name, this_layer = fields(instance, "capture_name", "layer")
+      if capture_name == nil or capture_name == "" then
+        Error("No capture_name for entity_capture @local:%s", position)
       end
       if this_layer == nil or this_layer == "" then
         Error("No layer for entity_capture @local:%s", position)
       end
 
       captures[position] = {
-        runner_name = runner_name,
+        capture_name = capture_name,
         layer = this_layer,
       }
     elseif instance.__identifier:ends_with("_N") then
@@ -180,9 +180,9 @@ put_positions = function(layer, offset, positions, captures)
 
       local index = (last_index[prefix] or 0) + 1
       last_index[prefix] = index
-      local runner_name = prefix .. "_" .. index
+      local capture_name = prefix .. "_" .. index
 
-      insert_position(positions, runner_name, position)
+      insert_position(positions, capture_name, position)
 
       for _, field in ipairs(instance.fieldInstances) do
         if field.__identifier:starts_with("_") then
@@ -213,11 +213,11 @@ end
 local use_captures = function(captures, entity, layer)
   local capture = captures[entity.position]
   if capture and capture.layer == layer then
-    if entity.runner_name then
-      Error("Attempt to capture an entity as %q, when it already has runner_name %s",
-        capture.runner_name, entity.runner_name)
+    if entity.capture_name then
+      Error("Attempt to capture an entity as %q, when it already has capture_name %s",
+        capture.capture_name, entity.capture_name)
     end
-    entity.runner_name = capture.runner_name
+    entity.capture_name = capture.capture_name
     captures[entity.position] = nil
   end
 end
@@ -245,7 +245,7 @@ put_entities = function(layer, offset, captures, entities)
       identifier = instance.__identifier,
     }
 
-    entity.runner_name, entity.args = fields(instance, "runner_name", "args")
+    entity.capture_name, entity.args = fields(instance, "capture_name", "args")
 
     use_captures(captures, entity, layer_name)
     entity.position:add_mut(offset)

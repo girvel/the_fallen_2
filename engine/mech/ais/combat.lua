@@ -94,7 +94,7 @@ end
 
 --- @param entity entity
 methods.control = function(self, entity)
-  if not State.combat or State.runner.locked_entities[State.player] then
+  if not State.combat or State.level.locked_entities[State.player] then
     self.target = nil
     return
   end
@@ -119,7 +119,7 @@ end
 --- @param entity entity
 --- @param dt number
 methods.observe = function(self, entity, dt)
-  if State.runner.locked_entities[State.player] or entity.hp <= 0 then return end
+  if State.level.locked_entities[State.player] or entity.hp <= 0 then return end
   if not Random.chance(dt / self.targeting.scan_period) then return end
 
   if State.combat and not State:in_combat(entity) then

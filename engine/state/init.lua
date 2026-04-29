@@ -24,7 +24,7 @@ local state = {}
 --- @field rails rails
 --- @field grids table<grid_layer, grid<entity>>
 --- @field grid_size vector
---- @field level level_info
+--- @field level level
 --- @field player player
 --- @field is_loaded boolean is level fully loaded
 --- @field _world table
@@ -184,22 +184,18 @@ methods.load_level = function(self, path)
   local read_t = love.timer.getTime()
   local last_yield_t = read_t
 
-  self.level = load_data.level_info
-  Log.info("State.level == %s", self.level)
-
-  self.rails = load_data.rails
-
-  Table.extend(self.runner.entities, load_data.runner_entities)
-  Table.extend(self.runner.positions, load_data.runner_positions)
+  Log.info(
+    "State.level:\n  grid_size: %s\n  positions: (%s)\n  entities: (%s)",
+    load_data.level.grid_size,
+    #load_data.level.positions,
+    #load_data.level.entities
+  )
+  self.level = load_data.level
 
   self.grids = Fun.iter(level.grid_layers)
     :map(function(layer) return layer, Grid.new(self.level.grid_size) end)
     :tomap()
-
-  self.grids.solids = tcod.observer(assert(
-    self.grids.solids,
-    "Missing \"solids\" grid_layer; required for FOV and pathing to work"
-  ))
+  self.grids.solids = tcod.observer(self.grids.solids)
   self._travel_map = tcod.map(self.grids.solids)
 
   for layer, grid in pairs(self.grids) do
@@ -232,9 +228,7 @@ methods.load_level = function(self, path)
   local add_t = love.timer.getTime()
   Log.info("%.2f s | Added %s entities", add_t - read_t, #load_data.entities)
 
-  if self.rails.init then
-    self.rails:init(Kernel.args.checkpoint)
-  end
+  self.rails = load_data.rails_new(Kernel.args.checkpoint)
 
   local end_t = love.timer.getTime()
   Log.info("%.2f s | Initialized rails", end_t - add_t)

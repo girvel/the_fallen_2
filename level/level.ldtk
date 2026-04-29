@@ -1718,7 +1718,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "runner_name",
+					"identifier": "capture_name",
 					"doc": null,
 					"__type": "String",
 					"uid": 82,
@@ -1794,7 +1794,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "runner_name",
+					"identifier": "capture_name",
 					"doc": null,
 					"__type": "String",
 					"uid": 81,
@@ -1937,7 +1937,7 @@
 			"pivotY": 0,
 			"fieldDefs": [
 				{
-					"identifier": "runner_name",
+					"identifier": "capture_name",
 					"doc": null,
 					"__type": "String",
 					"uid": 86,
@@ -2183,7 +2183,7 @@
 							"height": 16,
 							"defUid": 84,
 							"px": [1440,1488],
-							"fieldInstances": [{ "__identifier": "runner_name", "__type": "String", "__value": "travel_to", "__tile": null, "defUid": 86, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "capture_name", "__type": "String", "__value": "travel_to", "__tile": null, "defUid": 86, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["travel_to"]
 							}] }],
@@ -3125,7 +3125,7 @@
 							"height": 16,
 							"defUid": 2,
 							"px": [1408,1408],
-							"fieldInstances": [{ "__identifier": "runner_name", "__type": "String", "__value": "player", "__tile": null, "defUid": 82, "realEditorValues": [] }],
+							"fieldInstances": [{ "__identifier": "capture_name", "__type": "String", "__value": "player", "__tile": null, "defUid": 82, "realEditorValues": [] }],
 							"__worldX": 1408,
 							"__worldY": 1408
 						},
@@ -3157,7 +3157,7 @@
 							"height": 16,
 							"defUid": 80,
 							"px": [1440,1376],
-							"fieldInstances": [{ "__identifier": "runner_name", "__type": "String", "__value": "ai_tester", "__tile": null, "defUid": 81, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "capture_name", "__type": "String", "__value": "ai_tester", "__tile": null, "defUid": 81, "realEditorValues": [{
 								"id": "V_String",
 								"params": ["ai_tester"]
 							}] }],

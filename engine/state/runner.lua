@@ -4,10 +4,6 @@ local async = require("engine.tech.async")
 
 local runner = {}
 
---- @alias runner_characters table<string, entity>
---- @alias runner_positions table<string, vector>
---- @alias runner_scenes table<string, scene>
-
 --- @alias scene scene_strict|table
 --- @class scene_strict
 --- @field condition fun(self: scene, name: string, dt: number): boolean|any, ...
@@ -27,11 +23,10 @@ local runner = {}
 --- @field name string
 --- @field base_scene scene
 
+--- @alias runner_scenes table<string, scene>
+
 --- @class state_runner
 --- @field scenes runner_scenes
---- @field positions table<string, vector>
---- @field entities table<string, entity>
---- @field locked_entities table<entity, true>
 --- @field save_lock scene?
 --- @field active_run scene_run?
 --- @field _scene_runs scene_run[]
@@ -43,10 +38,7 @@ runner.mt = {__index = methods}
 runner.new = function()
   return setmetatable({
     scenes = {},
-    positions = Table.strict({}, "runner position"),
-    entities = Table.strict({}, "runner entity"),
     _scene_runs = {},
-    locked_entities = {},
   }, runner.mt)
 end
 
@@ -229,33 +221,6 @@ methods.handle_loading = function(self)
   end
 
   self._loading_cancellations = nil
-end
-
--- NEXT move to level
---- @param prefix string
---- @return string[]
-methods.position_sequence = function(self, prefix)
-  local result = {}
-  local count = 0
-  for name, position in pairs(self.positions) do
-    if not name:starts_with(prefix .. "_") then goto continue end
-    local index = tonumber(name:sub(#prefix + 2))
-    if not index then goto continue end
-    result[index] = position
-    count = count + 1
-
-    ::continue::
-  end
-
-  if #result == 0 then
-    Error("No elements in position sequence %q", prefix)
-  end
-
-  if count ~= #result then
-    Error("Hole in position sequence %q: %i is missing", prefix, #result + 1)
-  end
-
-  return result
 end
 
 --- @param self state_runner

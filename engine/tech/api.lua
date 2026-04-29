@@ -280,7 +280,7 @@ end
 --- @param text string
 api.line = function(source, text)
   assert(
-    State.runner.locked_entities[State.player],
+    State.level.locked_entities[State.player],
     "api.line shouldn't be called when the player is not locked into a cutscene"
   )
 
@@ -421,7 +421,7 @@ api.autosave = function(name)
   local _, scene = State.runner:run_task(function()
     Log.debug("Planned autosave %q", name)
 
-    while State.runner.locked_entities[State.player] or State.combat do
+    while State.level.locked_entities[State.player] or State.combat do
       coroutine.yield()
     end
 

@@ -203,7 +203,7 @@ local SIDEBAR_INNER_W = 336
 local SIDEBAR_W = SIDEBAR_INNER_W + PADDING_LX + PADDING_RX
 
 draw_sidebar = function(self)
-  if State.runner.locked_entities[State.player] then
+  if State.level.locked_entities[State.player] then
     State.camera.sidebar_w = 0
     return
   end
@@ -763,7 +763,7 @@ draw_notification = function()
 end
 
 draw_suggestion = function()
-  if State.runner.locked_entities[State.player] then return end
+  if State.level.locked_entities[State.player] then return end
   if not actions.interact:is_available(State.player) then return end
   local target = interactive.get_for(State.player)  --[[@as item]]
   if not target then return end

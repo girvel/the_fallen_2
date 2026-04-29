@@ -4,7 +4,7 @@ local level = require "engine.tech.level"
 
 --- @class generation_data
 --- @field entities entity[]
---- @field runner_entities table<string, entity>
+--- @field captured_entities table<string, entity>
 --- @field atlases table<string, love.Image>
 
 --- @async
@@ -16,7 +16,7 @@ local generate_entities = function(palette, preload_entities)
   local last_yield_t = start_t
   local result = {
     entities = {},
-    runner_entities = {},
+    captured_entities = {},
     atlases = {},
   }
 
@@ -54,12 +54,12 @@ local generate_entities = function(palette, preload_entities)
 
       local entity = factory(entry.args and Common.eval(entry.args))
 
-      if entry.runner_name then
+      if entry.capture_name then
         if not entity then
           Error("Entity capture at %s@%s attempted, but factory returned no entity",
             layer, entry.position)
         else
-          result.runner_entities[entry.runner_name] = entity
+          result.captured_entities[entry.capture_name] = entity
         end
       end
 

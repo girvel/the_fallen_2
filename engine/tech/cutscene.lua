@@ -7,10 +7,10 @@ local cutscene = {}
 
 --- @alias cutscene cutscene_strict|table
 --- @class cutscene_strict: scene_strict
---- @field _run fun(self: scene, ch: runner_characters, ps: runner_positions, sp?: screenplay, ...): any
---- @field _condition? fun(self: scene, name: string, dt: number, ch: runner_characters, ps: runner_positions): boolean|any, ...
---- @field _on_add? fun(self: scene, ch: runner_characters, ps: runner_positions) runs when the scene is added
---- @field _on_cancel? fun(self: scene, ch: runner_characters, ps: runner_positions) runs when the scene run is cancelled (either through runner:stop or loading a save)
+--- @field _run fun(self: scene, ch: ch, ps: ps, sp?: screenplay, ...): any
+--- @field _condition? fun(self: scene, name: string, dt: number, ch: ch, ps: ps): boolean|any, ...
+--- @field _on_add? fun(self: scene, ch: ch, ps: ps) runs when the scene is added
+--- @field _on_cancel? fun(self: scene, ch: ch, ps: ps) runs when the scene run is cancelled (either through runner:stop or loading a save)
 --- @field enabled? boolean
 --- @field mode? "sequential"|"parallel"|"once"|"disable"
 --- @field characters? table<string, cutscene.characters_def>
@@ -33,7 +33,7 @@ end
 
 --- @param scene scene
 --- @param scene_name string
---- @return boolean, runner_characters
+--- @return boolean, ch
 local select_characters = function(scene, scene_name)
   local ok = true
   local characters = {}
@@ -42,13 +42,13 @@ local select_characters = function(scene, scene_name)
     for name, opts in pairs(scene.characters) do
       local e
       if opts.dynamic then
-        e = rawget(State.runner.entities, name)
+        e = rawget(State.level.entities, name)
       else
-        e = State.runner.entities[name]
+        e = State.level.entities[name]
       end
 
       if not opts.optional and not State:exists(e)
-        or State.runner.locked_entities[e]
+        or State.level.locked_entities[e]
       then
         ok = false
       end
@@ -62,10 +62,10 @@ end
 
 --- @param scene scene
 --- @param key string
---- @param ch runner_characters
+--- @param ch ch
 local finish = function(scene, key, ch)
   for _, character in pairs(ch) do
-    State.runner.locked_entities[character] = nil
+    State.level.locked_entities[character] = nil
   end
 
   if Table.key_of(ch, State.player) then
@@ -98,7 +98,7 @@ methods.condition = function(self, name, dt)
 
   local condition_return
   if self._condition then
-    condition_return = {self:_condition(name, dt, ch, State.runner.positions)}
+    condition_return = {self:_condition(name, dt, ch, State.level.positions)}
     ok = table.remove(condition_return, 1)
   else
     condition_return = {}
@@ -108,15 +108,15 @@ methods.condition = function(self, name, dt)
   if ok then
     -- done in condition to prevent the next condition possibly triggering
     for _, character in pairs(ch) do
-      State.runner.locked_entities[character] = true
+      State.level.locked_entities[character] = true
     end
   end
-  return ok, ch, State.runner.positions, unpack(condition_return)
+  return ok, ch, State.level.positions, unpack(condition_return)
 end
 
 --- @param name string
---- @param ch runner_characters
---- @param ps runner_positions
+--- @param ch ch
+--- @param ps ps
 methods.run = function(self, name, ch, ps, ...)
   if not self.boring_flag then
     Log.info("Scene %q starts", name)
@@ -144,7 +144,7 @@ end
 methods.on_cancel = function(self, name)
   local _, ch = select_characters(self, name)
   if self._on_cancel then
-    self:_on_cancel(ch, State.runner.positions)
+    self:_on_cancel(ch, State.level.positions)
   end
   finish(self, name, ch)
   if not self.boring_flag then

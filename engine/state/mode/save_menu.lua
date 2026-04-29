@@ -23,7 +23,7 @@ tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 
 methods.draw_gui = function(self, dt)
   local in_combat = State.combat
-  local in_cutscene = State.runner.locked_entities[State.player]
+  local in_cutscene = State.level.locked_entities[State.player]
   if in_combat or in_cutscene then
     State.mode:close_menu()
     State.mode:show_warning(
