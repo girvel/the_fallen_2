@@ -233,12 +233,9 @@ methods.handle_loading = function(self)
   self._loading_cancellations = nil
 end
 
--- NEXT rewrite serialization post-refactor
 --- @param self state_runner
 runner.mt.__serialize = function(self)
   local scenes = self.scenes
-  local positions = self.positions
-  local entities = self.entities
 
   local cancellations = {}
   for _, run in ipairs(self._scene_runs) do
@@ -257,11 +254,8 @@ runner.mt.__serialize = function(self)
   return function()
     local result = setmetatable({
       scenes = scenes,
-      positions = positions,
-      entities = entities,
       _scene_runs = {},
       _loading_cancellations = cancellations,
-      locked_entities = {},
     }, runner.mt)
 
     return result
