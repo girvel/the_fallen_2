@@ -62,7 +62,15 @@ init_debug = function()
         end, "parent")
 
         async.sleep(.5)
-        State.runner:cancel(scene)
+        State.runner:cancel(scene, true)
+
+        promise, scene = State.runner:run_task(function()
+          async.sleep(5)
+          State.player.hp = 50
+        end)
+        scene.save_flag = true
+        coroutine.yield()
+        api.autosave("test")
       end,
     },
   }

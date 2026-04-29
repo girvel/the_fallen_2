@@ -8,6 +8,7 @@ local runner = {}
 --- @class scene_strict
 --- @field condition fun(self: scene, name: string, dt: number): boolean|any, ...
 --- @field run fun(self: scene, name: string, ...): any
+--- @field save_flag? true don't warn about making a save during this scene
 --- @field on_add? fun(self: scene, name: string) runs when the scene is added
 --- @field on_remove? fun(self: scene, name: string) runs when the scene is removed
 --- @field on_cancel? fun(self: scene, name: string) runs when the scene run is cancelled (either through runner:cancel or loading a save)
@@ -47,6 +48,13 @@ local scene_run_mt = {}
 --- @param dt number
 methods.update = function(self, dt)
   for scene_name, scene in pairs(self.scenes) do
+    if State.runner.save_lock
+      and State.runner.save_lock ~= scene
+      and not scene.on_cancel
+    then
+      goto continue
+    end
+
     local condition_return = {scene:condition(scene_name, dt)}
     local ok = table.remove(condition_return, 1)
     if ok then
@@ -61,6 +69,8 @@ methods.update = function(self, dt)
       setmetatable(run, scene_run_mt)
       table.insert(self._scene_runs, run)
     end
+
+    ::continue::
   end
 
   local to_remove = {}
@@ -223,6 +233,7 @@ methods.handle_loading = function(self)
   self._loading_cancellations = nil
 end
 
+-- NEXT rewrite serialization post-refactor
 --- @param self state_runner
 runner.mt.__serialize = function(self)
   local scenes = self.scenes

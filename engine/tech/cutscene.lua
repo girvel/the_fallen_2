@@ -16,7 +16,6 @@ local cutscene = {}
 --- @field characters? table<string, cutscene.characters_def>
 --- @field screenplay? string a path to screenplay
 --- @field boring_flag? true don't log scene beginning and ending
---- @field save_flag? true don't warn about making a save during this scene
 --- @field in_combat_flag? true allows scene to start in combat
 --- @field lag_flag? true hides coroutine lag warnings
 local methods = {}
@@ -82,8 +81,6 @@ end
 methods.condition = function(self, name, dt)
   local main_condition = (
     self.enabled
-    -- NEXT move save_lock logic back into the runner
-    and (not State.runner.save_lock or State.runner.save_lock == self or self.on_cancel)
     and (self.mode == "parallel" or not State.runner:is_running(self))
     and (self.in_combat_flag
       or not State.combat
