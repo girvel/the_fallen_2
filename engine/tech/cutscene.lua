@@ -130,6 +130,9 @@ methods.run = function(self, name, ch, ps, ...)
     sp = screenplay.new(self.screenplay, ch)
   end
   self:_run(ch, ps, sp, ...)
+  if sp then
+    sp:finish()
+  end
   finish(self, name, ch)
 
   if not self.boring_flag then
