@@ -152,6 +152,16 @@ string.indent = function(str)
     :totable(), "\n")
 end
 
+--- @param str string
+--- @return table<string, true>
+string.to_set = function(str)
+  local result = {}
+  for i = 1, str:utf_len() do
+    result[str:utf_sub(i, i)] = true
+  end
+  return result
+end
+
 
 local mt = getmetatable("")
 
