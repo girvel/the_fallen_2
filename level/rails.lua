@@ -46,6 +46,20 @@ init_debug = function()
   State.player.level = 20
   State.player.base_abilities.cha = 20
 
+  -- NEXT scars & clothes for people
+
+  local jumble_lines = function(sp, ratio)
+    for _, element in ipairs(sp.stack[1]) do
+      if element.type == "lines" then
+        for _, line in ipairs(element.lines) do
+          if line.source ~= "narration" then
+            line.text = jumble(line.text, .2)
+          end
+        end
+      end
+    end
+  end
+
   State.runner:extend {
     inn_dialogue_1 = cutscene.make {
       enabled = true,
@@ -57,16 +71,12 @@ init_debug = function()
         bandit_drunkard = {},
       },
 
+      _condition = function(self, dt, ch, ps)
+        return api.distance(State.player, ps.inn_dialogue_1) <= 1
+      end,
+
       _run = function(self, ch, ps, sp)
-        for _, element in ipairs(sp.stack[1]) do
-          if element.type == "lines" then
-            for _, line in ipairs(element.lines) do
-              if line.source ~= "narration" then
-                line.text = jumble(line.text, .2)
-              end
-            end
-          end
-        end
+        jumble_lines(sp, .2)
         sp:lines()
       end,
 
@@ -74,6 +84,34 @@ init_debug = function()
         ch.bandit_storyteller:rotate(Vector.left)
         ch.bandit_sadist:rotate(Vector.left)
         ch.bandit_drunkard:rotate(Vector.right)
+      end,
+    },
+    inn_dialogue_2 = cutscene.make {
+      enabled = true,
+      screenplay = "assets/screenplay/inn_dialogue_2.ms",
+      characters = {
+        player = {},
+        milkman = {},
+        milkmans_buddy = {},
+      },
+
+      _on_add = function(self, ch, ps)
+        api.rotate(ch.milkman, ch.milkmans_buddy)
+        api.rotate(ch.milkmans_buddy, ch.milkman)
+      end,
+
+      _condition = function(self, dt, ch, ps)
+        return api.distance(State.player, ps.inn_dialogue_2) <= 1
+      end,
+
+      _run = function(self, ch, ps, sp)
+        jumble_lines(sp, .2)
+        sp:lines()
+        async.sleep(.5)
+        api.rotate(ch.milkmans_buddy, State.player)
+        async.sleep(1)
+        sp:lines()
+        api.rotate(ch.milkmans_buddy, ch.milkman)
       end,
     },
     -- intro = cutscene.make {
