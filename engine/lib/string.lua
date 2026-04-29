@@ -58,6 +58,31 @@ string.utf_upper = function(str)
   return str
 end
 
+--- @param str string
+--- @return table<string, true>
+string.to_set = function(str)
+  local result = {}
+  for i = 1, str:utf_len() do
+    result[str:utf_sub(i, i)] = true
+  end
+  return result
+end
+
+local en_upper_set = ("ABCDEFGHIJKLMNOPQRSTUVWXYZ"):to_set()
+local ru_upper_set = ru_upper:to_set()
+
+--- @param str string
+--- @return boolean
+string.utf_is_upper = function(str)
+  for i = 1, str:utf_len() do
+    local char = str:utf_sub(i, i)
+    if not en_upper_set[char] and not ru_upper_set[char] then
+      return false
+    end
+  end
+  return true
+end
+
 --- Put the first UTF-8 character of `str` into uppercase
 --- @param str string
 --- @return string
@@ -150,16 +175,6 @@ string.indent = function(str)
   return table.concat(Fun.iter(str / "\n")
     :map(function(line) return "  " .. line end)
     :totable(), "\n")
-end
-
---- @param str string
---- @return table<string, true>
-string.to_set = function(str)
-  local result = {}
-  for i = 1, str:utf_len() do
-    result[str:utf_sub(i, i)] = true
-  end
-  return result
 end
 
 
