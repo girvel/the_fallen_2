@@ -22,7 +22,7 @@ local jumble_word = function(word, ratio)
   for _ = 1, morphems_n do
     result = result .. Random.item(morphems)
   end
-  if word:utf_sub(1, 1):utf_is_upper() and not word:utf_is_upper() then
+  if word:utf_sub(1, 1):utf_is_upper() and (word:utf_len() == 1 or not word:utf_is_upper()) then
     result = result:utf_sub(1, 1):utf_upper() .. result:utf_sub(2)
   end
   return result

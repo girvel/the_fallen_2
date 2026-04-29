@@ -3,6 +3,7 @@ bandit_storyteller: Р
 bandit_sadist: С
 bandit_drunkard: П
 player: Г
+narration: О
 ---
 
 Р: ...я к нему подхожу и говорю: "Гони деньги, сволочь!"

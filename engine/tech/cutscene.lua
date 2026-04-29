@@ -161,6 +161,11 @@ methods.on_add = function(self, name)
   if Table.contains(Kernel.args.disable_scenes, name) then
     self.enabled = nil
   end
+
+  if self._on_add then
+    local _, ch = select_characters(self, name)
+    self:_on_add(ch, State.level.positions)
+  end
 end
 
 --- @param name string
