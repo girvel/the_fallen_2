@@ -138,7 +138,8 @@ put_positions = function(layer, offset, positions, captures)
 
   for _, instance in ipairs(layer.entityInstances) do
     if instance.__identifier == "position" then
-      local position = absolute_position(instance)
+      local position = relative_position(instance)
+        :add_mut(offset)
 
       local capture_name = fields(instance, "capture_name")
       if capture_name == nil or capture_name == "" then
