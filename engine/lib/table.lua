@@ -4,11 +4,13 @@
 local _table = {}
 
 -- TODO maybe split it into a Map & Array files -- one containing pairs functions, the other ipairs?
+--   but actually, not all functions use pairs nor ipairs (for example, .strict), and some do array
+--   -> map (like .set), so they can not be cleanly separated into map & array
 
 --- Returns the pairs-based entry count
 --- @param t table
 --- @return integer
-_table.count = function(t)
+_table.count = function(t) -- map
   local result = 0
   for _ in pairs(t) do
     result = result + 1
@@ -23,7 +25,7 @@ end
 --- @param extension table table to copy fields from
 --- @param ... table following extensions
 --- @return table base the base table
-_table.extend = function(base, extension, ...)
+_table.extend = function(base, extension, ...) -- map
   if extension == nil then return base end
   for k, v in pairs(extension) do
     base[k] = v
@@ -32,7 +34,7 @@ _table.extend = function(base, extension, ...)
 end
 
 --- Same as .extend, but asserts no collisions
-_table.extend_strict = function(base, extension, ...)
+_table.extend_strict = function(base, extension, ...) -- map
   if extension == nil then return base end
   for k, v in pairs(extension) do
     if base[k] then
@@ -48,7 +50,7 @@ end
 --- @param base table?
 --- @param defaults T
 --- @return T
-_table.defaults = function(base, defaults)
+_table.defaults = function(base, defaults) -- map
   base = base or {}
   for k, v in pairs(defaults) do
     if base[k] == nil then
@@ -65,7 +67,7 @@ end
 --- @param extension table table to copy fields from
 --- @param ... table following extensions
 --- @return table base the base table
-_table.concat = function(base, extension, ...)
+_table.concat = function(base, extension, ...) -- array
   if extension == nil then return base end
   for _, v in ipairs(extension) do
     table.insert(base, v)
@@ -80,7 +82,7 @@ end
 --- @param extension table? table to copy fields from
 --- @param ... table following extensions
 --- @return table base the base table
-_table.join = function(base, extension, ...)
+_table.join = function(base, extension, ...) -- remove
   if extension == nil then return base end
   local length = #base
   for k, v in pairs(extension) do
@@ -100,7 +102,7 @@ end
 --- @param extension table table to copy fields from
 --- @param ... table following extensions
 --- @return table base the base table
-_table.merge = function(base, extension, ...)
+_table.merge = function(base, extension, ...) -- map
   if extension == nil then return base end
   for k, v in pairs(extension) do
     if base[k] and type(base[k]) == "table" and type(v) == "table" then
@@ -117,7 +119,7 @@ end
 --- @param t T[]
 --- @param item T
 --- @return integer?
-_table.index_of = function(t, item)
+_table.index_of = function(t, item) -- array
   for i, x in ipairs(t) do
     if x == item then
       return i
@@ -130,7 +132,7 @@ end
 --- @param t table
 --- @param item any
 --- @return any
-_table.key_of = function(t, item)
+_table.key_of = function(t, item) -- map
   for k, v in pairs(t) do
     if v == item then
       return k
@@ -143,7 +145,7 @@ end
 --- @param t1 table
 --- @param t2 table
 --- @return boolean
-_table.shallow_same = function(t1, t2)
+_table.shallow_same = function(t1, t2) -- map
   for k, v in pairs(t1) do
     if v ~= t2[k] then return false end
   end
@@ -153,10 +155,11 @@ _table.shallow_same = function(t1, t2)
   return true
 end
 
+--- Preserves metatable
 --- @generic T: table
 --- @param t T
 --- @return T
-_table.shallow_copy = function(t)
+_table.shallow_copy = function(t) -- map
   local result = setmetatable({}, getmetatable(t))
   for k, v in pairs(t) do
     result[k] = v
@@ -168,7 +171,7 @@ end
 --- @param o T
 --- @param seen? table
 --- @return T
-_table.deep_copy = function(o, seen)
+_table.deep_copy = function(o, seen) -- map
   seen = seen or {}
   if o == nil then return nil end
   if seen[o] then return seen[o] end
@@ -191,7 +194,7 @@ end
 --- @param t table
 --- @param item any
 --- @return table
-_table.remove = function(t, item)
+_table.remove = function(t, item) -- split
   for k, v in pairs(t) do
     if v == item then
       if type(k) == "number" and math.ceil(k) == k then
@@ -207,7 +210,7 @@ end
 --- @param t table
 --- @param ... any
 --- @return table
-_table.removed = function(t, ...)
+_table.removed = function(t, ...) -- array+rewrite
   local result = Table.shallow_copy(t)
   for i = 1, select("#", ...) do
     Table.remove(result, select(i, ...))
@@ -216,7 +219,7 @@ _table.removed = function(t, ...)
 end
 
 --- Uses pairs
-_table.remove_pair = function(t, item)
+_table.remove_pair = function(t, item) -- remove
   for k, v in pairs(t) do
     if v == item then
       t[k] = nil
@@ -226,20 +229,20 @@ end
 
 --- @param t any[]
 --- @param i integer
-_table.remove_breaking_at = function(t, i)
+_table.remove_breaking_at = function(t, i) -- remove
   t[i] = t[#t]
   t[#t] = nil
 end
 
 --- @param t any[]
 --- @param item any
-_table.remove_breaking = function(t, item)
+_table.remove_breaking = function(t, item) -- remove
   Table.remove_breaking_at(t, assert(Table.index_of(t, item)))
 end
 
 --- @param t any[]
 --- @param indexes integer[]
-_table.remove_breaking_in_bulk = function(t, indexes)
+_table.remove_breaking_in_bulk = function(t, indexes) -- replace
   for i = #indexes, 1, -1 do
     _table.remove_breaking_at(t, indexes[i])
   end
@@ -249,7 +252,7 @@ end
 --- @param t table
 --- @param item any
 --- @return boolean
-_table.contains = function(t, item)
+_table.contains = function(t, item) -- array
   for _, x in ipairs(t) do
     if x == item then
       return true
@@ -261,12 +264,12 @@ end
 --- @generic T
 --- @param t T[]
 --- @return T
-_table.last = function(t)
+_table.last = function(t) -- array
   return t[#t]
 end
 
 --- @return table
-_table.pack = function(...)
+_table.pack = function(...) -- remove
   local n = select("#", ...)
   local result = {}
   for i = 1, n do
@@ -279,7 +282,7 @@ end
 --- @generic T
 --- @param list T[]
 --- @return table<T, true?>
-_table.set = function(list)
+_table.set = function(list) -- array
   local result = {}
   for _, v in ipairs(list) do
     result[v] = true
@@ -289,7 +292,7 @@ end
 
 --- @param t table
 --- @param fields string[]
-_table.assert_fields = function(t, fields)
+_table.assert_fields = function(t, fields) -- replace
   local missing_fields = {}
   for _, field in ipairs(fields) do
     if t[field] == nil then
@@ -303,7 +306,7 @@ end
 
 --- @param path string
 --- @return table<string, any>
-_table.do_folder = function(path)
+_table.do_folder = function(path) -- map
   local result = {}
   for _, name in ipairs(love.filesystem.getDirectoryItems(path)) do
     local full_path = path .. "/" .. name
@@ -320,7 +323,7 @@ end
 --- @param t T
 --- @param item_name string?
 --- @return T
-_table.strict = function(t, item_name)
+_table.strict = function(t, item_name) -- ?
   return setmetatable(t, {
     __index = function(self, index)
       Error("There's no %s %q", item_name or "item", index)
@@ -331,7 +334,7 @@ end
 --- @generic T
 --- @param t table<T, any>
 --- @return T[]
-_table.keys = function(t)
+_table.keys = function(t) -- map
   local result = {}
   for k in pairs(t) do
     table.insert(result, k)
