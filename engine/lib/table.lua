@@ -229,7 +229,7 @@ end
 
 --- @param t any[]
 --- @param i integer
-_table.remove_breaking_at = function(t, i) -- remove
+_table.remove_breaking_at = function(t, i)
   t[i] = t[#t]
   t[#t] = nil
 end
@@ -237,7 +237,7 @@ end
 --- @param t any[]
 --- @param item any
 _table.remove_breaking = function(t, item) -- remove
-  Table.remove_breaking_at(t, assert(Table.index_of(t, item)))
+  _table.remove_breaking_at(t, assert(_table.index_of(t, item)))
 end
 
 --- @param t any[]
