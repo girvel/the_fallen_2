@@ -168,6 +168,18 @@ for index = 20, 22 do
   end
 end
 
+-- NEXT drinking beer?
+for index = 28, 28 do
+  local i, this_sprite = packer:geti(index)
+  on_solids[i] = function()
+    return {
+      boring_flag = true,
+      codename = "beer",
+      sprite = this_sprite,
+    }
+  end
+end
+
 packer.offset = 80
 
 do
