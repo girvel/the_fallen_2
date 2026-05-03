@@ -1,14 +1,77 @@
 local memory = require("engine.tech.shaders.memory")
-local saves = require "engine.kernel.saves"
+local saves = require("engine.kernel.saves")
+local state = require("engine.state")
+local safety = require "engine.tech.safety"
+local cli = require "engine.kernel.cli"
+local async = require "engine.tech.async"
 
+
+--- @diagnostic disable-next-line:duplicate-set-field
+love.load = function(args)
+  Log.info("Started love.load")
+
+  args = cli.parse(args)
+  Kernel.args = args
+  Kernel.debug = args.debug
+  Log.info("CLI args: %s", args)
+
+  if args.profiler then
+    Profile.start()
+    async.lag_threshold = 1
+  end
+
+  if args.mobdebug then
+    local ok, mobdebug = pcall(require, "mobdebug")
+    assert(
+      ok,
+      "-debug option provided, but mobdebug is not found. Are you running this from ZeroBrane?"
+    )
+
+    mobdebug.start()
+    async.lag_threshold = 2
+  end
+
+  if args.debug then
+    Kernel:set_key_rate("space", 15)
+  else
+    Lp = {
+      start = function() end,
+      stop = function() end,
+      report = function() return "" end,
+    }
+  end
+
+  if args.resolution then
+    love.window.updateMode(args.resolution[1], args.resolution[2], {fullscreen = false, minheight = 200, minwidth = 200})
+  else
+    love.window.updateMode(0, 0, {fullscreen = true, minheight = 200, minwidth = 200})
+  end
+
+  State = state.new(assert(love.filesystem.load("engine/systems/init.lua"))())
+  assert = safety.assert
+  Error = safety.error
+
+  if args.youtube then
+    if args.resolution then
+      love.window.setPosition(200, 200)
+    end
+    State.camera.SCALE = 8
+  end
+
+  if args.playground then
+    love.filesystem.load("engine/kernel/playground.lua")()
+  end
+
+  Log.info("Finished love.load")
+end
 
 local handle_event = function(event, ...)
   if not Kernel._is_active then return end
   State._world:update(function(_, system) return system.base_callback == event end, ...)
 end
 
-return function()
-  love.load(love.arg.parseGameArguments(arg), arg)
+love.run = function()
+  love.load(love.arg.parseGameArguments(arg))
 
   love.timer.step()
   local dt = 0
@@ -122,5 +185,44 @@ return function()
         love.graphics.present()
       Kernel.cpu_time = math.max(0, Kernel.cpu_time - (love.timer.getTime() - t))
     end
+  end
+end
+
+love.quit = function()
+  if not Kernel.debug and State.mode:attempt_exit() then return true end
+
+  Log.info("Exited smoothly")
+  Kernel:report()
+  return false
+end
+
+love.errorhandler = function(msg)
+  Log.fatal(debug.traceback(msg, 2))
+  Kernel:report()
+  -- saves.write({State}, "last_crash.ldump.gz")
+  -- love.window.requestAttention()
+
+  if Kernel.debug then return end
+
+  local FONT = love.graphics.newFont("engine/assets/fonts/clacon2.ttf", 48)
+
+  return function()
+    love.event.pump()
+
+    for e,a,_b,_c in love.event.poll() do
+      if e == "quit" then
+        return 1
+      elseif e == "keypressed" and a == "return" then
+        love.event.quit()
+      end
+    end
+
+    love.graphics.clear()
+      love.graphics.setColor(Vector.white)
+      love.graphics.setFont(FONT)
+
+      love.graphics.print("Игра потерпела крушение", 200, 200)
+      love.graphics.print("нажмите [Enter] чтобы выйти", 200, 260)
+    love.graphics.present()
   end
 end
