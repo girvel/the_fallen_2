@@ -4,25 +4,12 @@ local safety = require "engine.tech.safety"
 -- NEXT move systems out
 -- NEXT no live systems
 local systems = {
-  -- love.textinput
-  {codename = "ui_textinput"},  -- kernel
-
-  -- love.mousemoved
-  {codename = "ui_mousemoved"},  -- kernel
-
-  -- love.mousepressed
-  {codename = "ui_mousepressed"},  -- kernel
-
-  -- love.mousereleased
-  {codename = "ui_mousereleased"},  -- kernel
-
   -- love.update
   {codename = "genesis"},  -- non-kernel, but State:new flushes ECS manually
   {codename = "update_sound", live = true},
   {codename = "update_runner", live = true},  -- together with acting
   {codename = "acting", live = true},
   {codename = "animation", live = true},
-  {codename = "ui_update"},  -- kernel
   {codename = "drifting", live = true},
   {codename = "timed_death", live = true},
   {codename = "running", live = true},

@@ -79,6 +79,16 @@ local handle_event = function(event, a,b,c,d,e,f)
       Log.info("Ctrl+D")
       love.event.quit()
     end
+  elseif event == "textinput" then
+    ui.handle_textinput(a)
+  elseif event == "mousemoved" then
+    ui.handle_mousemove(a, b)
+  elseif event == "mousepressed" then
+    ui.handle_mousepress(c)
+  elseif event == "mousereleased" then
+    ui.handle_mouserelease(c)
+  elseif event == "update" then
+    ui.handle_update(a)
   end
 
   State._world:update(
