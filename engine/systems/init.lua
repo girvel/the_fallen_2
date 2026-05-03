@@ -1,36 +1,34 @@
 local safety = require "engine.tech.safety"
 
 
+-- NEXT move systems out
+-- NEXT no live systems
 local systems = {
-  -- love.keypressed
-  {codename = "ui_keypressed"},
-  {codename = "debug_exit"},
-
   -- love.textinput
-  {codename = "ui_textinput"},
+  {codename = "ui_textinput"},  -- kernel
 
   -- love.mousemoved
-  {codename = "ui_mousemoved"},
+  {codename = "ui_mousemoved"},  -- kernel
 
   -- love.mousepressed
-  {codename = "ui_mousepressed"},
+  {codename = "ui_mousepressed"},  -- kernel
 
   -- love.mousereleased
-  {codename = "ui_mousereleased"},
+  {codename = "ui_mousereleased"},  -- kernel
 
   -- love.update
-  {codename = "genesis"},
+  {codename = "genesis"},  -- non-kernel, but State:new flushes ECS manually
   {codename = "update_sound", live = true},
   {codename = "update_runner", live = true},  -- together with acting
   {codename = "acting", live = true},
   {codename = "animation", live = true},
-  {codename = "ui_update"},
+  {codename = "ui_update"},  -- kernel
   {codename = "drifting", live = true},
   {codename = "timed_death", live = true},
   {codename = "running", live = true},
 
   -- love.draw
-  {codename = "drawing"},
+  {codename = "drawing"},  -- partially kernel
 }
 
 return Fun.iter(systems)

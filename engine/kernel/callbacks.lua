@@ -1,3 +1,4 @@
+local ui = require("engine.tech.ui")
 local memory = require("engine.tech.shaders.memory")
 local saves = require("engine.kernel.saves")
 local state = require("engine.state")
@@ -64,12 +65,30 @@ love.load = function(args)
   Log.info("Finished love.load")
 end
 
-local handle_event = function(event, ...)
+local handle_event = function(event, a,b,c,d,e,f)
   if not Kernel._is_active then return end
-  State._world:update(function(_, system) return system.base_callback == event end, ...)
+
+  if event == "keypressed" then
+    local scancode = b
+    ui.handle_keypress(scancode)
+
+    if Kernel.debug and
+      (love.keyboard.isDown("rctrl") or love.keyboard.isDown("lctrl")) and
+      scancode == "d"
+    then
+      Log.info("Ctrl+D")
+      love.event.quit()
+    end
+  end
+
+  State._world:update(
+    function(_, system) return system.base_callback == event end,
+    a,b,c,d,e,f
+  )
 end
 
 love.run = function()
+  --- @diagnostic disable-next-line:undefined-field
   love.load(love.arg.parseGameArguments(arg))
 
   love.timer.step()
