@@ -15,9 +15,12 @@ local kernel = {}
 local methods = {}
 local mt = {__index = methods}
 
+--- @param args table
 --- @return kernel
-kernel.new = function()
+kernel.new = function(args)
   return setmetatable({
+    args = args,
+    debug = args.debug,
     _specific_key_rates = {},
     _delays = {},
     frame_n = 0,

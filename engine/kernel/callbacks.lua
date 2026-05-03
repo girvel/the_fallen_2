@@ -11,8 +11,7 @@ love.load = function(args)
   Log.info("Started love.load")
 
   args = cli.parse(args)
-  Kernel.args = args
-  Kernel.debug = args.debug
+  Kernel = require("engine.kernel").new(args)
   Log.info("CLI args: %s", args)
 
   if args.profiler then

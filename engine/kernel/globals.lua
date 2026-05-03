@@ -4,9 +4,6 @@ local KB = 1024
 Ldump.upvalue_warning_threshold = 1024 * KB
 
 
-Kernel = require("engine.kernel").new()
-
-
 Argparse = require("engine.lib.argparse")
 
 Common = require("engine.lib.common")
