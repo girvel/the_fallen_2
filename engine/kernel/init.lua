@@ -2,6 +2,7 @@ local kernel = {}
 
 --- @class kernel middleware between fallen engine and LOVE
 --- @field gui gui
+--- @field overlay debug_overlay
 --- @field args table CLI args
 --- @field debug boolean
 --- @field frame_n integer
@@ -21,6 +22,7 @@ local mt = {__index = methods}
 kernel.new = function(args)
   return setmetatable({
     gui = require("engine.gui").new(),
+    overlay = require("engine.kernel.debug_overlay").new(args.debug),
     args = args,
     debug = args.debug,
     frame_n = 0,

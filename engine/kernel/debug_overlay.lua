@@ -4,7 +4,7 @@ local ui = require("engine.tech.ui")
 
 local debug_overlay = {}
 
---- @class state_debug
+--- @class debug_overlay
 --- @field points table<any, overlay_point>
 --- @field _show_points boolean
 --- @field _show_fps boolean
@@ -16,7 +16,7 @@ local methods = {}
 local mt = {__index = methods}
 
 --- @param is_debug boolean
---- @return state_debug
+--- @return debug_overlay
 debug_overlay.new = function(is_debug)
   is_debug = not not is_debug
   return setmetatable({

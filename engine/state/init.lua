@@ -15,7 +15,6 @@ local state = {}
 --- @field quests state_quests
 --- @field hostility state_hostility
 --- @field audio state_audio
---- @field debug_overlay state_debug
 --- @field period state_period
 --- @field uid state_uid
 --- @field stats state_stats
@@ -41,7 +40,6 @@ local replace_modules = function(self)
   self.quests = require("engine.state.quests").new()
   self.hostility = require("engine.state.hostility").new()
   self.audio = require("engine.state.audio").new()
-  self.debug_overlay = require("engine.state.debug_overlay").new(Kernel.debug)
   self.period = require("engine.state.period").new()
   self.uid = require("engine.state.uid").new()
   self.stats = require("engine.state.stats").new()
