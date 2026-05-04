@@ -1,6 +1,6 @@
 local sprite = require("engine.tech.sprite")
 local colors = require("engine.tech.colors")
-local gui_elements = require("engine.state.mode.gui_elements")
+local gui_elements = require("engine.gui.gui_elements")
 local ui = require("engine.tech.ui")
 local item = require("engine.tech.item")
 

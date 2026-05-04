@@ -1,10 +1,10 @@
 local ui = require("engine.tech.ui")
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 
 
 local confirmation = {}
 
---- @class state_mode_confirmation
+--- @class gui_confirmation
 --- @field type "confirmation"
 --- @field message string
 --- @field f fun()
@@ -12,7 +12,7 @@ local confirmation = {}
 local methods = {}
 confirmation.mt = {__index = methods}
 
---- @return state_mode_confirmation
+--- @return gui_confirmation
 confirmation.new = function(prev, message, f)
   return setmetatable({
     type = "confirmation",

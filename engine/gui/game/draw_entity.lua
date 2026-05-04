@@ -1,8 +1,8 @@
 local sprite = require("engine.tech.sprite")
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 
 
---- @param self state_mode_game
+--- @param self gui_game
 --- @param entity table
 --- @param dt number
 local draw_entity = function(self, entity, dt)

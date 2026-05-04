@@ -1,6 +1,6 @@
 local class = require("engine.mech.class")
 local fighter_class = require("engine.mech.class.fighter")
-local gui_elements = require("engine.state.mode.gui_elements")
+local gui_elements = require("engine.gui.gui_elements")
 local ui = require("engine.tech.ui")
 
 
@@ -24,7 +24,7 @@ fighter.init_data = function(data)
   return data
 end
 
---- @param creator state_mode_creator
+--- @param creator gui_creator
 fighter.draw_pane = function(creator, dt, data)
   if data.class_level == 1 then
     creator:start_ability(gui_elements.fighting_styles, true)
@@ -53,7 +53,7 @@ fighter.draw_pane = function(creator, dt, data)
   end
 end
 
---- @param creator state_mode_creator
+--- @param creator gui_creator
 fighter.submit = function(creator, data)
   local result = {}
 

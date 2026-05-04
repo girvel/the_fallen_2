@@ -1,6 +1,6 @@
 local items = require("engine.mech.items")
 local ui = require("engine.tech.ui")
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 
 
 local HAIR_TYPES = {
@@ -25,14 +25,14 @@ local SKIN = {
 
 local appearance_editor = {}
 
---- @class state_mode_appearance_editor
+--- @class gui_appearance_editor
 --- @field type "appearance_editor"
---- @field _prev state_mode_game
+--- @field _prev gui_game
 --- @field model table
 local methods = {}
 appearance_editor.mt = {__index = methods}
 
---- @return state_mode_appearance_editor
+--- @return gui_appearance_editor
 appearance_editor.new = function(prev)
   return setmetatable({
     type = "appearance_editor",

@@ -1,17 +1,17 @@
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 local ui = require("engine.tech.ui")
 
 
 local save_menu = {}
 
---- @class state_mode_save_menu
+--- @class gui_save_menu
 --- @field type "save_menu"
 --- @field _prev table
 local methods = {}
 local mt = {__index = methods}
 
 --- @param prev table
---- @return state_mode_save_menu
+--- @return gui_save_menu
 save_menu.new = function(prev)
   return setmetatable({
     type = "save_menu",

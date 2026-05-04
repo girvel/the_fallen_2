@@ -1,11 +1,11 @@
 local ui = require("engine.tech.ui")
 local tcod = require("engine.tech.tcod")
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 
 
 local start_menu = {}
 
---- @class state_mode_start_menu
+--- @class gui_start_menu
 --- @field type "start_menu"
 local methods = {}
 local mt = {__index = methods}

@@ -1,17 +1,17 @@
 local ui = require("engine.tech.ui")
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 
 
 local warning = {}
 
---- @class state_mode_warning
+--- @class gui_warning
 --- @field type "warning"
 --- @field message string
 --- @field _prev table
 local methods = {}
 warning.mt = {__index = methods}
 
---- @return state_mode_warning
+--- @return gui_warning
 warning.new = function(prev, message)
   ui.reset_selection()
   return setmetatable({

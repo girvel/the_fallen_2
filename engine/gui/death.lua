@@ -1,11 +1,11 @@
 local sprite = require("engine.tech.sprite")
 local ui = require("engine.tech.ui")
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 
 
 local death = {}
 
---- @class state_mode_death
+--- @class gui_death
 --- @field type "death"
 local methods = {}
 local mt = {__index = methods}
@@ -34,7 +34,7 @@ methods.draw_gui = function(self)
   ui.finish_frame()
 end
 
---- @return state_mode_death
+--- @return gui_death
 death.new = function()
   return setmetatable({
     type = "death",

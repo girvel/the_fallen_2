@@ -9,9 +9,9 @@ local base_player = require("engine.state.player.base")
 local ui = require("engine.tech.ui")
 local actions = require("engine.mech.actions")
 local translation  = require("engine.tech.translation")
-local gui = require("engine.state.mode.gui_elements")
+local gui = require("engine.gui.gui_elements")
 local fighter = require("engine.mech.class.fighter")
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 local interactive = require("engine.tech.interactive")
 local api         = require("engine.tech.api")
 
@@ -170,7 +170,7 @@ local draw_gui, draw_sidebar, draw_top_bars, draw_action_grid, draw_resources, d
   draw_cancel_action_grid, draw_upcast_action_grid,
   use_mouse, draw_curtain
 
---- @param self state_mode_game
+--- @param self gui_game
 --- @param dt number
 draw_gui = function(self, dt)
   is_compact = love.graphics.getHeight() < 900

@@ -6,20 +6,20 @@ local sound    = require("engine.tech.sound")
 local mode = {}
 
 local STATES = {
-  start_menu = require("engine.state.mode.start_menu"),
-  game = require("engine.state.mode.game"),
-  loading_screen = require("engine.state.mode.loading_screen"),
-  escape_menu = require("engine.state.mode.escape_menu"),
-  journal = require("engine.state.mode.journal"),
-  save_menu = require("engine.state.mode.save_menu"),
-  load_menu = require("engine.state.mode.load_menu"),
-  death = require("engine.state.mode.death"),
-  exit_confirmation = require("engine.state.mode.exit_confirmation"),
-  ending = require("engine.state.mode.ending"),
-  creator = require("engine.state.mode.creator"),
-  warning = require("engine.state.mode.warning"),
-  confirmation = require("engine.state.mode.confirmation"),
-  appearance_editor = require("engine.state.mode.appearance_editor"),
+  start_menu = require("engine.gui.start_menu"),
+  game = require("engine.gui.game"),
+  loading_screen = require("engine.gui.loading_screen"),
+  escape_menu = require("engine.gui.escape_menu"),
+  journal = require("engine.gui.journal"),
+  save_menu = require("engine.gui.save_menu"),
+  load_menu = require("engine.gui.load_menu"),
+  death = require("engine.gui.death"),
+  exit_confirmation = require("engine.gui.exit_confirmation"),
+  ending = require("engine.gui.ending"),
+  creator = require("engine.gui.creator"),
+  warning = require("engine.gui.warning"),
+  confirmation = require("engine.gui.confirmation"),
+  appearance_editor = require("engine.gui.appearance_editor"),
 }
 
 local OPEN_JOURNAL = sound.multiple("engine/assets/sounds/open_journal", .3)
@@ -27,7 +27,7 @@ local CLOSE_JOURNAL = sound.multiple("engine/assets/sounds/close_journal", 1)
 
 local empty_f = function() end
 
---- @class state_mode
+--- @class gui
 --- @field _mode table
 local methods = {}
 mode.mt = {__index = methods}

@@ -1,18 +1,18 @@
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 local ui = require("engine.tech.ui")
 
 
 local escape_menu = {}
 
---- @class state_mode_escape_menu
+--- @class gui_escape_menu
 --- @field type "escape_menu"
 --- @field has_saved boolean
---- @field _prev state_mode_game
+--- @field _prev gui_game
 local methods = {}
 local mt = {__index = methods}
 
---- @param prev state_mode_game
---- @return state_mode_escape_menu
+--- @param prev gui_game
+--- @return gui_escape_menu
 escape_menu.new = function(prev)
   return setmetatable({
     type = "escape_menu",

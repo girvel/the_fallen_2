@@ -14,7 +14,7 @@ local is_blind_for = function(x, y)
 end
 
 
---- @param self state_mode_game
+--- @param self gui_game
 --- @param grid grid<entity>
 --- @param dt number
 local draw_grid = function(self, layer, grid, dt)

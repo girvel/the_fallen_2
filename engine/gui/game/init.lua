@@ -2,17 +2,17 @@ local game = {}
 
 --- @alias gui_input_mode "normal"|"target"
 
---- @class state_mode_game
+--- @class gui_game
 --- @field type "game"
 --- @field _sprite_batches table<string, love.SpriteBatch>
 --- @field _temp_canvas love.Canvas
 --- @field _main_canvas love.Canvas
 local methods = {
-  draw_entity = require("engine.state.mode.game.draw_entity"),
-  draw_gui = require("engine.state.mode.game.draw_gui"),
-  draw_grid = require("engine.state.mode.game.draw_grid"),
-  preprocess = require("engine.state.mode.game.preprocess"),
-  postprocess = require("engine.state.mode.game.postprocess"),
+  draw_entity = require("engine.gui.game.draw_entity"),
+  draw_gui = require("engine.gui.game.draw_gui"),
+  draw_grid = require("engine.gui.game.draw_grid"),
+  preprocess = require("engine.gui.game.preprocess"),
+  postprocess = require("engine.gui.game.postprocess"),
 }
 
 game.mt = {__index = methods}

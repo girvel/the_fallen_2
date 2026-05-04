@@ -5,7 +5,7 @@ local ui = require("engine.tech.ui")
 
 local loading_screen = {}
 
---- @class state_mode_loading_screen
+--- @class gui_loading_screen
 --- @field type "loading_screen"
 --- @field _loading_coroutine thread
 --- @field _next_state fun()

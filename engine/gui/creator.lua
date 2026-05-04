@@ -6,7 +6,7 @@ local xp = require("engine.mech.xp")
 local translation = require("engine.tech.translation")
 local abilities = require("engine.mech.abilities")
 local colors = require("engine.tech.colors")
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 local ui = require("engine.tech.ui")
 
 
@@ -31,9 +31,9 @@ local creator = {}
 
 --- @alias creator_model {[0]: creator_base_pane, [1]: creator_pane, [2]: creator_pane, [3]: creator_pane, [4]: creator_pane, [5]: creator_pane, [6]: creator_pane, [7]: creator_pane, [8]: creator_pane, [9]: creator_pane}
 
---- @class state_mode_creator
+--- @class gui_creator
 --- @field type "creator"
---- @field _prev state_mode_game
+--- @field _prev gui_game
 --- @field model creator_model
 --- @field pane_i integer
 --- @field is_disabled boolean
@@ -69,8 +69,8 @@ local CLASSES = {
 
 local CREATOR_CLASSES = Table.do_folder("engine/state/mode/creator_classes")
 
---- @param prev state_mode_game
---- @return state_mode_creator
+--- @param prev gui_game
+--- @return gui_creator
 creator.new = function(prev)
   local current_level = State.player.level
 
@@ -213,7 +213,7 @@ methods.draw_gui = function(self, dt)
   tk.finish_window()
 end
 
---- @param self state_mode_creator
+--- @param self gui_creator
 --- @param dt number
 draw_base_pane = function(self, dt)
   local data = self.model[0]
@@ -359,7 +359,7 @@ draw_base_pane = function(self, dt)
   end
 end
 
---- @param self state_mode_creator
+--- @param self gui_creator
 --- @param dt number
 draw_pane = function(self, dt)
   local data = self.model[self.pane_i]
@@ -413,7 +413,7 @@ draw_pane = function(self, dt)
   CREATOR_CLASSES[data.class.codename].draw_pane(self, dt, data)
 end
 
---- @param self state_mode_creator
+--- @param self gui_creator
 submit = function(self)
   local perks do
     local data = self.model[0]

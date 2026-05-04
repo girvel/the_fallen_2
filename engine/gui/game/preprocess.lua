@@ -1,4 +1,4 @@
---- @param self state_mode_game
+--- @param self gui_game
 --- @param dt number
 local preprocess = function(self, dt)
   local resolution = V(love.graphics.getDimensions())

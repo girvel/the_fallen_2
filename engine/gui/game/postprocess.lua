@@ -1,7 +1,7 @@
 local memory = require("engine.tech.shaders.memory")
 
 
---- @param self state_mode_game
+--- @param self gui_game
 --- @param dt number
 local postprocess = function(self, dt)
   love.graphics.setShader()

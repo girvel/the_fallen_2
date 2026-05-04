@@ -1,18 +1,18 @@
 local colors = require("engine.tech.colors")
 local ui = require("engine.tech.ui")
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 
 
 local journal = {}
 
---- @class state_mode_journal
+--- @class gui_journal
 --- @field type "journal"
---- @field _prev state_mode_game
+--- @field _prev gui_game
 local methods = {}
 local mt = {__index = methods}
 
---- @param prev state_mode_game
---- @return state_mode_journal
+--- @param prev gui_game
+--- @return gui_journal
 journal.new = function(prev)
   return setmetatable({
     type = "journal",

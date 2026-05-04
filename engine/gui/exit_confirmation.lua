@@ -1,17 +1,17 @@
 local colors = require("engine.tech.colors")
-local tk = require("engine.state.mode.tk")
+local tk = require("engine.gui.tk")
 local ui = require("engine.tech.ui")
 
 
 local exit_confirmation = {}
 
---- @class state_mode_exit_confirmation
+--- @class gui_exit_confirmation
 --- @field type "exit_confirmation"
 --- @field _prev table
 local methods = {}
 local mt = {__index = methods}
 
---- @return state_mode_exit_confirmation
+--- @return gui_exit_confirmation
 exit_confirmation.new = function(prev)
   return setmetatable({
     type = "exit_confirmation",

@@ -3,7 +3,7 @@ local ui = require("engine.tech.ui")
 
 local ending = {}
 
---- @class state_mode_ending
+--- @class gui_ending
 --- @field is_good boolean
 local methods = {}
 ending.mt = {__index = methods}
@@ -34,7 +34,7 @@ methods.draw_gui = function(self)
   ui.finish_frame()
 end
 
---- @return state_mode_ending
+--- @return gui_ending
 ending.new = function(is_good)
   return setmetatable({
     type = "ending",
