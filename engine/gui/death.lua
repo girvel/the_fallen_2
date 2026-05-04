@@ -27,7 +27,7 @@ methods.draw_gui = function(self)
     ui.finish_font()
     ui.start_font(36)
       if ui.choice({"Продолжить"}) then
-        State.mode:to_start_screen()
+        Kernel.gui:to_start_screen()
       end
     ui.finish_font()
   ui.finish_alignment()

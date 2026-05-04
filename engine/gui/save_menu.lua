@@ -25,8 +25,8 @@ methods.draw_gui = function(self, dt)
   local in_combat = State.combat
   local in_cutscene = State.level.locked_entities[State.player]
   if in_combat or in_cutscene then
-    State.mode:close_menu()
-    State.mode:show_warning(
+    Kernel.gui:close_menu()
+    Kernel.gui:show_warning(
       "Невозможно сохранить игру во время %s",
       in_combat and "битвы" or "диалога"
     )
@@ -50,7 +50,7 @@ methods.draw_gui = function(self, dt)
 
     if save or escape_pressed then
       ui.reset_selection()
-      State.mode:close_menu()
+      Kernel.gui:close_menu()
     end
   ui.finish_font()
   tk.finish_window()

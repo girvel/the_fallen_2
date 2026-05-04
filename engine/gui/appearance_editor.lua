@@ -53,14 +53,14 @@ appearance_editor.padding = 20
 
 methods.draw_gui = function(self, dt)
   if ui.keyboard("return") then
-    State.mode:confirm(
+    Kernel.gui:confirm(
       "Закончить редактирование внешности персонажа?",
-      function() State.mode:close_menu() end
+      function() Kernel.gui:close_menu() end
     )
   end
 
   if ui.keyboard("escape") then
-    State.mode:open_menu("escape_menu")
+    Kernel.gui:open_menu("escape_menu")
   end
 
   local parent_w = love.graphics.getWidth()

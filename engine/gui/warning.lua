@@ -35,7 +35,7 @@ methods.draw_gui = function(self)
     local n = ui.choice({"OK"})
 
     if n == 1 or ui.keyboard("escape") then
-      State.mode:close_menu()
+      Kernel.gui:close_menu()
     end
 
     h = ui.get_height()

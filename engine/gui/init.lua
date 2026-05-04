@@ -50,19 +50,19 @@ methods._set_mode = function(self, mode_value)
 end
 
 methods.draw_gui = function(self, dt)
-  Error("No State.mode._mode is set")
+  Error("No Kernel.gui._mode is set")
 end
 
 methods.draw_entity = function(self, entity, dt)
-  Error("No State.mode._mode is set")
+  Error("No Kernel.gui._mode is set")
 end
 
 methods.preprocess = function(self, entity, dt)
-  Error("No State.mode._mode is set")
+  Error("No Kernel.gui._mode is set")
 end
 
 methods.postprocess = function(self, entity, dt)
-  Error("No State.mode._mode is set")
+  Error("No Kernel.gui._mode is set")
 end
 
 methods.start_game = function(self)

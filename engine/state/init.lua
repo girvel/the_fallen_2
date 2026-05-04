@@ -9,7 +9,6 @@ local sprite = require("engine.tech.sprite")
 local state = {}
 
 --- @class state
---- @field mode gui
 --- @field runner state_runner
 --- @field camera state_camera
 --- @field combat state_combat?
@@ -37,7 +36,6 @@ state.mt = {__index = methods}
 
 --- @param self state
 local replace_modules = function(self)
-  self.mode = require("engine.gui").new()
   self.runner = require("engine.state.runner").new()
   self.camera = require("engine.state.camera").new()
   self.quests = require("engine.state.quests").new()

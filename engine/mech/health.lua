@@ -80,7 +80,7 @@ health.set_hp = function(target, value)
   end
 
   if target.player_flag then
-    State.mode:player_has_died()
+    Kernel.gui:player_has_died()
     return false
   end
 

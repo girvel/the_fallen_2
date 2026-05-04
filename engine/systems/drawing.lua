@@ -21,17 +21,17 @@ return Tiny.sortedProcessingSystem {
 
     love.graphics.clear(colors.black)
 
-    State.mode:preprocess(dt)
+    Kernel.gui:preprocess(dt)
   end,
 
   process = function(_, entity, dt)
-    State.mode:draw_entity(entity, dt)
+    Kernel.gui:draw_entity(entity, dt)
   end,
 
   postProcess = function(_, dt)
-    State.mode:postprocess(dt)
+    Kernel.gui:postprocess(dt)
     ui.start()
-    State.mode:draw_gui(dt)
+    Kernel.gui:draw_gui(dt)
     State.debug_overlay:draw(dt)
     ui.finish()
   end,

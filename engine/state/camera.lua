@@ -76,7 +76,7 @@ methods._update = function(self, dt)
       local tx, ty = unpack(target.position)
 
       if target == State.player
-        and State.mode._mode.type == "game"
+        and Kernel.gui._mode.type == "game"
         and State.player:can_act()
         and State.player.resources.movement > 0
       then

@@ -39,13 +39,13 @@ methods.draw_gui = function(self, dt)
     local escape_pressed = ui.keyboard("escape")
 
     if n == 1 or escape_pressed then
-      State.mode:close_menu()
+      Kernel.gui:close_menu()
     elseif n == 2 then
-      State.mode:open_menu("save_menu")
+      Kernel.gui:open_menu("save_menu")
     elseif n == 3 then
-      State.mode:open_menu("load_menu")
+      Kernel.gui:open_menu("load_menu")
     elseif n == 4 then
-      State.mode:attempt_exit()
+      Kernel.gui:attempt_exit()
     end
   ui.finish_font()
   tk.finish_window()

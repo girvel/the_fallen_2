@@ -35,7 +35,7 @@ methods.draw_gui = function(self, dt)
 
     if save or escape_pressed then
       ui.reset_selection()
-      State.mode:close_menu()
+      Kernel.gui:close_menu()
     end
   ui.finish_font()
   tk.finish_window()

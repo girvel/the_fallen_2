@@ -21,7 +21,7 @@ local display_tcod_error = not tcod.ok
 methods.draw_gui = function()
   if display_tcod_error then
     display_tcod_error = false
-    State.mode:show_warning(
+    Kernel.gui:show_warning(
       "Невозможно загрузить библиотеку libtcod, поля зрения и поиск путей не будут работать." ..
       "\n\nВозможно, путь к папке с игрой содержит русские символы. Попробуйте " ..
       "переместить её в другое место."
@@ -42,9 +42,9 @@ methods.draw_gui = function()
     end
 
     if choice == 1 then
-      State.mode:start_game()
+      Kernel.gui:start_game()
     elseif choice == 2 then
-      State.mode:open_menu("load_menu")
+      Kernel.gui:open_menu("load_menu")
     elseif choice == 3 then
       Log.info("Exiting from the main menu")
       love.event.quit()

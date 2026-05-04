@@ -25,13 +25,13 @@ tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
 methods.draw_gui = function(self, dt)
   if ui.keyboard("escape") or ui.keyboard("j") then
     State.quests:new_content_is_read()
-    State.mode:close_menu()
+    Kernel.gui:close_menu()
   end
 
   if ui.keyboard("n") then
     State.quests:new_content_is_read()
-    State.mode:close_menu()
-    State.mode:open_menu("creator")
+    Kernel.gui:close_menu()
+    Kernel.gui:open_menu("creator")
   end
 
   tk.start_window("center", "center", "read_max", "max")

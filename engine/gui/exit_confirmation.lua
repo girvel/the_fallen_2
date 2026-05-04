@@ -48,7 +48,7 @@ methods.draw_gui = function(self)
     })
 
     if n == 1 or ui.keyboard("escape") then
-      State.mode:close_menu()
+      Kernel.gui:close_menu()
     elseif n == 2 then
       Log.info("Exiting the game from escape menu")
       love.event.quit()

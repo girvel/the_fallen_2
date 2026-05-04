@@ -151,21 +151,21 @@ local draw_base_pane, draw_pane, submit
 
 methods.draw_gui = function(self, dt)
   if ui.keyboard("escape") or ui.keyboard("n") then
-    State.mode:close_menu()
+    Kernel.gui:close_menu()
   end
 
   if ui.keyboard("j") then
-    State.mode:close_menu()
-    State.mode:open_menu("journal")
+    Kernel.gui:close_menu()
+    Kernel.gui:open_menu("journal")
   end
 
   if not self.is_disabled and ui.keyboard("return") then
     if self.model[0].points > 0 then
-      State.mode:show_warning(
+      Kernel.gui:show_warning(
         "Редактирование персонажа не закончено: не все очки способностей израсходованы"
       )
     else
-      State.mode:confirm(
+      Kernel.gui:confirm(
         "Закончить создание персонажа?",
         function() submit(self) end
       )
@@ -452,7 +452,7 @@ submit = function(self)
   Log.info("Submitting a character build: %s", mixin)
   Table.extend(State.player, mixin)
   State.player:rest("full")
-  State.mode:close_menu()
+  Kernel.gui:close_menu()
 end
 
 --- @param possible_values any[]

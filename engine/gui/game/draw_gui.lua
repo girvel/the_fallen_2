@@ -184,7 +184,7 @@ draw_gui = function(self, dt)
   draw_suggestion()
 
   if ui.keyboard("escape") then
-    State.mode:open_menu("escape_menu")
+    Kernel.gui:open_menu("escape_menu")
   end
 end
 
@@ -325,7 +325,7 @@ draw_keyboard_action_grid = function(self)
     do
       local button = ui.key_button(gui.escape_menu, "escape")
       if button.is_clicked then
-        State.mode:open_menu("escape_menu")
+        Kernel.gui:open_menu("escape_menu")
       end
       if button.is_mouse_over then
         hint = "меню"
@@ -341,7 +341,7 @@ draw_keyboard_action_grid = function(self)
         tk.highlight()
       end
       if button.is_clicked then
-        State.mode:open_menu("journal")
+        Kernel.gui:open_menu("journal")
       end
       if button.is_mouse_over then
         hint = "журнал"
@@ -361,7 +361,7 @@ draw_keyboard_action_grid = function(self)
         tk.highlight()
       end
       if button.is_clicked then
-        State.mode:open_menu("creator")
+        Kernel.gui:open_menu("creator")
       end
       if button.is_mouse_over then
         hint = "персонаж"

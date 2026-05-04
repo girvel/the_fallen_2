@@ -20,15 +20,16 @@ local mt = {__index = methods}
 --- @return kernel
 kernel.new = function(args)
   return setmetatable({
+    gui = require("engine.gui").new(),
     args = args,
     debug = args.debug,
-    _specific_key_rates = {},
-    _delays = {},
     frame_n = 0,
     cpu_time = 0,
     start_time = 0,
-    _is_active = false,
     screenshot = love.graphics.newCanvas(),
+    _specific_key_rates = {},
+    _delays = {},
+    _is_active = false,
   }, mt)
 end
 
