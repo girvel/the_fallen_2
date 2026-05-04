@@ -1,6 +1,5 @@
 local ui = require("engine.tech.ui")
 local tcod = require("engine.tech.tcod")
-local tk = require("engine.gui.tk")
 
 
 local start_menu = {}

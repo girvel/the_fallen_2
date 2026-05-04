@@ -40,11 +40,11 @@ methods.draw = function(self, dt)
   self._show_rails    = self._show_rails    ~= ui.keyboard("f5")
   self._show_console  = self._show_console  ~= ui.keyboard("f6")
 
-  if self._show_points then draw_points(self.points) end
+  if State and self._show_points then draw_points(self.points) end
   if self._show_fps then report_fps() end
-  if self._show_ai then report_ai() end
-  if self._show_scenes then report_scenes() end
-  if self._show_rails then report_rails() end
+  if State and self._show_ai then report_ai() end
+  if State and self._show_scenes then report_scenes() end
+  if State and self._show_rails then report_rails() end
   if self._show_console then report_console() end
 end
 
@@ -66,6 +66,8 @@ draw_points = function(points)
     local x, y = unpack(v)
     love.graphics.circle("fill", x, y, 3)
     love.graphics.print(tostring(k), x, y)
+
+    ::continue::
   end
   love.graphics.setColor(Vector.white)
   ui.finish_font()

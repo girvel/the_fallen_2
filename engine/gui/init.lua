@@ -1,3 +1,4 @@
+local state = require("engine.state")
 local ui = require("engine.tech.ui")
 local animated = require("engine.tech.animated")
 local level    = require("engine.tech.level")
@@ -70,7 +71,10 @@ methods.start_game = function(self)
   assert(self._mode.type == "start_menu")
   Log.info("Starting new game...")
   self:_set_mode(STATES.loading_screen.new(
-    coroutine.create(function() return State:load_level("level") end),
+    coroutine.create(function()
+      State = state.new(assert(love.filesystem.load("engine/systems/init.lua"))())
+      State:load_level("level")
+    end),
     function() return self:start_game_finish() end
   ))
 end

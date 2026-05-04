@@ -16,6 +16,9 @@ love.load = function(args)
   Kernel = require("engine.kernel").new(args)
   Log.info("CLI args: %s", args)
 
+  assert = safety.assert
+  Error = safety.error
+
   if args.profiler then
     Profile.start()
     async.lag_threshold = 1
@@ -47,10 +50,6 @@ love.load = function(args)
   else
     love.window.updateMode(0, 0, {fullscreen = true, minheight = 200, minwidth = 200})
   end
-
-  State = state.new(assert(love.filesystem.load("engine/systems/init.lua"))())
-  assert = safety.assert
-  Error = safety.error
 
   if args.youtube then
     if args.resolution then
@@ -90,7 +89,6 @@ local handle_event = function(event, a,b,c,d,e,f)
     ui.handle_mouserelease(c)
   elseif event == "update" then
     ui.handle_update(a)
-  elseif event == "draw" then
   end
 
   if State then
@@ -98,9 +96,6 @@ local handle_event = function(event, a,b,c,d,e,f)
       function(_, system) return system.base_callback == event end,
       a,b,c,d,e,f
     )
-  end
-
-  if event == "draw" then
   end
 end
 
