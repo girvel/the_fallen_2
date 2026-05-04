@@ -57,11 +57,11 @@ methods.draw_entity = function(self, entity, dt)
   Error("No Kernel.gui._mode is set")
 end
 
-methods.preprocess = function(self, entity, dt)
+methods.preprocess = function(self, dt)
   Error("No Kernel.gui._mode is set")
 end
 
-methods.postprocess = function(self, entity, dt)
+methods.postprocess = function(self, dt)
   Error("No Kernel.gui._mode is set")
 end
 

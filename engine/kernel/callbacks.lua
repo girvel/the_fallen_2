@@ -1,3 +1,4 @@
+local colors = require("engine.tech.colors")
 local ui = require("engine.tech.ui")
 local memory = require("engine.tech.shaders.memory")
 local saves = require("engine.kernel.saves")
@@ -89,12 +90,18 @@ local handle_event = function(event, a,b,c,d,e,f)
     ui.handle_mouserelease(c)
   elseif event == "update" then
     ui.handle_update(a)
+  elseif event == "draw" then
   end
 
-  State._world:update(
-    function(_, system) return system.base_callback == event end,
-    a,b,c,d,e,f
-  )
+  if State then
+    State._world:update(
+      function(_, system) return system.base_callback == event end,
+      a,b,c,d,e,f
+    )
+  end
+
+  if event == "draw" then
+  end
 end
 
 love.run = function()
@@ -198,12 +205,17 @@ love.run = function()
 
       love.graphics.setCanvas(Kernel.screenshot)
       love.graphics.origin()
-      love.graphics.clear(love.graphics.getBackgroundColor())
-    end
+      love.graphics.clear(colors.black)
+      Kernel.gui:preprocess(dt)
 
-    handle_event("draw", dt)
+      handle_event("draw", dt)
 
-    if Kernel._is_active then
+      Kernel.gui:postprocess(dt)
+      ui.start()
+        Kernel.gui:draw_gui(dt)
+        -- NEXT debug_overlay
+        -- State.debug_overlay:draw(a)
+      ui.finish()
       love.graphics.setCanvas()
       love.graphics.draw(Kernel.screenshot)
     end
