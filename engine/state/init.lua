@@ -155,6 +155,9 @@ end
 --- @async
 --- @param path string
 methods.load_level = function(self, path)
+  -- :load_level is not part of .new, because entities being created during loading should
+  -- still have access to State.runner, State.rails, State.level etc.
+
   async.lag_threshold = .5
   self.is_loaded = false
   Log.info("Loading level %s", path)
@@ -190,7 +193,6 @@ methods.load_level = function(self, path)
   for i, e in ipairs(load_data.entities) do
     e = self:add(e)
     if e.player_flag then self.player = e --[[@as player]] end
-    -- if e.on_load then e:on_load() end
 
     if i % 500 == 0 and love.timer.getTime() - last_yield_t >= async.yield_period then
       coroutine.yield("add", i / #load_data.entities)
@@ -201,7 +203,7 @@ methods.load_level = function(self, path)
   self:flush()
 
   if not self.player then
-    error("There's no player in the level")
+    Error("There's no player in the level")
   end
 
   self.camera:immediate_center()
