@@ -30,8 +30,8 @@ end
 
 init_debug = function()
   item.give(State.player, State:add(items.short_bow()))
-  State.player.hp = 100
-  State.player.max_hp = 100
+  -- State.player.hp = 100
+  -- State.player.max_hp = 100
   State.player.resources.spell_slots_1 = 4
   State.player.resources.spell_slots_2 = 4
   State.player.resources.spell_slots_3 = 4

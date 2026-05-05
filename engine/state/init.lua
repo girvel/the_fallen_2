@@ -33,32 +33,26 @@ local state = {}
 local methods = {}
 state.mt = {__index = methods}
 
---- @param self state
-local replace_modules = function(self)
-  self.runner = require("engine.state.runner").new()
-  self.camera = require("engine.state.camera").new()
-  self.quests = require("engine.state.quests").new()
-  self.hostility = require("engine.state.hostility").new()
-  self.audio = require("engine.state.audio").new()
-  self.period = require("engine.state.period").new()
-  self.uid = require("engine.state.uid").new()
-  self.stats = require("engine.state.stats").new()
-end
-
 --- @param systems table[]
 --- @return state
 state.new = function(systems)
-  local result = setmetatable({
+  return setmetatable({
     is_loaded = false,
+
+    runner = require("engine.state.runner").new(),
+    camera = require("engine.state.camera").new(),
+    quests = require("engine.state.quests").new(),
+    hostility = require("engine.state.hostility").new(),
+    audio = require("engine.state.audio").new(),
+    period = require("engine.state.period").new(),
+    uid = require("engine.state.uid").new(),
+    stats = require("engine.state.stats").new(),
 
     _world = Tiny.world(unpack(systems)),
     _entities = {},
     _entities_to_add = {},
     _entities_to_remove = {},
   }, state.mt)
-
-  replace_modules(result)
-  return result
 end
 
 --- Schedules entity to be added
@@ -156,16 +150,6 @@ methods.flush = function(self)
   end
   self._entities_to_add = {}
   self._world:refresh()
-end
-
-methods.reset = function(self)
-  Log.info("State:reset()")
-  local to_remove = Table.shallow_copy(self._entities)
-  for e, _ in pairs(to_remove) do
-    self:remove(e, true)
-  end
-  self:flush()
-  replace_modules(self)
 end
 
 --- @async
