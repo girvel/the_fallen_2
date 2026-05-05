@@ -211,8 +211,10 @@ methods.load_level = function(self, path)
     if i % 500 == 0 and love.timer.getTime() - last_yield_t >= async.yield_period then
       coroutine.yield("add", i / #load_data.entities)
       last_yield_t = love.timer.getTime()
+      self:flush()
     end
   end
+  self:flush()
 
   if not self.player then
     error("There's no player in the level")

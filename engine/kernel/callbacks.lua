@@ -91,7 +91,7 @@ local handle_event = function(event, a,b,c,d,e,f)
     ui.handle_update(a)
   end
 
-  if State then
+  if State and State.is_loaded then
     State._world:update(
       function(_, system) return system.base_callback == event end,
       a,b,c,d,e,f

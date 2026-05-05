@@ -13,9 +13,7 @@ return Tiny.sortedProcessingSystem {
   end,
 
   preProcess = function(_, dt)
-    if State.is_loaded then
-      State.camera:_update(dt)
-    end
+    State.camera:_update(dt)
   end,
 
   process = function(_, entity, dt)
