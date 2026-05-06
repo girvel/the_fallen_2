@@ -6,6 +6,11 @@ local tcod = require("engine.tech.tcod")
 local sprite = require("engine.tech.sprite")
 
 
+-- NEXT times:
+-- State.real_time doesn't count loading and inactivity
+-- State.game_time is basically real_time until combat, then it's +6 (seconds) each turn
+-- Kernel.cpu_time includes loading, does not include inactivity
+
 local state = {}
 
 --- @class state
@@ -274,6 +279,8 @@ end
 methods.in_combat = function(self, entity)
   return State.combat and Table.contains(State.combat.list, entity)
 end
+
+-- get_time is love.timer.getTime() - Kernel.load_level_moment + State._total_time
 
 Ldump.mark(state, {mt = "const"}, ...)
 return state

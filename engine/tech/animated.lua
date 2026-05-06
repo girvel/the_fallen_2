@@ -142,6 +142,7 @@ methods.animation_update = function(self, dt)
     Error("%s is missing animation %s", Name.code(self), animation.current)
   end
 
+  -- DT State.real_time
   -- even if animation is 1 frame idle, still should play out for 1-frame FXs
   animation.frame = animation.frame + dt * DEFAULT_ANIMATION_FPS
   if math.floor(animation.frame) > #current_pack then

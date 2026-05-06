@@ -734,7 +734,7 @@ draw_notification = function()
   if not prev then
     start_t = love.timer.getTime()
   end
-  local dt = love.timer.getTime() - start_t
+  local dt = love.timer.getTime() - start_t -- DT State.real_time
 
   local postfix, prefix
   if dt <= .3 then

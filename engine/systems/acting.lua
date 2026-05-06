@@ -27,6 +27,8 @@ sample_methods.observe = function(self, entity, dt) end
 local MOVE_TIMEOUT = 6
 local AI_RANGE = 50
 
+-- State.game_time
+
 return Tiny.processingSystem {
   codename = "acting",
   base_callback = "update",
