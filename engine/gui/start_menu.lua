@@ -28,8 +28,16 @@ methods.draw_gui = function()
     return
   end
 
+  ui.start_frame(0, 100)
+  ui.start_font(72)
+  ui.start_alignment("center")
+    ui.text("The Fallen II")
+  ui.finish_alignment()
+  ui.finish_font()
+  ui.finish_frame()
+
   ui.start_font(48)
-  ui.start_frame(200, 200, 500, 500)
+  ui.start_frame(100, 300, 500, 500)
     local choice = ui.choice({
       "Новая игра",
       "Загрузить игру",
