@@ -1,4 +1,3 @@
--- NEXT no live systems
 local systems = {
   -- love.update
   "genesis",
