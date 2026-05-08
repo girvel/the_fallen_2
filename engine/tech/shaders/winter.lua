@@ -3,7 +3,7 @@ local constants = require("engine.tech.constants")
 
 local winter = {}
 
-local K = State.camera.SCALE * constants.cell_size
+local K = State.camera.scale * constants.cell_size
 
 --- @param tint vector 3-dimensional
 --- @param intensity number

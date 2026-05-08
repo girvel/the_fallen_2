@@ -1017,7 +1017,7 @@ render_path = function(path, max_length)
   end
 
   if max_length then
-    local n = State.camera.SCALE * sprite.cell_size
+    local n = State.camera.scale * sprite.cell_size
     ui.start_frame(px, py, n, n - 4)
     ui.start_alignment("center", "bottom")
       ui.text("%s/%s", #path, max_length)

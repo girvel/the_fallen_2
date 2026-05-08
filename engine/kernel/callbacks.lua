@@ -55,7 +55,6 @@ love.load = function(args)
     if args.resolution then
       love.window.setPosition(200, 200)
     end
-    State.camera.SCALE = 8
   end
 
   if args.playground then

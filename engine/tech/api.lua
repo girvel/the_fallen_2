@@ -22,15 +22,16 @@ api.to_vector = function(x)
 end
 
 api.scale = function(scale, duration)
-  scale = scale or 4
+  scale = scale or State.camera.base_scale
   duration = duration or .5
+  local prev_scale = State.camera.scale
   return State.runner:run_task(function()
     local start = love.timer.getTime()
     while true do
       local now = love.timer.getTime()
       local delta = now - start
       if delta > duration then break end
-      State.camera.SCALE = 4 + (scale - 4) * delta / duration
+      State.camera.scale = prev_scale + (scale - prev_scale) * delta / duration
       State.camera:immediate_center()
       coroutine.yield()
     end
