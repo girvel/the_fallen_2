@@ -22,7 +22,7 @@ local mt = {__index = methods}
 kernel.new = function(args)
   return setmetatable({
     gui = require("engine.gui").new(),
-    overlay = require("engine.kernel.debug_overlay").new(args.debug),
+    overlay = require("engine.kernel.debug_overlay").new(args.debug and not args.youtube),
     args = args,
     debug = args.debug,
     frame_n = 0,

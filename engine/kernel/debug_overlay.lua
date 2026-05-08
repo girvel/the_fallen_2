@@ -15,17 +15,17 @@ local debug_overlay = {}
 local methods = {}
 local mt = {__index = methods}
 
---- @param is_debug boolean
+--- @param use_debug_setup boolean
 --- @return debug_overlay
-debug_overlay.new = function(is_debug)
-  is_debug = not not is_debug
+debug_overlay.new = function(use_debug_setup)
+  use_debug_setup = not not use_debug_setup
   return setmetatable({
     points = {},
     _show_points = false,
-    _show_fps = is_debug,
+    _show_fps = use_debug_setup,
     _show_ai = false,
-    _show_scenes = is_debug,
-    _show_rails = is_debug,
+    _show_scenes = use_debug_setup,
+    _show_rails = use_debug_setup,
     _show_console = false,
   }, mt)
 end
