@@ -12,6 +12,17 @@ level.grid_layers = {
   "shadows",
 }
 
+for i, l1 in ipairs(level.grid_layers) do
+  for j, l2 in ipairs(level.grid_layers) do
+    if i ~= j and l1:starts_with(l2) then
+      error(
+        ("Grid layer id %q starts with grid layer id %q; may cause ambiguity in ldtk layer parsing")
+          :format(l1, l2)
+      )
+    end
+  end
+end
+
 --- @alias layer "tiles"|"on_tiles"|"marks"|"fx_under"|"items"|"solids"|"fx_over"|"on_solids"|"weather"|"shadows"|"fx_over_shadows"
 level.layers = {
   "tiles",
@@ -87,16 +98,18 @@ level.put = function(entity)
   end
 
   local prev = grid[entity.position]
-  if prev == entity then return end
-  if prev and entity.bouncy_spawn_flag then
-    entity.position = grid:find_free_position(entity.position) or entity.position
-    prev = grid[entity.position]
-  end
-
-  if State.is_loaded and prev then
-    Log.warn("Grid collision at %s[%s]: %s replaces %s",
-      entity.grid_layer, entity.position, Name.code(entity), Name.code(grid[entity.position])
-    )
+  if prev then
+    if prev == entity then return end
+    if entity.bouncy_spawn_flag then
+      entity.position = grid:find_free_position(entity.position) or entity.position
+      prev = grid[entity.position]
+    elseif State.is_loaded then
+      Log.warn("Grid collision at %s[%s]: %s replaces %s",
+        entity.grid_layer, entity.position, Name.code(entity), Name.code(grid[entity.position])
+      )
+    else
+      State:remove(prev)
+    end
   end
 
   grid[entity.position] = entity
@@ -106,6 +119,7 @@ end
 --- @param entity entity
 --- @return nil
 level.remove = function(entity)
+  if State.grids[entity.grid_layer]:slow_get(entity.position) ~= entity then return end
   State.grids[entity.grid_layer][entity.position] = nil
 end
 

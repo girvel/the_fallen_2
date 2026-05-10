@@ -1,3 +1,4 @@
+local level = require("engine.tech.level")
 local sprite = require("engine.tech.sprite")
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] External API
@@ -208,6 +209,18 @@ put_positions = function(layer, offset, positions, captures)
   end
 end
 
+--- @param identifier string
+--- @return string
+local parse_layer_name = function(identifier)
+  for _, candidate in ipairs(level.grid_layers) do
+    if identifier:starts_with(candidate) then
+      return candidate
+    end
+  end
+  Error("Layer name %s does not start with any known grid layer identifiers", identifier)
+  return "solids"
+end
+
 --- @param captures grid<preload_capture>
 --- @param entity preload_entity
 --- @param layer string
@@ -228,16 +241,7 @@ end
 --- @param captures grid<preload_capture>
 --- @param entities table<string, preload_entity[]>
 put_entities = function(layer, offset, captures, entities)
-  local layer_name do
-    layer_name = layer.__identifier
-    local POSTFIX = "_e"
-    if not layer_name:ends_with(POSTFIX) then
-      Error("Expected Entities layer identfier to end with %q, got %q", POSTFIX, layer_name)
-    else
-      layer_name = layer_name:sub(1, -#POSTFIX - 1)
-    end
-  end
-
+  local layer_name = parse_layer_name(layer.__identifier)
   entities[layer_name] = entities[layer_name] or {}
 
   for _, instance in ipairs(layer.entityInstances) do
@@ -261,19 +265,7 @@ end
 --- @param entities table<string, preload_entity[]>
 --- @param is_auto boolean
 put_tiles = function(layer, offset, captures, entities, is_auto)
-  local layer_name do
-    layer_name = layer.__identifier
-    local POSTFIX = is_auto and "_a" or "_t"
-    if not layer_name:ends_with(POSTFIX) then
-      Error(
-        "Expected %s layer identfier to end with %q, got %q",
-        is_auto and "auto" or "tile", POSTFIX, layer_name
-      )
-    else
-      layer_name = layer_name:sub(1, -#POSTFIX - 1)
-    end
-  end
-
+  local layer_name = parse_layer_name(layer.__identifier)
   entities[layer_name] = entities[layer_name] or {}
 
   for _, instance in ipairs(layer[is_auto and "autoLayerTiles" or "gridTiles"]) do

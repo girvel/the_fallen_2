@@ -315,6 +315,21 @@ do
   end
 end
 
+solids[packer:geti(2)] = function()
+  local result = {
+    codename = "water",
+    boring_flag = true,
+    transparent_flag = true,
+    low_flag = true,
+    on_remove = function(self)
+      self.grid_layer = "tiles"
+      State:add(self)
+    end,
+  }
+  animated.mix_in(result, "assets/animations/water", "no_atlas")
+  return result
+end
+
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Entities
 ----------------------------------------------------------------------------------------------------

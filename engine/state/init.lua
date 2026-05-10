@@ -205,7 +205,12 @@ methods.load_level = function(self, path)
       self:flush()
     end
   end
-  self:flush()
+
+  -- entities may continue to be created/removed during :on_add & :on_remove
+  for _ = 1, 100 do
+    if #self._entities_to_add + #self._entities_to_remove == 0 then break end
+    self:flush()
+  end
 
   if not self.player then
     Error("There's no player in the level")
