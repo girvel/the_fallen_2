@@ -29,7 +29,8 @@ methods.init = function(self, checkpoint)
 end
 
 init_debug = function()
-  item.give(State.player, State:add(items.short_bow()))
+  item.give(State.player, State:add(items.knife()))
+  item.give(State.player, State:add(items.knife()))
   -- State.player.hp = 100
   -- State.player.max_hp = 100
   State.player.resources.spell_slots_1 = 4

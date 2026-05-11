@@ -269,7 +269,7 @@ actions.shove = action.plain {
     local distance, ok
     if target.sokoban_flag then
       distance = 1
-      ok = true
+      ok = not State.grids.solids:slow_get(entity.position + direction * 2)
     else
       local dc = target:get_roll("acrobatics"):roll()
       distance = math.ceil(entity:get_modifier("athletics") / 4)
@@ -285,8 +285,9 @@ actions.shove = action.plain {
 
       for remains = distance, 1, -1 do
         local next_p = target.position + direction
-        if not level.slow_move(target, next_p) and
-          (remains == 1 or not State.grids.solids:slow_get(next_p).low_flag)
+        if not level.slow_move(target, next_p)
+          and target.hp
+          and (remains == 1 or not State.grids.solids:slow_get(next_p).low_flag)
         then
           health.damage(target, D(2 + remains * 2):roll(), entity, false)
           break

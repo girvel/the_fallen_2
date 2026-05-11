@@ -31,5 +31,32 @@ items.short_bow = function()
   return e
 end
 
+items.axe = function()
+  local e = {
+    name = "топорик",
+    codename = "axe",
+    damage_roll = D(6),
+    tags = {},
+    slot = "hands",
+  }
+  item.mix_in(e, "assets/animations/axe")
+  return e
+end
+
+items.knife = function()
+  local e = {
+    name = "кухонный нож",
+    codename = "knife",
+    damage_roll = D(4),
+    tags = {
+      finesse = true,
+      light = true,
+    },
+    slot = "hands",
+  }
+  item.mix_in(e, "assets/animations/knife")
+  return e
+end
+
 Ldump.mark(items, {}, ...)
 return items

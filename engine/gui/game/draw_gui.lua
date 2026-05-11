@@ -402,13 +402,13 @@ draw_keyboard_action_grid = function(self)
     end
     ui.offset(4)
 
-    if offhand
-      and offhand.damage_roll
-      and not offhand.tags.ranged
+    local target = State.grids.solids:slow_get(State.player.position + State.player.direction)
+    if target and target.sokoban_flag
+      or not offhand or not offhand.damage_roll or offhand.tags.ranged
     then
-      action_button(actions.offhand_attack, "2")
-    else
       action_button(actions.shove, "2")
+    else
+      action_button(actions.offhand_attack, "2")
     end
     ui.offset(4)
 
