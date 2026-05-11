@@ -173,10 +173,10 @@ methods.load_level = function(self, path)
   local last_yield_t = read_t
 
   Log.info(
-    "State.level:\n  grid_size: %s\n  positions: (%s)\n  entities: (%s)",
+    "State.level:\n  grid_size: %s\n  captured positions: (%s)\n  captured entities: (%s)",
     load_data.level.grid_size,
-    #load_data.level.positions,
-    #load_data.level.entities
+    Table.count(load_data.level.positions),
+    Table.count(load_data.level.entities)
   )
   self.level = load_data.level
 
