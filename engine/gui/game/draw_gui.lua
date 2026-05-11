@@ -762,15 +762,11 @@ draw_notification = function()
   prev = text
 end
 
-draw_suggestion = function()
-  if State.level.locked_entities[State.player] then return end
-  if not actions.interact:is_available(State.player) then return end
+local get_suggestion = function()
   local target = interactive.get_for(State.player)  --[[@as item]]
-  if not target then return end
-
-  ui.start_frame(nil, love.graphics.getHeight() - 100)
-  ui.start_alignment("center")
-  ui.start_font(32)
+  if target
+    and actions.interact:is_available(State.player)
+  then
     local name = Name.game(target)
     local roll = target.damage_roll
     if roll then
@@ -779,7 +775,24 @@ draw_suggestion = function()
       end
       name = ("%s (%s)"):format(name, roll:simplified())
     end
-    ui.text("[E] для взаимодействия с " .. name)
+    return "[E] для взаимодействия с "..name
+  end
+
+  target = State.grids.solids:slow_get(State.player.position + State.player.direction)
+  if target and target.sokoban_flag then
+    return "[2] чтобы толкнуть "..Name.game(target)
+  end
+end
+
+draw_suggestion = function()
+  if State.level.locked_entities[State.player] then return end
+  local text = get_suggestion()
+  if not text then return end
+
+  ui.start_frame(nil, love.graphics.getHeight() - 100)
+  ui.start_alignment("center")
+  ui.start_font(32)
+    ui.text(text)
   ui.finish_font()
   ui.finish_alignment()
   ui.finish_frame()
