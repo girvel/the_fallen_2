@@ -243,7 +243,7 @@ actions.opportunity_attack = Table.extend({
 }, action.base)
 
 --- @type action
-actions.shove = Table.extend({
+actions.shove = action.plain {
   name = "толкнуть",
   codename = "shove",
 
@@ -253,8 +253,9 @@ actions.shove = Table.extend({
 
   _is_available = function(_, entity)
     local target = State.grids.solids:slow_get(entity.position + entity.direction)
-    return target
-      and target.hp
+    if not target then return false end
+    if target.sokoban_flag then return true end
+    return target.hp
       and target.get_modifier
       and (not entity.inventory.offhand
         or not entity.inventory.offhand.damage_roll
@@ -263,13 +264,21 @@ actions.shove = Table.extend({
   end,
 
   _act = function(_, entity)
-    local target = State.grids.solids:slow_get(entity.position + entity.direction)
     local direction = entity.direction
-    entity:animate("offhand_attack"):next(function()
+    local target = State.grids.solids:slow_get(entity.position + direction)
+    local distance, ok
+    if target.sokoban_flag then
+      distance = 1
+      ok = true
+    else
       local dc = target:get_roll("acrobatics"):roll()
-      local distance = math.ceil(entity:get_modifier("athletics") / 4)
+      distance = math.ceil(entity:get_modifier("athletics") / 4)
 
-      if distance <= 0 or not entity:ability_check("athletics", dc) then
+      ok = distance > 0 and entity:ability_check_precog("athletics", dc)
+    end
+
+    entity:animate("offhand_attack"):next(function()
+      if not ok then
         State:add(floater.new("-", target.position, health.COLOR_DAMAGE))
         return
       end
@@ -286,7 +295,7 @@ actions.shove = Table.extend({
     end)
     return true
   end,
-}, action.base)
+}
 
 local WHOOSH = sound.multiple("engine/assets/sounds/whoosh", .1)
 

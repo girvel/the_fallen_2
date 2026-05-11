@@ -192,19 +192,29 @@ local FAILURE = sound.multiple("engine/assets/sounds/check_failed")
 --- @param to_check ability|skill
 --- @param dc integer difficulty class
 --- @return boolean
-methods.ability_check = function(self, to_check, dc)
+methods.ability_check_precog = function(self, to_check, dc)
   local roll = D(20) + self:get_modifier(to_check)
   local result = roll:roll()
-
   Log.debug("%s rolls check %s: %s against %s",
     Name.code(self), to_check, result, dc
   )
+  return result >= dc
+end
 
-  local success = result >= dc
-
+--- @param self entity
+--- @param success boolean
+methods.ability_check_enact = function(self, success)
   local sounds = success and SUCCESS or FAILURE
   sounds:play_at(self.position)
+end
 
+--- @param self entity
+--- @param to_check ability|skill
+--- @param dc integer difficulty class
+--- @return boolean
+methods.ability_check = function(self, to_check, dc)
+  local success = self:ability_check_precog(to_check, dc)
+  self:ability_check_enact(success)
   return success
 end
 
