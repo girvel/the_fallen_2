@@ -1,3 +1,4 @@
+local warlock = require("engine.mech.class.warlock")
 local class = require("engine.mech.class")
 local races = require("engine.mech.races")
 local feats = require("engine.mech.class.feats")
@@ -65,9 +66,12 @@ local RACES = {
 
 local CLASSES = {
   fighter,
+  warlock,
 }
 
 local CREATOR_CLASSES = Table.do_folder("engine/gui/creator_classes")
+
+local draw_base_pane, draw_pane, submit, reassign_model
 
 --- @param prev gui_game
 --- @return gui_creator
@@ -114,30 +118,7 @@ creator.new = function(prev)
       }
     end
 
-    local class_levels = {}
-    for i = 1, total_level do
-      local this_class, class_level
-      if i > current_level then
-        this_class = model[i - 1].class or CLASSES[1]
-        class_level = (class_levels[this_class] or 0) + 1
-
-        model[i] = {
-          class = this_class,
-          class_level = class_level,
-          total_level = i,
-        }
-        local creator_class = CREATOR_CLASSES[this_class.codename]
-        if not creator_class then
-          Error("No creator class %q", this_class.codename)
-        end
-        creator_class.init_data(model[i])
-      else
-        this_class = model[i].class
-        class_level = model[i].class_level
-      end
-
-      class_levels[this_class] = class_level
-    end
+    reassign_model(model, model[#model].class or CLASSES[1], current_level + 1, total_level)
   end
 
   return setmetatable({
@@ -150,8 +131,6 @@ creator.new = function(prev)
 end
 
 tk.delegate(methods, "draw_entity", "preprocess", "postprocess")
-
-local draw_base_pane, draw_pane, submit
 
 methods.draw_gui = function(self, dt)
   if ui.keyboard("escape") or ui.keyboard("n") then
@@ -377,7 +356,10 @@ draw_pane = function(self, dt)
         ui.text("## ")
       ui.finish_color()
       ui.text("Класс: ")
-      self:switch(CLASSES, "class")
+      if self:switch(CLASSES, "class") then
+        reassign_model(self.model, data.class, self.pane_i, #self.model)
+        data = self.model[self.pane_i]
+      end
       ui.text("(уровень %s)", data.class_level)
     ui.finish_font()
   ui.finish_line()
@@ -459,12 +441,42 @@ submit = function(self)
   Kernel.gui:close_menu()
 end
 
+reassign_model = function(model, assigned_class, level_from, level_to)
+  if level_from > level_to then return end
+
+  local class_levels = {}
+  for i = 1, level_to do
+    local this_class, class_level
+    if i >= level_from then
+      this_class = assigned_class
+      class_level = (class_levels[this_class] or 0) + 1
+
+      model[i] = {
+        class = this_class,
+        class_level = class_level,
+        total_level = i,
+      }
+      local creator_class = CREATOR_CLASSES[this_class.codename]
+      if not creator_class then
+        Error("No creator class %q", this_class.codename)
+      end
+      creator_class.init_data(model[i])
+    else
+      this_class = model[i].class
+      class_level = model[i].class_level
+    end
+
+    class_levels[this_class] = class_level
+  end
+end
+
 --- @param possible_values any[]
 --- @param key any
 --- @param group? string
+--- @return boolean did_switch
 methods.switch = function(self, possible_values, key, group)
   local container = self.model[self.pane_i]
-  ui.switch(possible_values, container, key, self.is_disabled)
+  return ui.switch(possible_values, container, key, self.is_disabled)
 end
 
 methods.selector = function(self)
