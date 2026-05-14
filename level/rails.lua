@@ -1,9 +1,8 @@
+local xp = require("engine.mech.xp")
 local jumble = require("engine.tech.jumble")
 local async = require("engine.tech.async")
 local api = require("engine.tech.api")
 local cutscene = require("engine.tech.cutscene")
-local spells = require("engine.mech.spells")
-local class = require("engine.mech.class")
 local items = require("level.palette.items")
 local item = require("engine.tech.item")
 
@@ -34,19 +33,7 @@ init_debug = function()
   item.give(State.player, State:add(items.knife()))
   -- State.player.hp = 100
   -- State.player.max_hp = 100
-  State.player.resources.spell_slots_1 = 4
-  State.player.resources.spell_slots_2 = 4
-  State.player.resources.spell_slots_3 = 4
-  State.player.resources.spell_slots_4 = 4
-  State.player.perks = {
-    class.spell(spells.eldritch_blast),
-    class.spell(spells.animate_dead),
-    class.spell(spells.healing_word, "wis"),
-    class.spell(spells.spray_of_cards, "cha"),
-    class.spell(spells.hold_person, "cha"),
-  }
-  State.player.level = 20
-  State.player.base_abilities.cha = 20
+  State.player.xp = xp.to_reach(2)
 
   -- NEXT scars & clothes for people
 

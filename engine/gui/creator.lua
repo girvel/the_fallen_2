@@ -67,7 +67,7 @@ local CLASSES = {
   fighter,
 }
 
-local CREATOR_CLASSES = Table.do_folder("engine/state/mode/creator_classes")
+local CREATOR_CLASSES = Table.do_folder("engine/gui/creator_classes")
 
 --- @param prev gui_game
 --- @return gui_creator
@@ -126,7 +126,11 @@ creator.new = function(prev)
           class_level = class_level,
           total_level = i,
         }
-        CREATOR_CLASSES[this_class.codename].init_data(model[i])
+        local creator_class = CREATOR_CLASSES[this_class.codename]
+        if not creator_class then
+          Error("No creator class %q", this_class.codename)
+        end
+        creator_class.init_data(model[i])
       else
         this_class = model[i].class
         class_level = model[i].class_level

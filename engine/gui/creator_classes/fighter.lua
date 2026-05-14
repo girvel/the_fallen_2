@@ -21,7 +21,6 @@ fighter.init_data = function(data)
   if data.class_level == 1 then
     data.fighting_style = FIGHTING_STYLES[1]
   end
-  return data
 end
 
 --- @param creator gui_creator
