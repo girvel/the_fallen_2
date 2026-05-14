@@ -391,7 +391,7 @@ draw_pane = function(self, dt)
     hp_bonus,
     con_mod >= 0 and "+" or "-",
     math.abs(con_mod),
-    is_tough and "+ 2 (Крепкий)" or "",
+    is_tough and " + 2 (Крепкий)" or "",
     prev_hp + hp_bonus + con_mod + tough_bonus
   )
   ui.br()

@@ -11,6 +11,7 @@ local FIGHTING_STYLES = Fun.pairs(fighter_class.fighting_styles)
   :totable()
 table.sort(FIGHTING_STYLES, function(a, b) return Name.game(a) < Name.game(b) end)
 
+-- There was a mutex issue
 local _SAMURAI_SKILLS = {
   class.skill_proficiency("performance"),
   class.skill_proficiency("history"),
