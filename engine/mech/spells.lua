@@ -36,7 +36,7 @@ spells.eldritch_blast = action.plain {
           return 4
         end
       end,
-      filter = action.filters.enemy(actions.BOW_ATTACK_RANGE),
+      filter = action.filters.visible_enemy(actions.BOW_ATTACK_RANGE),
     }
   },
 
@@ -110,11 +110,55 @@ spells.healing_word = action.leveled_spell(1, function(mod, cast_level)
   }
 end)
 
+local hexed = function(spell_source)
+  return {
+    codename = "hexed",
+    life_time = 3600,
+    modify_outgoing_attack_damage_roll = function(self, entity, damage_roll, source)
+      if source == spell_source then
+        return damage_roll + D(6)
+      end
+      return damage_roll
+    end
+  }
+end
+
+spells.hex = action.leveled_spell(1, function(mod, cast_level)
+  --- @type spell_prototype
+  return {
+    _name = "Сглаз",
+    _codename = "hex",
+    _cost = {
+      bonus_actions = 1,
+    },
+
+    parameters = {
+      entity_targets = {
+        filter = action.filters.visible_enemy(40),
+        max_n = function() return 1 end,
+      },
+    },
+
+    _act = function(self, entity, params)
+      local target = params.entity_targets[1]
+      api.rotate(entity, target)
+      entity:animate("hand_attack")
+      Log.tracel(target)
+      if target.conditions then
+        table.insert(target.conditions, hexed(entity))
+        Log.tracel(target.conditions)
+      end
+      -- NEXT FX
+      return true
+    end
+  }
+end)
+
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Level 2
 ----------------------------------------------------------------------------------------------------
 
-local _enemy_filter_20 = action.filters.enemy(20)
+local _enemy_filter_20 = action.filters.visible_enemy(20)
 
 --- TODO concentration
 spells.hold_person = action.leveled_spell(2, function(mod, cast_level)

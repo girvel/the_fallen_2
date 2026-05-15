@@ -34,12 +34,15 @@ warlock.submit = function(creator, datas, perks)
   for _, data in ipairs(datas) do
     if data.class_level == 1 then
       table.insert(perks, class.spell(spells.eldritch_blast, "cha"))
+      table.insert(perks, class.spell(spells.hex, "cha"))
     end
   end
   local class_level = #datas
   table.insert(perks, warlock_class.spell_slots(class_level))
   table.insert(perks, warlock_class.dark_ones_blessing(class_level))
 end
+
+-- NEXT submit creator with mouse
 
 Ldump.mark(warlock, {}, ...)
 return warlock

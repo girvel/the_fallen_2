@@ -350,7 +350,7 @@ actions.bow_attack = {
 
   parameters = {
     entity_targets = {
-      filter = action.filters.enemy(actions.BOW_ATTACK_RANGE),
+      filter = action.filters.visible_enemy(actions.BOW_ATTACK_RANGE),
       max_n = function() return 1 end,
     }
   },

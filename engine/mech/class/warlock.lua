@@ -17,8 +17,8 @@ end
 
 warlock.spell_slots = function(class_level)
   return {
-    name = "",
-    codename = "",
+    name = "Ячейки заклинаний",
+    codename = "spell_slots",
     modify_resources = function(self, entity, resources, rest_type)
       if rest_type == "short" or rest_type == "long" then
         local key = "spell_slots_"..math.min(5, math.ceil(class_level / 2))
