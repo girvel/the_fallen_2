@@ -28,14 +28,17 @@ warlock.draw_pane = function(creator, dt, data)
 end
 
 --- @param creator gui_creator
---- @param data creator_pane
-warlock.submit = function(creator, data)
-  local result = {}
-  if data.class_level == 1 then
-    table.insert(result, class.spell(spells.eldritch_blast, "cha"))
-    table.insert(result, warlock_class.dark_ones_blessing)
+--- @param datas creator_pane[]
+--- @param perks table[]
+warlock.submit = function(creator, datas, perks)
+  for _, data in ipairs(datas) do
+    if data.class_level == 1 then
+      table.insert(perks, class.spell(spells.eldritch_blast, "cha"))
+    end
   end
-  return result
+  local class_level = #datas
+  table.insert(perks, warlock_class.spell_slots(class_level))
+  table.insert(perks, warlock_class.dark_ones_blessing(class_level))
 end
 
 Ldump.mark(warlock, {}, ...)

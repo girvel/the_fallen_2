@@ -55,19 +55,19 @@ fighter.draw_pane = function(creator, dt, data)
 end
 
 --- @param creator gui_creator
-fighter.submit = function(creator, data)
-  local result = {}
-
-  if data.class_level == 1 then
-    table.insert(result, data.fighting_style)
-    table.insert(result, fighter_class.second_wind)
-  elseif data.class_level == 2 then
-    table.insert(result, fighter_class.action_surge)
-  elseif data.class_level == 3 then
-    table.insert(result, fighter_class.fighting_spirit)
+--- @param datas creator_pane[]
+--- @param perks table[]
+fighter.submit = function(creator, datas, perks)
+  for _, data in ipairs(datas) do
+    if data.class_level == 1 then
+      table.insert(perks, data.fighting_style)
+      table.insert(perks, fighter_class.second_wind)
+    elseif data.class_level == 2 then
+      table.insert(perks, fighter_class.action_surge)
+    elseif data.class_level == 3 then
+      table.insert(perks, fighter_class.fighting_spirit)
+    end
   end
-
-  return result
 end
 
 Ldump.mark(fighter, {}, ...)

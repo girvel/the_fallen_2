@@ -424,9 +424,17 @@ submit = function(self)
     end
   end
 
+  local class_datas = {}
   for i, data in ipairs(self.model) do
+    if not class_datas[data.class] then
+      class_datas[data.class] = {}
+    end
+    table.insert(class_datas[data.class], data)
     table.insert(perks, class.hit_dice(data.class.hit_die, i == 1))
-    Table.concat(perks, CREATOR_CLASSES[data.class.codename].submit(self, data))
+  end
+
+  for this_class, datas in pairs(class_datas) do
+    CREATOR_CLASSES[this_class.codename].submit(self, datas, perks)
   end
 
   local mixin = {
