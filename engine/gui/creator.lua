@@ -366,9 +366,7 @@ draw_pane = function(self, dt)
   ui.finish_line()
   ui.br()
 
-  local con_mod = abilities.get_modifier(
-    self.model[0].base_abilities.con + self:get_bonus("con")
-  )
+  local con_mod = self:get_modifier("con")
   local is_tough = self:has_feat(feats.tough)
   local tough_bonus = is_tough and 2 or 0
 
@@ -539,6 +537,13 @@ methods.get_bonus = function(self, ability)
     bonus = bonus + 1
   end
   return bonus
+end
+
+--- @param ability ability
+methods.get_modifier = function(self, ability)
+  return abilities.get_modifier(
+    self.model[0].base_abilities[ability] + self:get_bonus(ability)
+  )
 end
 
 methods.has_feat = function(self, feat)

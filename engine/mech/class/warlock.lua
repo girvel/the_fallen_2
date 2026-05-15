@@ -39,5 +39,12 @@ warlock.spell_slots = function(class_level)
   }
 end
 
+warlock.agonizing_blast = {
+  codename = "agonizing_blast",
+  modify_eldritch_blast_damage = function(self, entity, damage_roll)
+    return damage_roll + entity:get_modifier("cha")
+  end,
+}
+
 Ldump.mark(warlock, {}, ...)
 return warlock

@@ -24,6 +24,10 @@ warlock.draw_pane = function(creator, dt, data)
     creator:start_ability(gui_elements.dark_ones_blessing)
       ui.text("Способность: Благословение Тёмного")
     creator:finish_ability("Временное здоровье при убийстве")
+  elseif data.class_level == 2 then
+    creator:start_ability(gui_elements.agonizing_blast)
+      ui.text("Способность: Мучительный взрыв")
+    creator:finish_ability("%+d (ХАР) урона к Мистическому взрыву", creator:get_modifier("cha"))
   end
 end
 
@@ -35,6 +39,8 @@ warlock.submit = function(creator, datas, perks)
     if data.class_level == 1 then
       table.insert(perks, class.spell(spells.eldritch_blast, "cha"))
       table.insert(perks, class.spell(spells.hex, "cha"))
+    elseif data.class_level == 2 then
+      table.insert(perks, warlock_class.agonizing_blast)
     end
   end
   local class_level = #datas

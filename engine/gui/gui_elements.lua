@@ -53,6 +53,7 @@ local gui_elements = {
   fighting_styles = nth(49),
   generic_perk = nth(50),
   dark_ones_blessing = nth(51),
+  agonizing_blast = nth(52),
   eldritch_blast = nth(65),
   animate_dead_3 = nth(66),
   healing_word_1 = nth(67),
