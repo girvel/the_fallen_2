@@ -29,6 +29,7 @@ warlock.submit = function(creator, data)
   local result = {}
   if data.class_level == 1 then
     table.insert(result, class.spell(spells.eldritch_blast, "cha"))
+    table.insert(result, warlock_class.dark_ones_blessing)
   end
   return result
 end

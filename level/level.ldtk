@@ -3199,6 +3199,22 @@
 							"fieldInstances": [{ "__identifier": "capture_name", "__type": "String", "__value": "player", "__tile": null, "defUid": 82, "realEditorValues": [] }],
 							"__worldX": 960,
 							"__worldY": 1264
+						},
+						{
+							"__identifier": "pig",
+							"__grid": [60,82],
+							"__pivot": [0,0],
+							"__tags": ["solid"],
+							"__tile": { "tilesetUid": 61, "x": 16, "y": 0, "w": 16, "h": 16 },
+							"__smartColor": "#D77643",
+							"iid": "5a412fe0-48b0-11f1-bb57-a30c83bb2d09",
+							"width": 16,
+							"height": 16,
+							"defUid": 60,
+							"px": [960,1312],
+							"fieldInstances": [],
+							"__worldX": 960,
+							"__worldY": 1312
 						}
 					]
 				},

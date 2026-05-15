@@ -23,6 +23,15 @@ health.heal = function(target, amount)
   end
 end
 
+--- @param target entity
+--- @param amount number
+health.push_temp_hp = function(target, amount)
+  local value = math.min(target:get_max_hp(), target.hp) + amount
+  if target.hp < value then
+    health.set_hp(target, value)
+  end
+end
+
 --- Inflict fixed damage; handles hp, death and FX
 --- @param target entity
 --- @param amount number
@@ -43,12 +52,15 @@ health.damage = function(target, amount, source, is_critical)
 
   State:add(floater.new(repr, target.position, health.COLOR_DAMAGE))
 
-  if health.set_hp(target, target.hp - amount)
-    and source
-    and source.xp
-    and target.xp_reward
-  then
-    source.xp = source.xp + target.xp_reward
+  local did_kill = health.set_hp(target, target.hp - amount)
+  if did_kill then
+    source:modify("on_kill", nil, target)
+    if source
+      and source.xp
+      and target.xp_reward
+    then
+      source.xp = source.xp + target.xp_reward
+    end
   end
 end
 

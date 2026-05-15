@@ -51,6 +51,7 @@ end
 --- | '"light"'
 --- | '"additional_actions"'
 --- | '"hit_dice_result"'
+--- | '"on_kill"'
 
 --- @param self entity
 --- @param modname creature_modification
