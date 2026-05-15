@@ -104,7 +104,7 @@ spells.healing_word = action.leveled_spell(1, function(mod, cast_level)
       entity:animate("gesture")
       health.heal(target, (D(4) * cast_level + entity:get_modifier(mod)):roll())
       animated.add_fx("engine/assets/animations/healing_word_target", target.position)
-      animated.add_fx("engine/assets/animations/healing_word_spell", entity.position)
+      animated.add_fx("engine/assets/animations/healing_word_spell", entity.position, "fx_over")
       return true
     end,
   }
@@ -148,7 +148,7 @@ spells.hex = action.leveled_spell(1, function(mod, cast_level)
         table.insert(target.conditions, hexed(entity))
         Log.tracel(target.conditions)
       end
-      -- NEXT FX
+      animated.add_fx("engine/assets/animations/hex", target.position, "fx_over")
       return true
     end
   }
