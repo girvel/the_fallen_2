@@ -6,11 +6,6 @@ local tcod = require("engine.tech.tcod")
 local sprite = require("engine.tech.sprite")
 
 
--- NEXT times:
--- State.real_time doesn't count loading and inactivity
--- State.game_time is basically real_time until combat, then it's +6 (seconds) each turn
--- Kernel.cpu_time includes loading, does not include inactivity
-
 local state = {}
 
 --- @class state

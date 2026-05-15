@@ -168,7 +168,7 @@ for index = 20, 22 do
   end
 end
 
--- NEXT drinking beer?
+-- TODO drinking beer?
 for index = 28, 28 do
   local i, this_sprite = packer:geti(index)
   on_solids[i] = function()

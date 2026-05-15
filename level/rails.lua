@@ -35,7 +35,7 @@ init_debug = function()
   -- State.player.max_hp = 100
   State.player.xp = xp.to_reach(2)
 
-  -- NEXT scars & clothes for people
+  -- TODO scars & clothes for people
 
   local jumble_lines = function(sp, ratio)
     for _, element in ipairs(sp.stack[1]) do

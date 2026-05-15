@@ -20,6 +20,10 @@ warlock.draw_pane = function(creator, dt, data)
     creator:start_ability(gui_elements.eldritch_blast)
       ui.text("Заклинание: Мистический взрыв")
     creator:finish_ability("Дистанционная атака, 1d10 урона")
+
+    creator:start_ability(gui_elements.dark_ones_blessing)
+      ui.text("Способность: Благословение Тёмного")
+    creator:finish_ability("Временное здоровье при убийстве")
   end
 end
 

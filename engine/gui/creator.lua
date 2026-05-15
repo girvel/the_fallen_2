@@ -1,3 +1,4 @@
+local gui_elements = require("engine.gui.gui_elements")
 local warlock = require("engine.mech.class.warlock")
 local class = require("engine.mech.class")
 local races = require("engine.mech.races")
@@ -488,6 +489,8 @@ methods.selector = function(self)
   end
 end
 
+--- @param image? love.Image|string
+--- @param selector? boolean
 methods.start_ability = function(self, image, selector)
   ui.start_line()
   if selector then
@@ -495,7 +498,7 @@ methods.start_ability = function(self, image, selector)
   else
     ui.text("  ")
   end
-  ui.image(image, 2)
+  ui.image(image or gui_elements.generic_perk, 2)
   ui.start_font(32)
   ui.text(" ")
 end
