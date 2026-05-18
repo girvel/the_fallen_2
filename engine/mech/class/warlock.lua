@@ -1,4 +1,6 @@
 local health = require("engine.mech.health")
+
+
 local warlock = {
   name = "Колдун",
   codename = "warlock",
@@ -43,6 +45,13 @@ warlock.agonizing_blast = {
   codename = "agonizing_blast",
   modify_eldritch_blast_damage = function(self, entity, damage_roll)
     return damage_roll + entity:get_modifier("cha")
+  end,
+}
+
+warlock.repelling_blast = {
+  codename = "repelling_blast",
+  modify_eldritch_blast_shove_distance = function(self, entity, distance)
+    return 2
   end,
 }
 

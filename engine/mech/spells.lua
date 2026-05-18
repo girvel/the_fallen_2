@@ -57,12 +57,23 @@ spells.eldritch_blast = action.plain {
       })
     end
 
+    local shove_distance = entity:modify("eldritch_blast_shove_distance", 0)
+
     entity:animate("fast_gesture"):next(function()
       for _, data in ipairs(precogs) do
         local target, did_hit, is_crit, damage = unpack(data)
         health.attack_enact(entity, target, did_hit, is_crit, damage)
         if did_hit then
-          animated.add_fx("engine/assets/animations/eldritch_blast_target", target.position, "fx_over")
+          animated.add_fx(
+            "engine/assets/animations/eldritch_blast_target", target.position, "fx_over"
+          )
+          if shove_distance > 0 then
+            actions.shove_impl(
+              entity, target,
+              (target.position - entity.position):normalized2(),
+              shove_distance
+            )
+          end
         end
       end
     end)

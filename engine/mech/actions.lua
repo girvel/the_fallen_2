@@ -242,6 +242,23 @@ actions.opportunity_attack = Table.extend({
   end,
 }, action.base)
 
+--- @param entity entity?
+--- @param target entity
+--- @param direction vector
+--- @param distance integer
+actions.shove_impl = function(entity, target, direction, distance)
+  for remains = distance, 1, -1 do
+    local next_p = target.position + direction
+    if not level.slow_move(target, next_p)
+      and target.hp
+      and (remains == 1 or not State.grids.solids:slow_get(next_p).low_flag)
+    then
+      health.damage(target, D(2 + remains * 2):roll(), entity, false)
+      break
+    end
+  end
+end
+
 --- @type action
 actions.shove = action.plain {
   name = "толкнуть",
@@ -283,16 +300,7 @@ actions.shove = action.plain {
         return
       end
 
-      for remains = distance, 1, -1 do
-        local next_p = target.position + direction
-        if not level.slow_move(target, next_p)
-          and target.hp
-          and (remains == 1 or not State.grids.solids:slow_get(next_p).low_flag)
-        then
-          health.damage(target, D(2 + remains * 2):roll(), entity, false)
-          break
-        end
-      end
+      actions.shove_impl(entity, target, direction, distance)
     end)
     return true
   end,
