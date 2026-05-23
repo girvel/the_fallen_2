@@ -20,7 +20,7 @@ poisoned.new = function(damage)
   }, poisoned.mt)
 end
 
--- TODO that is just weird
+-- TODO poisoned itself being a perk -- that is just weird
 --- @param damage integer
 poisoned.modify_outgoing_damage = function(damage)
   return function(self, entity, _damage, target, is_critical)

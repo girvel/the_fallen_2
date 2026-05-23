@@ -27,7 +27,7 @@ projectile.launch = function(parent, slot, target, speed)
         end
 
         if Kernel.debug then
-          State.debug_overlay.points.projectile_target = {
+          Kernel.overlay.points.projectile_target = {
             position = target_position,
             color = Vector.white,
             view = "grid",

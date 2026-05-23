@@ -3,11 +3,8 @@ local generate_entities = require("engine.tech.ldtk.generate_entities")
 local read_json         = require("engine.tech.ldtk.read_json")
 
 
+--- LDtk driver
 local ldtk = {}
-
-----------------------------------------------------------------------------------------------------
--- [Section] External API
-----------------------------------------------------------------------------------------------------
 
 --- @alias palette table<string, table<string | integer, function>>
 
@@ -15,19 +12,24 @@ local ldtk = {}
 --- @class level_definition
 --- @field ldtk_path string
 --- @field palette palette entity factories by layer and then name
---- @field rails rails
+--- @field rails_new fun(checkpoint: string): rails
+--- @field level_mix_in fun(t: level_base)
 
---- General information about the level
---- @class level_info
+--- @alias ch table<string, entity>
+--- @alias ps table<string, vector>
+
+--- @class level_base
 --- @field atlases table<string, love.Image> atlas images for each grid_layer that uses them
 --- @field grid_size vector
+--- @field positions ps
+--- @field entities ch
+--- @field locked_entities table<entity, true>
+local level_methods = {}
 
 --- @class load_result
---- @field level_info level_info
 --- @field entities entity[]
---- @field rails rails
---- @field runner_entities table<string, entity>
---- @field runner_positions table<string, vector>
+--- @field rails_new fun(checkpoint: string): rails
+--- @field level level
 
 --- Read LDtk level file
 --- @async
@@ -49,21 +51,48 @@ ldtk.load = function(path)
   coroutine.yield("preload", 1)
   local generation_data = generate_entities(definition.palette, preload_data.entities)
 
+  local level = {
+    entities = Table.strict(generation_data.captured_entities, "captured entities"),
+    positions = Table.strict(preload_data.positions, "captured positions"),
+    locked_entities = {},
+    atlases = generation_data.atlases,
+    grid_size = preload_data.size,
+  }
+  Table.extend(level, level_methods)
+  definition.level_mix_in(level)
+
   return {
-    level_info = {
-      atlases = generation_data.atlases,
-      grid_size = preload_data.size,
-    },
     entities = generation_data.entities,
-    rails = definition.rails,
-    runner_entities = generation_data.runner_entities,
-    runner_positions = preload_data.positions,
+    rails_new = definition.rails_new,
+    level = level,
   }
 end
 
-----------------------------------------------------------------------------------------------------
--- [Section] Implementation
-----------------------------------------------------------------------------------------------------
+--- @param prefix string
+--- @return string[]
+level_methods.position_sequence = function(self, prefix)
+  local result = {}
+  local count = 0
+  for name, position in pairs(self.positions) do
+    if not name:starts_with(prefix .. "_") then goto continue end
+    local index = tonumber(name:sub(#prefix + 2))
+    if not index then goto continue end
+    result[index] = position
+    count = count + 1
+
+    ::continue::
+  end
+
+  if #result == 0 then
+    Error("No elements in position sequence %q", prefix)
+  end
+
+  if count ~= #result then
+    Error("Hole in position sequence %q: %i is missing", prefix, #result + 1)
+  end
+
+  return result
+end
 
 Ldump.mark(ldtk, {}, ...)
 return ldtk

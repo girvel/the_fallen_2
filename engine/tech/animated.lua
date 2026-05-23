@@ -10,8 +10,8 @@ local animated = {}
 --- @class animation
 --- @field pack animation_pack
 --- @field paused boolean
+--- @field looped boolean
 --- @field current animation_name|string
---- @field next animation_name
 --- @field frame number
 --- @field _end_promise promise
 --- @field _fx_flag boolean
@@ -106,15 +106,13 @@ methods.animate = function(self, animation_name, assertive, looped)
   set_current(self, animation_name)
 
   if animation.pack[animation.current] then
-    if looped then
-      animation.next = animation_name
-    end
+    animation.looped = looped or false
   else
     if assertive then
       Error("Missing %s for entity %s", animation_name, self)
     end
 
-    set_current(self, animation.next)
+    set_current(self, "idle")
   end
 
   animation.frame = 1
@@ -144,6 +142,7 @@ methods.animation_update = function(self, dt)
     Error("%s is missing animation %s", Name.code(self), animation.current)
   end
 
+  -- DT State.real_time
   -- even if animation is 1 frame idle, still should play out for 1-frame FXs
   animation.frame = animation.frame + dt * DEFAULT_ANIMATION_FPS
   if math.floor(animation.frame) > #current_pack then
@@ -152,7 +151,10 @@ methods.animation_update = function(self, dt)
       return
     end
 
-    self:animate(animation.next)
+    local next_animation = animation.looped
+      and animation.current
+      or "idle"
+    self:animate(next_animation, false, animation.looped)
     current_pack = animation.pack[animation.current]
   end
   self.sprite = current_pack[math.floor(animation.frame)]

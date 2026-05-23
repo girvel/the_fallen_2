@@ -14,20 +14,23 @@ local camera = {}
 --- @field vision_start vector (internally set)
 --- @field vision_end vector (internally set)
 --- @field sidebar_w integer sidebar width in screen pixels
---- @field SCALE integer
+--- @field scale integer current scaling coefficient
+--- @field base_scale integer starting scaling coefficient
 local methods = {}
 camera.mt = {__index = methods}
 
 camera.new = function()
-  return setmetatable({
+  local self = {
     is_moving = false,
     is_camera_following = true,
     offset = Vector.zero,
     vision_start = Vector.zero,
     vision_end = Vector.zero,
     sidebar_w = 0,
-    SCALE = 4,
-  }, camera.mt)
+    base_scale = Kernel.args.youtube and 8 or 4,
+  }
+  self.scale = self.base_scale
+  return setmetatable(self, camera.mt)
 end
 
 methods.immediate_center = function(self)
@@ -36,13 +39,23 @@ end
 
 --- @param gx number
 --- @param gy number
---- @return number sx, number sy
+--- @return number sx
+--- @return number sy
 methods.game_to_screen = function(self, gx, gy)
   local dx, dy = unpack(self.offset)
-  local k = State.camera.SCALE * sprite.cell_size
+  local k = State.camera.scale * sprite.cell_size
   return k * gx - dx, k * gy - dy
 end
 
+--- @param sx number
+--- @param sy number
+--- @return number gx
+--- @return number gy
+methods.screen_to_game = function(self, sx, sy)
+  local dx, dy = unpack(self.offset)
+  local k = State.camera.scale * sprite.cell_size
+  return math.floor((sx + dx) / k), math.floor((sy + dy) / k)
+end
 
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Implementation
@@ -66,7 +79,7 @@ methods._update = function(self, dt)
       local tx, ty = unpack(target.position)
 
       if target == State.player
-        and State.mode._mode.type == "game"
+        and Kernel.gui._mode.type == "game"
         and State.player:can_act()
         and State.player.resources.movement > 0
       then
@@ -89,7 +102,7 @@ methods._update = function(self, dt)
   end
 
   do
-    local total_scale = self.SCALE * sprite.cell_size
+    local total_scale = self.scale * sprite.cell_size
     self.vision_start = (self.offset / total_scale):map(math.ceil):sub_mut(Vector.one)
     self.vision_end = V(love.graphics.getWidth() - self.sidebar_w, love.graphics.getHeight())
       :div_mut(total_scale)
@@ -108,7 +121,7 @@ end
 --- @return number x
 --- @return number y
 methods._center = function(self, x, y)
-  local k = sprite.cell_size * self.SCALE
+  local k = sprite.cell_size * self.scale
   return
     math.floor((x + .5) * k - (love.graphics.getWidth() - self.sidebar_w) / 2),
     math.floor((y + .5) * k - love.graphics.getHeight() / 2)

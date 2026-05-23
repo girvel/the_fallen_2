@@ -1,19 +1,5 @@
 local safety = {}
 
---- Prevents the system from running if the level is not fully loaded
---- @generic T
---- @param system T
---- @return T
-safety.live_system = function(system)
-  --- @cast system table
-  local prev = system.update
-  system.update = function(...)
-    if not State.is_loaded then return end
-    return prev(...)
-  end
-  return system
-end
-
 local built_in_assert = assert
 
 --- Normal assert in debug mode, just a warning in release

@@ -23,6 +23,15 @@ health.heal = function(target, amount)
   end
 end
 
+--- @param target entity
+--- @param amount number
+health.push_temp_hp = function(target, amount)
+  local value = math.min(target:get_max_hp(), target.hp) + amount
+  if target.hp < value then
+    health.set_hp(target, value)
+  end
+end
+
 --- Inflict fixed damage; handles hp, death and FX
 --- @param target entity
 --- @param amount number
@@ -43,12 +52,15 @@ health.damage = function(target, amount, source, is_critical)
 
   State:add(floater.new(repr, target.position, health.COLOR_DAMAGE))
 
-  if health.set_hp(target, target.hp - amount)
-    and source
-    and source.xp
-    and target.xp_reward
-  then
-    source.xp = source.xp + target.xp_reward
+  local did_kill = health.set_hp(target, target.hp - amount)
+  if did_kill then
+    source:modify("on_kill", nil, target)
+    if source
+      and source.xp
+      and target.xp_reward
+    then
+      source.xp = source.xp + target.xp_reward
+    end
   end
 end
 
@@ -80,7 +92,7 @@ health.set_hp = function(target, value)
   end
 
   if target.player_flag then
-    State.mode:player_has_died()
+    Kernel.gui:player_has_died()
     return false
   end
 
@@ -144,6 +156,9 @@ health.attack_precog = function(source, target, attack_roll, damage_roll)
     end
   end
 
+  if target.modify then
+    damage_roll = target:modify("outgoing_attack_damage_roll", damage_roll, source)
+  end
   local damage_amount = damage_roll:roll()
   if source.modify then
     damage_amount = source:modify("outgoing_damage", damage_amount, target, is_critical)

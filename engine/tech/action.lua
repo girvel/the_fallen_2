@@ -191,7 +191,7 @@ end
 
 --- @param range integer
 --- @return target_filter
-action.filters.enemy = function(range)
+action.filters.visible_enemy = function(range)
   return function(self, entity, target)
     return target
       and target.hp

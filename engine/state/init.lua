@@ -9,14 +9,12 @@ local sprite = require("engine.tech.sprite")
 local state = {}
 
 --- @class state
---- @field mode state_mode
 --- @field runner state_runner
 --- @field camera state_camera
 --- @field combat state_combat?
 --- @field quests state_quests
 --- @field hostility state_hostility
 --- @field audio state_audio
---- @field debug_overlay state_debug
 --- @field period state_period
 --- @field uid state_uid
 --- @field stats state_stats
@@ -24,7 +22,7 @@ local state = {}
 --- @field rails rails
 --- @field grids table<grid_layer, grid<entity>>
 --- @field grid_size vector
---- @field level level_info
+--- @field level level
 --- @field player player
 --- @field is_loaded boolean is level fully loaded
 --- @field _world table
@@ -35,34 +33,26 @@ local state = {}
 local methods = {}
 state.mt = {__index = methods}
 
---- @param self state
-local replace_modules = function(self)
-  self.mode = require("engine.state.mode").new()
-  self.runner = require("engine.state.runner").new()
-  self.camera = require("engine.state.camera").new()
-  self.quests = require("engine.state.quests").new()
-  self.hostility = require("engine.state.hostility").new()
-  self.audio = require("engine.state.audio").new()
-  self.debug_overlay = require("engine.state.debug_overlay").new(Kernel.debug)
-  self.period = require("engine.state.period").new()
-  self.uid = require("engine.state.uid").new()
-  self.stats = require("engine.state.stats").new()
-end
-
 --- @param systems table[]
 --- @return state
 state.new = function(systems)
-  local result = setmetatable({
+  return setmetatable({
     is_loaded = false,
+
+    runner = require("engine.state.runner").new(),
+    camera = require("engine.state.camera").new(),
+    quests = require("engine.state.quests").new(),
+    hostility = require("engine.state.hostility").new(),
+    audio = require("engine.state.audio").new(),
+    period = require("engine.state.period").new(),
+    uid = require("engine.state.uid").new(),
+    stats = require("engine.state.stats").new(),
 
     _world = Tiny.world(unpack(systems)),
     _entities = {},
     _entities_to_add = {},
     _entities_to_remove = {},
   }, state.mt)
-
-  replace_modules(result)
-  return result
 end
 
 --- Schedules entity to be added
@@ -162,19 +152,12 @@ methods.flush = function(self)
   self._world:refresh()
 end
 
-methods.reset = function(self)
-  Log.info("State:reset()")
-  local to_remove = Table.shallow_copy(self._entities)
-  for e, _ in pairs(to_remove) do
-    self:remove(e, true)
-  end
-  self:flush()
-  replace_modules(self)
-end
-
 --- @async
 --- @param path string
 methods.load_level = function(self, path)
+  -- :load_level is not part of .new, because entities being created during loading should
+  -- still have access to State.runner, State.rails, State.level etc.
+
   async.lag_threshold = .5
   self.is_loaded = false
   Log.info("Loading level %s", path)
@@ -184,22 +167,18 @@ methods.load_level = function(self, path)
   local read_t = love.timer.getTime()
   local last_yield_t = read_t
 
-  self.level = load_data.level_info
-  Log.info("State.level == %s", self.level)
-
-  self.rails = load_data.rails
-
-  Table.extend(self.runner.entities, load_data.runner_entities)
-  Table.extend(self.runner.positions, load_data.runner_positions)
+  Log.info(
+    "State.level:\n  grid_size: %s\n  captured positions: (%s)\n  captured entities: (%s)",
+    load_data.level.grid_size,
+    Table.count(load_data.level.positions),
+    Table.count(load_data.level.entities)
+  )
+  self.level = load_data.level
 
   self.grids = Fun.iter(level.grid_layers)
     :map(function(layer) return layer, Grid.new(self.level.grid_size) end)
     :tomap()
-
-  self.grids.solids = tcod.observer(assert(
-    self.grids.solids,
-    "Missing \"solids\" grid_layer; required for FOV and pathing to work"
-  ))
+  self.grids.solids = tcod.observer(self.grids.solids)
   self._travel_map = tcod.map(self.grids.solids)
 
   for layer, grid in pairs(self.grids) do
@@ -214,16 +193,22 @@ methods.load_level = function(self, path)
   for i, e in ipairs(load_data.entities) do
     e = self:add(e)
     if e.player_flag then self.player = e --[[@as player]] end
-    -- if e.on_load then e:on_load() end
 
     if i % 500 == 0 and love.timer.getTime() - last_yield_t >= async.yield_period then
       coroutine.yield("add", i / #load_data.entities)
       last_yield_t = love.timer.getTime()
+      self:flush()
     end
   end
 
+  -- entities may continue to be created/removed during :on_add & :on_remove
+  for _ = 1, 100 do
+    if #self._entities_to_add + #self._entities_to_remove == 0 then break end
+    self:flush()
+  end
+
   if not self.player then
-    error("There's no player in the level")
+    Error("There's no player in the level")
   end
 
   self.camera:immediate_center()
@@ -232,9 +217,7 @@ methods.load_level = function(self, path)
   local add_t = love.timer.getTime()
   Log.info("%.2f s | Added %s entities", add_t - read_t, #load_data.entities)
 
-  if self.rails.init then
-    self.rails:init(Kernel.args.checkpoint)
-  end
+  self.rails = load_data.rails_new(Kernel.args.checkpoint)
 
   local end_t = love.timer.getTime()
   Log.info("%.2f s | Initialized rails", end_t - add_t)
@@ -296,6 +279,8 @@ end
 methods.in_combat = function(self, entity)
   return State.combat and Table.contains(State.combat.list, entity)
 end
+
+-- get_time is love.timer.getTime() - Kernel.load_level_moment + State._total_time
 
 Ldump.mark(state, {mt = "const"}, ...)
 return state

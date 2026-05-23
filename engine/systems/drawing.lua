@@ -1,6 +1,4 @@
-local ui = require("engine.tech.ui")
 local level = require("engine.tech.level")
-local colors = require("engine.tech.colors")
 
 
 return Tiny.sortedProcessingSystem {
@@ -15,24 +13,10 @@ return Tiny.sortedProcessingSystem {
   end,
 
   preProcess = function(_, dt)
-    if State.is_loaded then
-      State.camera:_update(dt)
-    end
-
-    love.graphics.clear(colors.black)
-
-    State.mode:preprocess(dt)
+    State.camera:_update(dt)
   end,
 
   process = function(_, entity, dt)
-    State.mode:draw_entity(entity, dt)
-  end,
-
-  postProcess = function(_, dt)
-    State.mode:postprocess(dt)
-    ui.start()
-    State.mode:draw_gui(dt)
-    State.debug_overlay:draw(dt)
-    ui.finish()
+    Kernel.gui:draw_entity(entity, dt)
   end,
 }

@@ -1,3 +1,5 @@
+local sprite = require("engine.tech.sprite")
+local mark = require("engine.tech.mark")
 local animated = require("engine.tech.animated")
 local creature = require("engine.mech.creature")
 local combat_ai = require("engine.mech.ais.combat")
@@ -5,6 +7,15 @@ local abilities = require("engine.mech.abilities")
 
 
 local monsters = {}
+
+local bones_sprites = sprite.collection("engine/assets/sprites/bones.png")
+local add_bones = mark(function()
+  return {
+    codename = "bones",
+    boring_flag = true,
+    sprite = Random.item(bones_sprites),
+  }
+end)
 
 local skeleton_base = function()
   local e = {
@@ -14,8 +25,7 @@ local skeleton_base = function()
     level = 1,
     ai = combat_ai.new({follow_range = 30}),
     faction = "predators",
-    -- TODO bones on death
-    -- on_death = mark(bones_mark),
+    on_death = add_bones,
     _is_a_skeleton = true,
     blind_sight_flag = true,
   }

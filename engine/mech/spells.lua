@@ -36,7 +36,7 @@ spells.eldritch_blast = action.plain {
           return 4
         end
       end,
-      filter = action.filters.enemy(actions.BOW_ATTACK_RANGE),
+      filter = action.filters.visible_enemy(actions.BOW_ATTACK_RANGE),
     }
   },
 
@@ -51,18 +51,29 @@ spells.eldritch_blast = action.plain {
       if api.distance(entity, target) == 1 then
         attack_roll = attack_roll:set("disadvantage")
       end
-      local damage_roll = D(10)
+      local damage_roll = entity:modify("eldritch_blast_damage", D(10))
       table.insert(precogs, {
         target, health.attack_precog(entity, target, attack_roll, damage_roll)
       })
     end
+
+    local shove_distance = entity:modify("eldritch_blast_shove_distance", 0)
 
     entity:animate("fast_gesture"):next(function()
       for _, data in ipairs(precogs) do
         local target, did_hit, is_crit, damage = unpack(data)
         health.attack_enact(entity, target, did_hit, is_crit, damage)
         if did_hit then
-          animated.add_fx("engine/assets/animations/eldritch_blast_target", target.position, "fx_over")
+          animated.add_fx(
+            "engine/assets/animations/eldritch_blast_target", target.position, "fx_over"
+          )
+          if shove_distance > 0 then
+            actions.shove_impl(
+              entity, target,
+              (target.position - entity.position):normalized2(),
+              shove_distance
+            )
+          end
         end
       end
     end)
@@ -104,9 +115,53 @@ spells.healing_word = action.leveled_spell(1, function(mod, cast_level)
       entity:animate("gesture")
       health.heal(target, (D(4) * cast_level + entity:get_modifier(mod)):roll())
       animated.add_fx("engine/assets/animations/healing_word_target", target.position)
-      animated.add_fx("engine/assets/animations/healing_word_spell", entity.position)
+      animated.add_fx("engine/assets/animations/healing_word_spell", entity.position, "fx_over")
       return true
     end,
+  }
+end)
+
+local hexed = function(spell_source)
+  return {
+    codename = "hexed",
+    life_time = 3600,
+    modify_outgoing_attack_damage_roll = function(self, entity, damage_roll, source)
+      if source == spell_source then
+        return damage_roll + D(6)
+      end
+      return damage_roll
+    end
+  }
+end
+
+spells.hex = action.leveled_spell(1, function(mod, cast_level)
+  --- @type spell_prototype
+  return {
+    _name = "Сглаз",
+    _codename = "hex",
+    _cost = {
+      bonus_actions = 1,
+    },
+
+    parameters = {
+      entity_targets = {
+        filter = action.filters.visible_enemy(40),
+        max_n = function() return 1 end,
+      },
+    },
+
+    _act = function(self, entity, params)
+      local target = params.entity_targets[1]
+      api.rotate(entity, target)
+      entity:animate("hand_attack")
+      Log.tracel(target)
+      if target.conditions then
+        table.insert(target.conditions, hexed(entity))
+        Log.tracel(target.conditions)
+      end
+      animated.add_fx("engine/assets/animations/hex", target.position, "fx_over")
+      return true
+    end
   }
 end)
 
@@ -114,7 +169,7 @@ end)
 -- [SECTION] Level 2
 ----------------------------------------------------------------------------------------------------
 
-local _enemy_filter_20 = action.filters.enemy(20)
+local _enemy_filter_20 = action.filters.visible_enemy(20)
 
 --- TODO concentration
 spells.hold_person = action.leveled_spell(2, function(mod, cast_level)
@@ -128,7 +183,7 @@ spells.hold_person = action.leveled_spell(2, function(mod, cast_level)
       entity_targets = {
         filter = function(self, entity, target)
           return _enemy_filter_20(self, entity, target)
-            and entity.creature_type == "humanoid"
+            and target.creature_type == "humanoid"
         end,
         max_n = function(self, entity)
           return cast_level - 1

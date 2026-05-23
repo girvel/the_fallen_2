@@ -1,30 +1,37 @@
 local kernel = {}
 
 --- @class kernel middleware between fallen engine and LOVE
+--- @field gui gui
+--- @field overlay debug_overlay
+--- @field args table CLI args
+--- @field debug boolean
+--- @field frame_n integer
+--- @field cpu_time number
+--- @field start_time number
+--- @field screenshot love.Canvas
 --- @field _save? string
 --- @field _load? string
 --- @field _specific_key_rates table<love.KeyConstant, number>
 --- @field _delays table<love.KeyConstant, number>
 --- @field _is_active boolean
---- @field frame_n integer
---- @field cpu_time number
---- @field start_time number
---- @field screenshot love.Canvas
---- @field debug boolean
---- @field args table CLI args
 local methods = {}
 local mt = {__index = methods}
 
+--- @param args table
 --- @return kernel
-kernel.new = function()
+kernel.new = function(args)
   return setmetatable({
-    _specific_key_rates = {},
-    _delays = {},
+    gui = require("engine.gui").new(),
+    overlay = require("engine.kernel.debug_overlay").new(args.debug and not args.youtube),
+    args = args,
+    debug = args.debug,
     frame_n = 0,
     cpu_time = 0,
     start_time = 0,
-    _is_active = false,
     screenshot = love.graphics.newCanvas(),
+    _specific_key_rates = {},
+    _delays = {},
+    _is_active = false,
   }, mt)
 end
 

@@ -90,6 +90,18 @@ sprite.grid = function(grid)
   }
 end
 
+--- @param path string
+--- @return sprite_image[]
+sprite.collection = function(path)
+  local atlas = love.image.newImageData(path)
+  local w, h = atlas:getDimensions()
+  local result = {}
+  for i = 1, w * h / sprite.cell_size / sprite.cell_size do
+    result[i] = sprite.image(sprite.utility.select(atlas, i))
+  end
+  return result
+end
+
 --- @param base love.ImageData
 --- @param n integer
 sprite.utility.select = function(base, n)

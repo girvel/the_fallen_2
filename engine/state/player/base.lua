@@ -49,7 +49,7 @@ base.mix_in = function(entity)
   entity.is_deaf = false
   entity.on_add = function(self)
     self.memory = love.graphics.newCanvas(unpack(
-      State.level.grid_size * sprite.cell_size * State.camera.SCALE
+      State.level.grid_size * sprite.cell_size * State.camera.scale
     ))
   end
 

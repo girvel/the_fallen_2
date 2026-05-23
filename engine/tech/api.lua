@@ -22,15 +22,16 @@ api.to_vector = function(x)
 end
 
 api.scale = function(scale, duration)
-  scale = scale or 4
+  scale = scale or State.camera.base_scale
   duration = duration or .5
+  local prev_scale = State.camera.scale
   return State.runner:run_task(function()
     local start = love.timer.getTime()
     while true do
       local now = love.timer.getTime()
       local delta = now - start
       if delta > duration then break end
-      State.camera.SCALE = 4 + (scale - 4) * delta / duration
+      State.camera.scale = prev_scale + (scale - prev_scale) * delta / duration
       State.camera:immediate_center()
       coroutine.yield()
     end
@@ -280,7 +281,7 @@ end
 --- @param text string
 api.line = function(source, text)
   assert(
-    State.runner.locked_entities[State.player],
+    State.level.locked_entities[State.player],
     "api.line shouldn't be called when the player is not locked into a cutscene"
   )
 
@@ -421,7 +422,7 @@ api.autosave = function(name)
   local _, scene = State.runner:run_task(function()
     Log.debug("Planned autosave %q", name)
 
-    while State.runner.locked_entities[State.player] or State.combat do
+    while State.level.locked_entities[State.player] or State.combat do
       coroutine.yield()
     end
 

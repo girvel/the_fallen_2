@@ -1,4 +1,3 @@
-local spells = require("engine.mech.spells")
 local item = require("engine.tech.item")
 local perks = require("engine.mech.perks")
 local animated = require("engine.tech.animated")
@@ -142,6 +141,8 @@ for _, tuple in ipairs {
   {15, "shelf_blue", "полки", "assets/sounds/cabinet/open"},
   {21, "chest", "сундук", "assets/sounds/chest/open"},
   {23, "bin", "урна", false},
+  {29, "chest", "сундук", false},
+  {31, "chest", "сундук", false},
 } do
   local index, codename, name, sound_path = unpack(tuple --[=[@as [integer, string, string, string]]=])
   local codename_open = codename .. "_open"
@@ -314,6 +315,21 @@ do
   end
 end
 
+solids[packer:geti(2)] = function()
+  local result = {
+    codename = "water",
+    boring_flag = true,
+    transparent_flag = true,
+    low_flag = true,
+    on_remove = function(self)
+      self.grid_layer = "tiles"
+      State:add(self)
+    end,
+  }
+  animated.mix_in(result, "assets/animations/water", "no_atlas")
+  return result
+end
+
 ----------------------------------------------------------------------------------------------------
 -- [SECTION] Entities
 ----------------------------------------------------------------------------------------------------
@@ -361,7 +377,7 @@ solids.pig = function()
       perks.passive,
     },
     on_half_hp = humanoid.add_blood_mark,
-    on_death = humanoid.add_body,
+    on_death = humanoid.add_blood_mark,
   }
   creature.mix_in(e)
   animated.mix_in(e, "assets/animations/pig")
@@ -400,7 +416,7 @@ solids.boar = function()
       perks.relentless,
     },
     on_half_hp = humanoid.add_blood_mark,
-    on_death = humanoid.add_body,
+    on_death = humanoid.add_blood_mark,
   }
   creature.mix_in(e)
   animated.mix_in(e, "assets/animations/pig")

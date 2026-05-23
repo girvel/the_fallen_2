@@ -51,6 +51,7 @@ end
 --- | '"light"'
 --- | '"additional_actions"'
 --- | '"hit_dice_result"'
+--- | '"on_kill"'
 
 --- @param self entity
 --- @param modname creature_modification
@@ -192,19 +193,29 @@ local FAILURE = sound.multiple("engine/assets/sounds/check_failed")
 --- @param to_check ability|skill
 --- @param dc integer difficulty class
 --- @return boolean
-methods.ability_check = function(self, to_check, dc)
+methods.ability_check_precog = function(self, to_check, dc)
   local roll = D(20) + self:get_modifier(to_check)
   local result = roll:roll()
-
   Log.debug("%s rolls check %s: %s against %s",
     Name.code(self), to_check, result, dc
   )
+  return result >= dc
+end
 
-  local success = result >= dc
-
+--- @param self entity
+--- @param success boolean
+methods.ability_check_enact = function(self, success)
   local sounds = success and SUCCESS or FAILURE
   sounds:play_at(self.position)
+end
 
+--- @param self entity
+--- @param to_check ability|skill
+--- @param dc integer difficulty class
+--- @return boolean
+methods.ability_check = function(self, to_check, dc)
+  local success = self:ability_check_precog(to_check, dc)
+  self:ability_check_enact(success)
   return success
 end
 
@@ -300,12 +311,12 @@ end
 
 --- Whether the entity can use actions at this moment
 methods.can_act = function(self)
-  return not State.runner.locked_entities[self] and not (State.combat and State.combat:get_current() ~= self)
+  return not State.level.locked_entities[self] and not (State.combat and State.combat:get_current() ~= self)
 end
 
 --- Whether the entity is free from cutscenes/combat
 methods.is_free = function(self)
-  return not State.runner.locked_entities[self] and not (State.combat and State:in_combat(self))
+  return not State.level.locked_entities[self] and not (State.combat and State:in_combat(self))
 end
 
 Ldump.mark(creature, {

@@ -18,24 +18,24 @@ humanoid.cues = {
   end,
 }
 
-local blood_mark = function()
-  local atlas = love.image.newImageData("engine/assets/sprites/blood_mark.png")
+local blood_mark_sprites = sprite.collection("engine/assets/sprites/blood_mark.png")
+humanoid.add_blood_mark = mark(function()
   return {
     codename = "blood_mark",
     boring_flag = true,
-    sprite = sprite.image(sprite.utility.select(atlas, math.random(1, 2))),
+    sprite = Random.item(blood_mark_sprites),
   }
-end
+end)
 
-humanoid.add_blood_mark = mark(blood_mark)
-
-humanoid.add_body = function(self)
-  local e = humanoid.add_blood_mark(self)
-  if e then
-    e.body_flag = true
-  end
-  return e
-end
+local body_sprites = sprite.collection("engine/assets/sprites/body.png")
+humanoid.add_body = mark(function()
+  return {
+    codename = "body",
+    boring_flag = true,
+    body_flag = true,
+    sprite = Random.item(body_sprites),
+  }
+end)
 
 local humanoid_defaults = {
   transparent_flag = true,
