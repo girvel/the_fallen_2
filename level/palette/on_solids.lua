@@ -248,5 +248,17 @@ do
   end
 end
 
+packer.offset = 96
+for index = 1, 8 do
+  local i, this_sprite = packer:geti(index)
+  on_solids[i] = function()
+    return {
+      boring_flag = true,
+      codename = "plaster",
+      sprite = this_sprite,
+    }
+  end
+end
+
 Ldump.mark(on_solids, {}, ...)
 return on_solids

@@ -30,7 +30,6 @@ end
 init_debug = function()
   item.give(State.player, State:add(items.knife()))
   item.give(State.player, State:add(items.knife()))
-  item.give(State.player, State:add(items.knife()))
   -- State.player.hp = 100
   -- State.player.max_hp = 100
   State.player.xp = xp.to_reach(2)
@@ -42,7 +41,7 @@ init_debug = function()
       if element.type == "lines" then
         for _, line in ipairs(element.lines) do
           if line.source ~= "narration" then
-            line.text = jumble(line.text, .2)
+            line.text = jumble(line.text, ratio)
           end
         end
       end
@@ -65,7 +64,7 @@ init_debug = function()
       end,
 
       _run = function(self, ch, ps, sp)
-        jumble_lines(sp, .2)
+        jumble_lines(sp, .4)
         sp:lines()
       end,
 
