@@ -76,18 +76,7 @@ end
 
 packer.offset = 32
 
-for x = 1, 7 do
-  for y = 1, 2 do
-    local i, this_sprite = packer:get(x, y)
-    on_solids[i] = function()
-      return {
-        boring_flag = true,
-        codename = "cobweb",
-        sprite = this_sprite,
-      }
-    end
-  end
-end
+-- empty --
 
 packer.offset = 48
 

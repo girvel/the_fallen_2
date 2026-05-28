@@ -9,6 +9,7 @@ level.grid_layers = {
   "items",
   "solids",
   "on_solids",
+  "on2_solids",
   "shadows",
 }
 
@@ -23,7 +24,7 @@ for i, l1 in ipairs(level.grid_layers) do
   end
 end
 
---- @alias layer "tiles"|"on_tiles"|"marks"|"fx_under"|"items"|"solids"|"fx_over"|"on_solids"|"weather"|"shadows"|"fx_over_shadows"
+--- @alias layer "tiles"|"on_tiles"|"marks"|"fx_under"|"items"|"solids"|"fx_over"|"on_solids"|"on2_solids"|"weather"|"shadows"|"fx_over_shadows"
 level.layers = {
   "tiles",
   "on_tiles",
@@ -33,10 +34,18 @@ level.layers = {
   "solids",
   "fx_over",
   "on_solids",
-  "weather",
+  "on2_solids",
   "shadows",
   "fx_over_shadows",
+  "weather",
 }
+
+do
+  local missing = Fun.iter(level.grid_layers)
+    :filter(function(l) return not Table.contains(level.layers, l) end)
+    :totable()
+  assert(#missing == 0, ("Grid layers %s not in level.layers"):format(Inspect(missing)))
+end
 
 --- Forcefully move entity to a new position
 --- @param entity entity

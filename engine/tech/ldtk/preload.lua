@@ -86,6 +86,8 @@ end
 --- @field capture_name string
 --- @field layer string
 
+--- @return string?
+--- @return string?
 local fields = function(instance, ...)
   local len = select("#", ...)
   assert(len <= 2)

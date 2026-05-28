@@ -26,7 +26,7 @@
 - Tools
 - Breakable vases
 - Sofas
-- Partial paint on walls?
++ Partial paint on walls?
 - Mirror
 - Paintings?
 - ...Some of the decorations from Fallen, maybe pipes?
