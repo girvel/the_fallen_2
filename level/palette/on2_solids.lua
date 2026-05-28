@@ -42,5 +42,17 @@ do
   end
 end
 
+packer.offset = 40
+for x = 1, 6 do
+  local i, this_sprite = packer:get(x, 1)
+  on2_solids[i] = function()
+    return {
+      boring_flag = true,
+      codename = "lamp",
+      sprite = this_sprite,
+    }
+  end
+end
+
 Ldump.mark(on2_solids, {}, ...)
 return on2_solids

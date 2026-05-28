@@ -14,8 +14,8 @@ local packer = factoring.packer(on_solids.ATLAS_IMAGE)
 
 packer.offset = 0
 
-for x = 1, 3 do
-  for y = 1, 2 do
+do
+  local define_vines = function(x, y)
     local i, this_sprite = packer:get(x, y)
     on_solids[i] = function()
       return {
@@ -23,6 +23,18 @@ for x = 1, 3 do
         codename = "vines",
         sprite = this_sprite,
       }
+    end
+  end
+
+  for x = 1, 3 do
+    for y = 1, 2 do
+      define_vines(x, y)
+    end
+  end
+
+  for x = 4, 5 do
+    for y = 3, 4 do
+      define_vines(x, y)
     end
   end
 end

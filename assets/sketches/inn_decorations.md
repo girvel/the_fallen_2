@@ -11,8 +11,6 @@
 - Storage shelves (top and top+bottom)
 - Bookshelves
 - Beer barrels
-- Lamps
-- Less monotonous vines
 - Hay (in blocks & walkable)
 - Дрова и место для колки дров
 - Benches (for outside)
@@ -32,6 +30,8 @@
 - Рог
 - Ложки, ножи
 - Висящие на стене кухонные приборы
++ Lamps
++ Less monotonous vines
 + Wine
 + Wine glasses?
 + More broken floors
