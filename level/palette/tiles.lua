@@ -26,8 +26,8 @@ end
 for index, codename in ipairs {
   "stone_bricks", "stone_bricks", "stone", "sand", "roots", "leaves", "grass", "grass",
   "stone_bricks", "stone_bricks", "wtf", "dirt", false, "leaves", "flowers_red", "flowers_red",
-  false, "planks", "walkway_stone", "walkway", false, false, "flowers_blue", "flowers_blue",
-  false, false, false, false, false, false, false, false,
+  "planks", "planks", "walkway_stone", "walkway", false, false, "flowers_blue", "flowers_blue",
+  "planks", "planks", false, false, false, false, false, false,
   "ornament", "ornament", "ornament", "ornament", false, false, false, false,
   "ornament", "ornament", "ornament", "ornament", false, false, false, false,
   "ornament", "ornament", "ornament", "ornament", false, false, false, false,
