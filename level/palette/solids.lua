@@ -143,6 +143,7 @@ for _, tuple in ipairs {
   {23, "bin", "урна", false},
   {29, "chest", "сундук", false},
   {31, "chest", "сундук", false},
+  {47, "barrel", "бочка", false},
 } do
   local index, codename, name, sound_path = unpack(tuple --[=[@as [integer, string, string, string]]=])
   local codename_open = codename .. "_open"

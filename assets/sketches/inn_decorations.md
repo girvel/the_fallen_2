@@ -30,6 +30,7 @@
 - Рог
 - Ложки, ножи
 - Висящие на стене кухонные приборы
++ Barrels
 + Lamps
 + Less monotonous vines
 + Wine
