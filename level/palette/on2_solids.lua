@@ -19,5 +19,28 @@ for x = 1, 7 do
   end
 end
 
+for x = 1, 2 do
+  local i, this_sprite = packer:get(x, 3)
+  on2_solids[i] = function()
+    return {
+      boring_flag = true,
+      codename = "herbs",
+      sprite = this_sprite,
+    }
+  end
+end
+
+packer.offset = 32
+do
+  local i, this_sprite = packer:get(1, 1)
+  on2_solids[i] = function()
+    return {
+      boring_flag = true,
+      codename = "wine_glass",
+      sprite = this_sprite,
+    }
+  end
+end
+
 Ldump.mark(on2_solids, {}, ...)
 return on2_solids

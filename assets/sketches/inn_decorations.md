@@ -5,18 +5,13 @@
 - Sink
 - Bath
 - Toilet
-- Wine
-- Wine glasses?
 - Posters (on the wall)
-- Newspaper
 - Windows
 - Sacks (like with food/seeds)
 - Storage shelves (top and top+bottom)
 - Bookshelves
 - Beer barrels
 - Lamps
-- More broken floors
-- Less broken floors
 - Less monotonous vines
 - Hay (in blocks & walkable)
 - Дрова и место для колки дров
@@ -26,7 +21,6 @@
 - Tools
 - Breakable vases
 - Sofas
-+ Partial paint on walls?
 - Mirror
 - Paintings?
 - ...Some of the decorations from Fallen, maybe pipes?
@@ -38,6 +32,12 @@
 - Рог
 - Ложки, ножи
 - Висящие на стене кухонные приборы
++ Wine
++ Wine glasses?
++ More broken floors
++ Less broken floors
++ Newspaper
++ Partial paint on walls?
 
 ## Sources
 

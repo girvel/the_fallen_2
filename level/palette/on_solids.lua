@@ -91,17 +91,6 @@ for index = 1, 2 do
   end
 end
 
-for index = 7, 8 do
-  local i, this_sprite = packer:geti(index)
-  on_solids[i] = function()
-    return {
-      boring_flag = true,
-      codename = "herbs",
-      sprite = this_sprite,
-    }
-  end
-end
-
 for index = 9, 12 do
   local i, this_sprite = packer:geti(index)
   on_solids[i] = function()
@@ -158,12 +147,34 @@ for index = 20, 22 do
 end
 
 -- TODO drinking beer?
-for index = 28, 28 do
-  local i, this_sprite = packer:geti(index)
+do
+  local i, this_sprite = packer:geti(28)
   on_solids[i] = function()
     return {
       boring_flag = true,
       codename = "beer",
+      sprite = this_sprite,
+    }
+  end
+end
+
+do
+  local i, this_sprite = packer:geti(29)
+  on_solids[i] = function()
+    return {
+      boring_flag = true,
+      codename = "newspaper",
+      sprite = this_sprite,
+    }
+  end
+end
+
+do
+  local i, this_sprite = packer:geti(30)
+  on_solids[i] = function()
+    return {
+      boring_flag = true,
+      codename = "wine_bottle",
       sprite = this_sprite,
     }
   end
