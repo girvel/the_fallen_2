@@ -44,7 +44,13 @@ local draw_entity = function(self, entity, dt)
     love.graphics.print({this_sprite.color, this_sprite.text}, x, y)
   elseif this_sprite.type == "rendered" then
     local drawable = this_sprite:render(entity, dt)
-    love.graphics.draw(drawable, x, y, 0, State.camera.scale)
+    if this_sprite.anchor == "screen" then
+      love.graphics.draw(drawable, unpack(entity.position))
+    elseif this_sprite.anchor == "world" then
+      love.graphics.draw(drawable, x, y, 0, State.camera.scale)
+    else
+      Error("Unknown rendered sprite .anchor %q", this_sprite.anchor)
+    end
   else
     Error("Unknown sprite type %q", this_sprite.type)
   end

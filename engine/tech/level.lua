@@ -1,7 +1,7 @@
 --- Module for level grid logic
 local level = {}
 
---- @alias grid_layer "tiles"|"on_tiles"|"items"|"marks"|"solids"|"on_solids"|"shadows"
+--- @alias grid_layer "tiles"|"on_tiles"|"items"|"marks"|"solids"|"on_solids"
 level.grid_layers = {
   "tiles",
   "on_tiles",
@@ -10,7 +10,6 @@ level.grid_layers = {
   "solids",
   "on_solids",
   "on2_solids",
-  "shadows",
 }
 
 for i, l1 in ipairs(level.grid_layers) do

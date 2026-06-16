@@ -1,3 +1,4 @@
+local shadow = require("engine.state.shadow")
 local async = require("engine.tech.async")
 local level = require("engine.tech.level")
 local combat = require("engine.state.combat")
@@ -18,10 +19,10 @@ local state = {}
 --- @field period state_period
 --- @field uid state_uid
 --- @field stats state_stats
+--- @field shadow state_shadow
 --- @field shader shader?
 --- @field rails rails
 --- @field grids table<grid_layer, grid<entity>>
---- @field grid_size vector
 --- @field level level
 --- @field player player
 --- @field is_loaded boolean is level fully loaded
@@ -182,13 +183,16 @@ methods.load_level = function(self, path)
   self._travel_map = tcod.map(self.grids.solids)
 
   for layer, grid in pairs(self.grids) do
-    State:add({
+    self:add({
       codename = layer .. "_grid_container",
       sprite = sprite.grid(grid),
       layer = layer,
       position = Vector.zero,
     })
   end
+
+  self.shadow = shadow.new(self.level.grid_size)
+  self:add(shadow.new_entity())
 
   for i, e in ipairs(load_data.entities) do
     e = self:add(e)

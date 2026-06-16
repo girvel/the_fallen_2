@@ -109,6 +109,7 @@ rain.render = function(self, entity, dt)
     local target = Vector.use(Random.float, start, finish)
     local target_cell = (target / sprite.cell_size):map(math.floor)
 
+    assert(false, "Rain still uses State.grids.shadows")
     if State.grids.shadows:slow_get(target_cell, true) then goto continue end
 
     local e = State.grids.solids[target_cell]

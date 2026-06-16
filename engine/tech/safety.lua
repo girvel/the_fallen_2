@@ -25,6 +25,8 @@ safety.assert = function(condition, message)
   return condition
 end
 
+local seen = {}
+
 --- Errors in debug mode, warns in release
 --- @param fmt any
 --- @param ... any
@@ -39,7 +41,10 @@ safety.error = function(fmt, ...)
   if Kernel.debug then
     error(message, 1)
   else
-    Log.log("error", 1, message)
+    if not seen[message] then
+      Log.log("error", 1, message)
+      seen[message] = true
+    end
   end
 end
 

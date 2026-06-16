@@ -2,7 +2,6 @@ local colors = require("engine.tech.colors")
 local ui = require("engine.tech.ui")
 local memory = require("engine.tech.shaders.memory")
 local saves = require("engine.kernel.saves")
-local state = require("engine.state")
 local safety = require "engine.tech.safety"
 local cli = require "engine.kernel.cli"
 local async = require "engine.tech.async"
