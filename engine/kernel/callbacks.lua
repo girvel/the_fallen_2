@@ -45,15 +45,29 @@ love.load = function(args)
     }
   end
 
-  if args.resolution then
-    love.window.updateMode(args.resolution[1], args.resolution[2], {fullscreen = false, minheight = 200, minwidth = 200})
-  else
-    love.window.updateMode(0, 0, {fullscreen = true, minheight = 200, minwidth = 200})
-  end
-
-  if args.youtube then
+  do
+    local mode = {minheight = 200, minwidth = 200}
+    local w, h
     if args.resolution then
-      love.window.setPosition(200, 200)
+      mode.fullscreen = false
+      w, h = unpack(args.resolution)
+    else
+      mode.fullscreen = true
+      w = 0
+      h = 0
+    end
+
+    if args.fixed_size then
+      mode.resizable = false
+    end
+
+    if args.youtube then
+      mode.x = 200
+      mode.y = 200
+    end
+
+    if args.resolution then
+      love.window.updateMode(w, h, mode)
     end
   end
 

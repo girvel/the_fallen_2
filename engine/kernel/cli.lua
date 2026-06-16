@@ -53,6 +53,11 @@ cli.parse = function(args)
     "-r --resolution"
   ):args("?")
 
+  parser:flag(
+    "-f --fixed-size",
+    "Disable resizing of the window"
+  )
+
   args[-2] = nil
   args[-1] = nil
 
@@ -64,17 +69,18 @@ cli.parse = function(args)
   local result = parser:parse(args)
 
   if result.resolution then
-    result.resolution = result.resolution[1] or "1080p"
+    local resolution = result.resolution[1] or "1080p"
     local builtin_resolutions = {
       ["1080p"] = V(1920, 1080),
       ["720p"] = V(1280, 720),
       ["360p"] = V(640, 360),
     }
 
-    assert(builtin_resolutions[result.resolution] or result.resolution:find("x"))
+    assert(builtin_resolutions[resolution] or resolution:find("x"))
 
-    result.resolution = builtin_resolutions[result.resolution]
-      or Vector.own(Fun.iter(result.resolution / "x"):map(tonumber):totable())
+    --- @type vector
+    result.resolution = builtin_resolutions[resolution]
+      or Vector.own(Fun.iter(resolution / "x"):map(tonumber):totable())
   end
 
   result.mobdebug = is_mobdebug_attached
