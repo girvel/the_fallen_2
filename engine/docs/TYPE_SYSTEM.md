@@ -5,6 +5,7 @@
 - A single isolated type can be defined using `module.mt = {__index = methods}` convention.
 - If the type is not isolated (like entities can contain sprites, be animated, be interactive, ...), `methods` are not used; instead, the instance is created through mixing data from multiple sources (like .mix_in functions).
 - Good format for actions & spells: single constructor that sets defaults & does boilerplate
+- Even though `State.<something>` objects are single-instance and can be produced using `dofile`, their constructors sometimes receive arguments (like State.shadow depends on grid_size) => typical .new constructors
 
 ## Historically
 
