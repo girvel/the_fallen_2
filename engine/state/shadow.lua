@@ -1,3 +1,4 @@
+local sprite = require("engine.tech.sprite")
 local shadow = {}
 
 --- @class state_shadow
@@ -22,7 +23,28 @@ local shadow_sprite = {
     local prev_canvas = love.graphics.getCanvas()
     love.graphics.setCanvas(entity._shadow_canvas)
       love.graphics.clear(Vector.transparent)
-      love.graphics.print("Hello, world", 100, 100)
+
+      local k = State.camera.scale * sprite.cell_size
+      local ox, oy = unpack(State.camera.offset:map(function(a) return (-a) % k - k end))
+
+      local prev_color = {love.graphics.getColor()}
+        local vision_start = State.camera.vision_start
+        local vision_end = State.camera.vision_end
+
+        for x = vision_start.x, vision_end.x do
+          for y = vision_start.y, vision_end.y do
+            local shadow_value = State.shadow.static:unsafe_get(x, y)
+            love.graphics.setColor(0, 0, 0, shadow_value)
+            love.graphics.rectangle(
+              "fill",
+              ox + (x - vision_start.x) * k,
+              oy + (y - vision_start.y) * k,
+              k, k
+            )
+          end
+        end
+        love.graphics.rectangle("fill", ox, oy, k, k)
+      love.graphics.setColor(prev_color)
     love.graphics.setCanvas(prev_canvas)
     return entity._shadow_canvas
   end,

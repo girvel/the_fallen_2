@@ -11,8 +11,8 @@ local camera = {}
 --- @field is_camera_following boolean
 --- @field is_moving boolean (internally set)
 --- @field offset vector (internally set) offset in pixels relative to the grid start
---- @field vision_start vector (internally set)
---- @field vision_end vector (internally set)
+--- @field vision_start vector (internally set) the grid coordinate of the first cell visible in top left corner, clamped to grid size
+--- @field vision_end vector (internally set) the grid coordinate of the last cell visible in bottom right corner, clamped to grid size
 --- @field sidebar_w integer sidebar width in screen pixels
 --- @field scale integer current scaling coefficient
 --- @field base_scale integer starting scaling coefficient

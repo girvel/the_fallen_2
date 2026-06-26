@@ -154,10 +154,8 @@ spells.hex = action.leveled_spell(1, function(mod, cast_level)
       local target = params.entity_targets[1]
       api.rotate(entity, target)
       entity:animate("hand_attack")
-      Log.tracel(target)
       if target.conditions then
         table.insert(target.conditions, hexed(entity))
-        Log.tracel(target.conditions)
       end
       animated.add_fx("engine/assets/animations/hex", target.position, "fx_over")
       return true

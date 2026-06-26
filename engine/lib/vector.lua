@@ -278,18 +278,19 @@ vector_methods.unm_mut = function(self)
 end
 
 --- @param self vector
---- @param f fun(n: number): number
+--- @param f fun(n: number, i: integer): number
 --- @return vector
 vector_methods.map_mut = function(self, f)
   for i, value in ipairs(self) do
-    self[i] = f(value)
+    self[i] = f(value, i)
   end
   return self
 end
 
 --- @param self vector
---- @param f fun(n: number): number
+--- @param f fun(n: number, i: integer): number
 --- @return vector
+--- @nodiscard
 vector_methods.map = function(self, f)
   return self:copy():map_mut(f)
 end

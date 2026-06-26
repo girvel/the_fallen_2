@@ -1,7 +1,7 @@
 local jumble = require("engine.tech.jumble")
 
 
-Log.traces(jumble(
+Log.debug(jumble(
   'Но я же не могу сказать: "Ну ладно, хорошо, иди давай", это как-то непрофессионально, так что я начинаю тянуться к кинжалу.',
   .8
 ))
