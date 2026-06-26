@@ -156,17 +156,18 @@ put_positions = function(layer, offset, positions, captures)
       local capture_name, this_layer = fields(instance, "capture_name", "layer")
       if capture_name == nil or capture_name == "" then
         Error("No capture_name for entity_capture @local:%s", position)
-      end
+      end  --- @cast capture_name string
       if this_layer == nil or this_layer == "" then
         Error("No layer for entity_capture @local:%s", position)
-      end
+      end  --- @cast this_layer string
 
       captures[position] = {
         capture_name = capture_name,
         layer = this_layer,
       }
     elseif instance.__identifier:ends_with("_N") then
-      local position = absolute_position(instance)
+      local position = relative_position(instance)
+        :add_mut(offset)
       local prefix = instance.__identifier:sub(1, -3)
 
       if not last_index[prefix] then

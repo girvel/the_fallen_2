@@ -69,7 +69,7 @@ ldtk.load = function(path)
 end
 
 --- @param prefix string
---- @return string[]
+--- @return vector[]
 level_methods.position_sequence = function(self, prefix)
   local result = {}
   local count = 0
@@ -81,10 +81,6 @@ level_methods.position_sequence = function(self, prefix)
     count = count + 1
 
     ::continue::
-  end
-
-  if #result == 0 then
-    Error("No elements in position sequence %q", prefix)
   end
 
   if count ~= #result then
