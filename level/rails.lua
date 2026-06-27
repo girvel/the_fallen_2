@@ -29,7 +29,7 @@ end
 
 init_debug = function()
   item.give(State.player, State:add(items.knife()))
-  item.give(State.player, State:add(items.knife()))
+  item.give(State.player, State:add(items.lamp()))
   -- State.player.hp = 100
   -- State.player.max_hp = 100
   State.player.xp = xp.to_reach(2)

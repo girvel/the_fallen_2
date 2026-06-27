@@ -50,7 +50,7 @@ for x = 1, 6 do
       boring_flag = true,
       codename = "lamp",
       sprite = this_sprite,
-      light_intensity = 0.5,  -- NEXT lamp item, rm this
+      light_intensity = 0.5,
     }
   end
 end
