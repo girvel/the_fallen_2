@@ -1,3 +1,4 @@
+local level = require("engine.tech.level")
 local sprite = require("engine.tech.sprite")
 local shadow = {}
 
@@ -16,6 +17,7 @@ shadow.new = function(grid_size)
   local house_starts = State.level:position_sequence("house")
   local house_ends = State.level:position_sequence("house_end")
   assert(#house_starts == #house_ends)
+  Log.tracel(house_starts, house_ends)
   for i = 1, #house_starts do
     for x = house_starts[i].x, house_ends[i].x do
       for y = house_starts[i].y, house_ends[i].y do
@@ -31,6 +33,7 @@ end
 local shadow_sprite = {
   type = "rendered",
   anchor = "screen",
+
   --- @param entity entity
   --- @param dt number
   render = function(self, entity, dt)
@@ -44,15 +47,61 @@ local shadow_sprite = {
       local prev_color = {love.graphics.getColor()}
         local vision_start = State.camera.vision_start
         local vision_end = State.camera.vision_end
+        local vision_size = vision_end:copy():sub_mut(vision_start):add_mut(Vector.one)
+
+        local light_grid = Grid.new(vision_size, function() return 0 end)
+
+        for relx = 1, vision_size.x do
+          for rely = 1, vision_size.y do
+            local x = vision_start.x + relx - 1
+            local y = vision_start.y + rely - 1
+
+            local light_value = 0
+            for _, layer_name in ipairs(level.grid_layers) do
+              local e = State.grids[layer_name]:unsafe_get(x, y)
+              if not e then goto continue end
+              if e.light_intensity then
+                light_value = math.max(light_value, e.light_intensity)
+              end
+
+              if not e.inventory then goto continue end
+              for _, item in pairs(e.inventory) do
+                if item.light_intensity then
+                  light_value = math.max(light_value, item.light_intensity)
+                end
+              end
+
+              ::continue::
+            end
+
+            -- NEXT optimize
+            if light_value > 0 then
+              local light_value_int = math.ceil(light_value / .1)
+              for d in Iteration.rhombus(light_value_int) do
+                local x1 = relx + d.x
+                local y1 = rely + d.y
+                if light_grid:can_fitn(x1, y1) then
+                  local v = light_grid:unsafe_get(x1, y1) + (light_value_int - d:abs2()) * .1
+                  light_grid:unsafe_set(x1, y1, v)
+                end
+              end
+            end
+          end
+        end
 
         for x = vision_start.x, vision_end.x do
           for y = vision_start.y, vision_end.y do
+            local relx = x - vision_start.x + 1
+            local rely = y - vision_start.y + 1
             local shadow_value = State.shadow.static:unsafe_get(x, y)
+            local light_value = light_grid:unsafe_get(relx, rely)
+            shadow_value = math.max(0, shadow_value - light_value)
+
             love.graphics.setColor(0, 0, 0, shadow_value)
             love.graphics.rectangle(
               "fill",
-              ox + (x - vision_start.x) * k,
-              oy + (y - vision_start.y) * k,
+              ox + (relx - 1) * k,
+              oy + (rely - 1) * k,
               k, k
             )
           end

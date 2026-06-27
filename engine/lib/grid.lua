@@ -57,6 +57,15 @@ methods.can_fit = function(self, v)
   return vector.zero < v and self.size >= v
 end
 
+--- @param self grid
+--- @param x integer
+--- @param y integer
+--- @return boolean
+methods.can_fitn = function(self, x, y)
+  return 1 <= x and x <= self.size.x
+    and 1 <= y and y <= self.size.y
+end
+
 --- @generic T, D
 --- @param self grid<T>
 --- @param v vector

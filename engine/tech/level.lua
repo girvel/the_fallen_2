@@ -1,7 +1,7 @@
 --- Module for level grid logic
 local level = {}
 
---- @alias grid_layer "tiles"|"on_tiles"|"items"|"marks"|"solids"|"on_solids"
+--- @alias grid_layer "tiles"|"on_tiles"|"items"|"marks"|"solids"|"on_solids"|"on2_solids"
 level.grid_layers = {
   "tiles",
   "on_tiles",

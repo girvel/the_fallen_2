@@ -2,7 +2,7 @@ local vector = require("engine.lib.vector")
 
 local iteration = {}
 
---- Guarantees that returned vectors are not references anywhere else
+--- Guarantees that returned vectors are not referenced anywhere else
 --- @param radius? integer
 --- @return fun(): vector
 iteration.rhombus = function(radius)
@@ -29,7 +29,7 @@ iteration.rhombus = function(radius)
   end)
 end
 
---- Guarantees that returned vectors are not references anywhere else
+--- Guarantees that returned vectors are not referenced anywhere else
 --- @param radius? integer
 --- @return fun(): vector
 iteration.rhombus_edge = function(radius)

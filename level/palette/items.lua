@@ -53,6 +53,7 @@ items.knife = function()
       light = true,
     },
     slot = "hands",
+    light_intensity = .5,
   }
   item.mix_in(e, "assets/animations/knife")
   return e
