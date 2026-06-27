@@ -30,6 +30,7 @@ local level_methods = {}
 --- @field entities entity[]
 --- @field rails_new fun(checkpoint: string): rails
 --- @field level level
+--- @field shadows grid<number>
 
 --- Read LDtk level file
 --- @async
@@ -65,6 +66,7 @@ ldtk.load = function(path)
     entities = generation_data.entities,
     rails_new = definition.rails_new,
     level = level,
+    shadows = preload_data.shadows,
   }
 end
 

@@ -191,7 +191,7 @@ methods.load_level = function(self, path)
     })
   end
 
-  self.shadow = shadow.new(self.level.grid_size)
+  self.shadow = shadow.new(load_data.shadows)
   self:add(shadow.new_entity())
 
   for i, e in ipairs(load_data.entities) do

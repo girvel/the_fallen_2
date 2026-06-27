@@ -1,5 +1,7 @@
 local level = require("engine.tech.level")
 local sprite = require("engine.tech.sprite")
+
+
 local shadow = {}
 
 --- @class state_shadow
@@ -7,26 +9,11 @@ local shadow = {}
 local methods = {}
 shadow.mt = {__index = methods}
 
-local VALUE_HOUSE = .3
-
---- @param grid_size vector
+--- @param base_grid grid<number>
 --- @return state_shadow
-shadow.new = function(grid_size)
-  local static = Grid.new(grid_size, function() return 0 end)
-  -- NEXT shadows in houses should be manual
-  local house_starts = State.level:position_sequence("house")
-  local house_ends = State.level:position_sequence("house_end")
-  assert(#house_starts == #house_ends)
-  Log.tracel(house_starts, house_ends)
-  for i = 1, #house_starts do
-    for x = house_starts[i].x, house_ends[i].x do
-      for y = house_starts[i].y, house_ends[i].y do
-        static:unsafe_set(x, y, VALUE_HOUSE)
-      end
-    end
-  end
+shadow.new = function(base_grid)
   return setmetatable({
-    static = static,
+    static = base_grid,
   }, shadow.mt)
 end
 

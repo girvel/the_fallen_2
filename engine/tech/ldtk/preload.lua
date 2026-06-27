@@ -8,6 +8,7 @@ local sprite = require("engine.tech.sprite")
 --- @field size vector
 --- @field positions table<string, vector>
 --- @field entities table<string, preload_entity[]>
+--- @field shadows grid<number>
 
 --- @class preload_entity
 --- @field position vector
@@ -15,7 +16,7 @@ local sprite = require("engine.tech.sprite")
 --- @field capture_name? string
 --- @field args? string
 
-local put_positions, put_entities, put_tiles
+local put_positions, put_shadows, put_entities, put_tiles
 
 --- @param root table
 --- @return preload_level
@@ -23,15 +24,19 @@ local preload = function(root)
   local start_t = love.timer.getTime()
 
   local total_offset = Vector.zero
+  local total_size = Vector.zero
   for _, ldtk_level in ipairs(root.levels) do
     local offset = V(ldtk_level.worldX, ldtk_level.worldY):div_mut(-sprite.cell_size)
     total_offset = Vector.use(math.max, total_offset, offset)
+    local size = V(ldtk_level.pxWid, ldtk_level.pxHei):div_mut(sprite.cell_size)
+    total_size = Vector.use(math.max, total_size, offset + size)
   end
 
   local result = {
-    size = Vector.zero,
+    size = total_size,
     positions = {},
     entities = {},
+    shadows = Grid.new(total_size, function() return 0 end),
   }  --[[@as preload_level]]
 
   for _, ldtk_level in ipairs(root.levels) do
@@ -40,26 +45,22 @@ local preload = function(root)
       :add_mut(total_offset)
     local size = V(ldtk_level.pxWid, ldtk_level.pxHei)
       :div_mut(sprite.cell_size)
-    result.size = Vector.use(math.max, result.size, offset + size)
 
     local captures = Grid.new(size)  --[[@as grid<preload_capture>]]
     for _, layer in ipairs(ldtk_level.layerInstances) do
       if layer.__identifier == "positions" then
         put_positions(layer, offset, result.positions, captures)
-        goto continue
-      end
-
-      if layer.__type == "Entities" then
+      elseif layer.__identifier == "shadows" then
+        put_shadows(layer, offset, result.shadows)
+      elseif layer.__type == "Entities" then
         put_entities(layer, offset, captures, result.entities)
       elseif layer.__type == "Tiles" then
         put_tiles(layer, offset, captures, result.entities, false)
       elseif layer.__type == "IntGrid" then
         put_tiles(layer, offset, captures, result.entities, true)
       else
-        Error("Unsupported error type %s", layer.__type)
+        Error("Unsupported layer type %s", layer.__type)
       end
-
-      ::continue::
     end
 
     if Table.count(captures._inner_array) > 0 then
@@ -209,6 +210,21 @@ put_positions = function(layer, offset, positions, captures)
     else
       Error("Unknown position layer entity %q", instance.__identifier)
     end
+  end
+end
+
+--- @param layer table
+--- @param offset vector
+--- @param shadows grid<number>
+put_shadows = function(layer, offset, shadows)
+  if layer.__type ~= "Tiles" then
+    Error("Expected shadow layer to be of type \"tiles\"")
+  end
+
+  for _, instance in ipairs(layer.gridTiles) do
+    local pos = tile_relative_position(instance)
+    local intensity = 1 - instance.t / 10
+    shadows[pos] = intensity
   end
 end
 
